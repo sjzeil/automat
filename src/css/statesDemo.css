@@ -1,0 +1,11 @@
+.canvas1 {
+	width: 600px;
+	height: 400px;
+	border: 1px solid black;
+}
+
+.canvas2 {
+	width: 800px;
+	height: 600px;
+	border: 1px solid black;
+}
