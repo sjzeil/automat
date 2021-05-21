@@ -44,7 +44,24 @@ var State = fabric.util.createClass(fabric.Group, {
 			originY: 'center'
 		}));
 
-		this.callSuper('initialize', [this.circle, this.text], options);
+		this.set ('mainGroup',
+			new fabric.Group(
+				[this.circle, this.text],
+				{
+					top: 0
+				}
+			));
+
+		let annotText = options.annotation || "";
+		this.set('annotation', new fabric.Text(annotText, 
+			{
+				fontSize:this.text.fontSize,
+				fontFamily: 'monospace',
+				top: this.circle.height + State.rimOffSet
+			}));
+		this.annotation.left = -(this.annotation.width / 2);
+
+		this.callSuper('initialize', [this.mainGroup, this.annotation], options);
 		console.log ("initialized ");
 		this.dirty = true;
 	},
@@ -61,7 +78,7 @@ var State = fabric.util.createClass(fabric.Group, {
 		this.callSuper('render', ctx);
 		if (this.initial) {
 			ctx.beginPath();
-			var y = this.top + this.height/2;
+			var y = this.top + this.circle.height/2;
 			ctx.moveTo(this.left, y);
 			ctx.lineTo (this.left - State.initMarkerSize/2, y - State.initMarkerSize/2);
 			ctx.lineTo (this.left - State.initMarkerSize/2, y + State.initMarkerSize/2);
