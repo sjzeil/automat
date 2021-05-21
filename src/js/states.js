@@ -62,8 +62,6 @@ var State = fabric.util.createClass(fabric.Group, {
 		this.annotation.left = -(this.annotation.width / 2);
 
 		this.callSuper('initialize', [this.mainGroup, this.annotation], options);
-		console.log ("initialized ");
-		this.dirty = true;
 	},
 
 	toObject: function() {
@@ -90,7 +88,6 @@ var State = fabric.util.createClass(fabric.Group, {
 			var radius = this.width / 2;
 			var x = this.left + radius;
 			var y = this.top + radius;
-			console.log ("at " + x + "," + y + ": " + radius);
 			ctx.beginPath();
 			ctx.arc(x, y, radius-State.rimOffSet, 0, 2*Math.PI);
 			ctx.strokeStyle='black';
