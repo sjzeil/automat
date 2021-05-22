@@ -13,6 +13,7 @@ var State = fabric.util.createClass(fabric.Group, {
 		this.set('selected', options.selected || false);
 		this.set('final', options.final || false);
 		this.set('initial', options.initial || false);
+		this.set('hasControls', false);
 
 		this.set('text', new fabric.Text(
 			this.label,
