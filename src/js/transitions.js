@@ -1,5 +1,7 @@
 /**
- * State: an automaton state, displayed as a short string within a circle
+ * Transition: a potential change from one state to another.
+ * 
+ * Displayed as a labelled arrow between two states.
  *
  */
 
@@ -14,6 +16,7 @@ var Transition = fabric.util.createClass(fabric.Text, {
         this.set('label', options.label || '');
         this.set('curved', options.curved || false);
         this.set('selectable', true);
+        this.set('hasControls', false);
 
         if (fromState == toState) {
             this.curved = true;
@@ -36,17 +39,13 @@ var Transition = fabric.util.createClass(fabric.Text, {
         let angle = Math.atan2(dy, dx);
 
         if (this.from == this.to) {
-            console.log ('matched');
-
             angle = -Math.PI / 2.0;
         }
 
         let xc = (x0 + x1) / 2;
         let yc = (y0 + y1) / 2;
 
-        console.log ("angle: " + angle + "  offset: " + Transition.angleOffset);
         let exitAngle = angle - ((this.curved) ? Transition.angleOffset : 0);
-        console.log ("angle: " + angle + "  exit: " + exitAngle);
         let fromXc = this.from.left + this.from.circle.radius;
         let fromYc = this.from.top + this.from.circle.radius;
         let exitX = fromXc + this.from.circle.radius * Math.cos(exitAngle);
@@ -112,7 +111,6 @@ var Transition = fabric.util.createClass(fabric.Text, {
             // transition from a node to itself
 
             let entryAngle = exitAngle + 2.0 * Transition.angleOffset;
-            console.log ("angle: " + angle + "  exit: " + exitAngle + "  entry: " + entryAngle);
             let toXc = this.to.left + this.to.circle.radius;
             let toYc = this.to.top + this.to.circle.radius;
             let entryX = toXc + this.to.circle.radius * Math.cos(entryAngle);
@@ -120,9 +118,7 @@ var Transition = fabric.util.createClass(fabric.Text, {
 
             ctx.save();
             ctx.beginPath();
-            drawPoint(ctx, exitX, exitY, 'green');
-            drawPoint(ctx, entryX, entryY, 'red');
-
+            
             ctx.moveTo(exitX, exitY);
             ctx.bezierCurveTo(exitX-Transition.curveOffset, exitY-Transition.curveOffset,
                 entryX+Transition.curveOffset, entryY-Transition.curveOffset,
@@ -153,6 +149,7 @@ var Transition = fabric.util.createClass(fabric.Text, {
             this.top = this.from.top - this.from.circle.radius - 0.5 * textOffset  - this.height;
         }
 
+        this.setCoords();
         this.callSuper('render', ctx);
     },
 
