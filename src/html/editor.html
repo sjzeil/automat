@@ -1,0 +1,38 @@
+<html>
+  <head>
+	<title>Automat</title>
+	<link rel="stylesheet" href="../css/editor.css"/>
+  </head>
+  <body>
+	<h1>Automat</h1>
+	<script src="../../libs/fabric.js"> </script>
+	<script src="../js/states.js"> </script>
+	<script src="../js/transitions.js"> </script>
+	<script src="../js/automaton.js"> </script>
+	
+
+    <div id="editor" class="editor">
+      <div id="editorContainer" class="editorView">
+          <canvas id="editorView" height=600 width=600> </canvas>
+      </div>
+      <div id="editorControls" class="editorControls">
+        <div id="editorToolBar" class="editorToolBar">
+            <input type="button" value="Load"/>
+            <input type="button" value="Save"/>
+            <input type="button" value="+State"/>
+            <input type="button" value="+Transition"/>
+            <input type="button" value="Test"/>
+        </div>
+        <div id="stateEditor" class="editors">States</div>
+        <div id="transitionEditor" class="editors">Transitions</div>
+        <div id="messages" class="messages">
+            <b>Welcome to the Automat!</b>
+        </div>
+        
+      </div>
+    </div>
+
+    <script src="../js/editor.js"> </script>
+
+  </body>
+</html>
