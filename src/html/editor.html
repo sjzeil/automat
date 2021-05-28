@@ -57,7 +57,32 @@
             <input type="button" value="Delete" onclick="editor.deleteState()"/>
           </div>
         </div>
-        <div id="transitionEditor" class="editors">Transitions</div>
+        <div id="transitionEditor" class="editors">
+          <table>
+            <tr>
+              <td>
+                <span>Transition:</span>
+                <input type="text" id="transition_label" name="transition_label"/>
+              </td>
+              <td>
+                <select id="transition_selection" size="4" onchange="editor.selectedTransitionOption()">
+                  <option value="temp">temp</option>
+                </select>
+              </td>
+              <td>
+                <input type="button" value="Add" id="add_transition_label" onclick="editor.addTransitionOption()"/><br/>
+                <input type="button" value="Replace" id="edit_transition_label" onclick="editor.replaceTransitionOption()"/><br/>
+                <input type="button" value="Remove" id="remove_transition_label" onclick="editor.removeTransitionOption()"/><br/>
+                <input type="button" value="Up" id="up_transition_label" onclick="editor.upTransitionOption()"/><br/>
+                <input type="button" value="Down" id="down_transition_label" onclick="editor.downTransitionOption()"/>
+              </td>
+            </tr>
+          </table>
+          <div>
+            <input type="button" value="Apply" onclick="editor.applyTransitionChanges()"/>
+            <input type="button" value="Cancel" onclick="editor.fillTransitionEditor()"/>
+          </div>
+        </div>
         <div id="messages" class="messages">
             <b>Welcome to the Automat!</b>
         </div>

@@ -49,9 +49,8 @@ class Editor {
             let transitionEditor = document.getElementById('transitionEditor');
             stateEditor.style.display = 'block';
             transitionEditor.style.display = 'none';
-            this.displayMessage("Add, delete, or change states.");
         }
-
+        this.displayMessage("State: " + state.label);
         this._editing = state.renderingOf;
         this.fillStateEditor ();
         this.render();
@@ -92,9 +91,86 @@ class Editor {
             let transitionEditor = document.getElementById('transitionEditor');
             stateEditor.style.display = 'none';
             transitionEditor.style.display = 'block';
-            this.displayMessage("Add, delete, or change transitions.");
         }
+        this.displayMessage("From " + transition.from.label + " to " + transition.to.label);
+        this._editing = transition.renderingOf;
+        this.fillTransitionEditor ();
+        this.render();
+    }
 
+    fillTransitionEditor() {
+        let label = this._editing.label;
+        let options = label.split("\n");
+        let selector = document.getElementById('transition_selection');
+        while (selector.hasChildNodes()) {
+            selector.removeChild(selector.lastChild);
+        }
+        let trigger;
+        for (trigger of options) {
+            let newOption = document.createElement('option');
+            selector.appendChild(newOption);
+            newOption.innerHTML = trigger;
+        }
+    }
+
+    selectedTransitionOption() {
+        let selector = document.getElementById('transition_selection');
+        let selectedValue = selector.options[selector.selectedIndex].value;
+        let labelBox = document.getElementById('transition_label');
+        labelBox.value = selectedValue;
+    }
+
+    addTransitionOption() {
+        let selector = document.getElementById('transition_selection');
+        let selectedOption = selector.options[selector.selectedIndex];
+        let labelBox = document.getElementById('transition_label');
+        if (labelBox.value != '')
+        {
+            let newOption = document.createElement('option');
+            selector.appendChild(newOption);
+            newOption.innerHTML = labelBox.value;
+        }
+    }
+
+    replaceTransitionOption() {
+        let selector = document.getElementById('transition_selection');
+        let selectedOption = selector.options[selector.selectedIndex];
+        let labelBox = document.getElementById('transition_label');
+        if (labelBox.value == '')
+        {
+            this.removeTransitionOption();
+        } else {
+            selectedOption.innerHTML = labelBox.value;
+        }
+    }
+
+    removeTransitionOption() {
+        let selector = document.getElementById('transition_selection');
+        let selectedOption = selector.options[selector.selectedIndex];
+        let labelBox = document.getElementById('transition_label');
+        selector.removeChild(selectedOption);
+        labelBox.value="";
+    }
+
+    applyTransitionChanges() {
+        let selector = document.getElementById('transition_selection');
+        let options = selector.childNodes;
+        let option;
+        let label="";
+        let first=true;
+        for (option of options) {
+            if (!first) {
+                label += "\n";
+            }
+            first = false;
+            label += option.innerHTML;
+        }
+        if (label != '') {
+            this._editing.label = label;
+        } else {
+            this._automaton.removeTransition(this._editing);
+        }
+        this.render();
     }
 }
 

@@ -84,6 +84,13 @@ class Automaton {
         return t;
     }
 
+    removeTransition(transition)
+    {
+        let trRenderer = transition.getRendering();
+        this._canvas.remove(trRenderer);
+        this.transitions.splice(this.transitions.indexOf(transition), 1);
+    }
+
     findTransition (fromState, toState) {
         let tr;
         for (tr of this.transitions) {
