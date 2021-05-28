@@ -1,5 +1,5 @@
 /**
- * State: an automaton state, displayed as a short string within a circle
+ * State: rendering of an automaton state, displayed as a short string within a circle
  *
  */
 
@@ -17,9 +17,7 @@ var State = fabric.util.createClass(fabric.Group, {
 
 		this.set('text', new fabric.Text(
 			this.label,
-			{//left: options.left + 5,
-			 //top: options.top - 5,
-			 fontSize: 14,
+			{fontSize: 14,
 			 fontWeight: 'bold',
 			 originX: 'center',
 			 originY: 'center'
@@ -37,8 +35,6 @@ var State = fabric.util.createClass(fabric.Group, {
 
 		this.set ('circle', new fabric.Circle({
 			radius: radius,
-			//left: options.left,
-			//top: options.top + radius,
 			fill: ((this.selected) ? State.selectedColor: State.unselectedColor),
 			stroke: '#000000',
 			originX: 'center',
@@ -96,6 +92,28 @@ var State = fabric.util.createClass(fabric.Group, {
 		}
 	},
 
+	select: function(yesNo) {
+		this.fill = yesNo ? State.selectedColor: State.unselectedColor;
+	},
+
+	changeLabel(newLabel) {
+		if (this.label != newLabel) {
+			this.label = newLabel;
+			let newText = new fabric.Text(newLabel, {
+				fontSize: this.text.fontSize,
+				fontWeight: this.text.fontWeight,
+				fontFamily: this.text.fontFamily,
+				originX: 'center',
+			 	originY: 'center'
+			});
+			this.mainGroup.removeWithUpdate(this.text);
+
+			this.mainGroup.addWithUpdate(newText);
+			this.text = newText;
+			this.setCoords();
+		}
+	},
+
 	_render: function(ctx) {
 		this.callSuper('_render', ctx);
 		alert("in _render");
@@ -115,3 +133,95 @@ State.selectedColor = '#88FF88';
 State.unselectedColor = '#88FFFF';
 State.rimOffSet = 5;
 State.initMarkerSize = 3*State.rimOffSet;	
+
+
+/**
+ * A renderable state within an automaton
+ */
+ class AutomatonState extends RenderedElement {
+
+    constructor (label, canvas, renderingOptions) {
+        super(canvas);
+        this._label = label;
+        this._selected = false;
+        this._initial = false;
+        this._final = false;
+        this._annotation = "";
+        this._prepareRendering(renderingOptions);
+    }
+
+    _prepareRendering(renderingOptions)
+    {
+		let options = (renderingOptions) ? renderingOptions : {};
+		let left = (options.left) ? options.left : ((this.rendering) ? this.rendering.left : 50);
+		let top = (options.top) ? options.top : ((this.rendering) ? this.rendering.top : 50);
+		
+        let rendering = new State({
+            label: this.label,
+            selected: this.selected,
+            initial: this.initial,
+            final: this.final,
+            annotation : this.annotation,
+			left: left,
+			top: top
+        });
+        this.setRendering(rendering, false);
+    }
+
+    get label() {
+        return this._label;
+    }
+
+    set label(newLabel) {
+        if (newLabel != this._label) {
+			this._label = newLabel;
+            this._prepareRendering();
+        }
+    }
+
+    get annotation() {
+        return this._annotation;
+    }
+
+    set annotation(newAnnotation) {
+        if (newAnnotation != this._annotation) {
+            this._annotation = newAnnotation;
+            this._prepareRendering();
+        }
+    }
+
+    get selected() {
+        return this._selected;
+    }
+
+    set selected(selectionState) {
+        if (selectionState != this._selected) {
+            this._selected = selectionState;
+            this._prepareRendering();
+        }
+    }
+    
+    get initial() {
+        return this._initial;
+    }
+
+    set initial(initialState) {
+        if (initialState != this._initial) {
+            this._initial = initialState;
+            this._prepareRendering();
+        }
+    }
+    
+    get final() {
+        return this._final;
+    }
+
+    set final(finalState) {
+        if (finalState != this._final) {
+            this._final = finalState;
+            this._prepareRendering();
+        }
+    }
+    
+}
+

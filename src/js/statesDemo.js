@@ -12,6 +12,9 @@ canvas.add(state1);
 canvas.add(state2);
 canvas.add(state3);
 
+var state4 = new AutomatonState("4", canvas, {left: 100, top: 300});
+state4.selected = true;
+
 
 canvas.renderAll();
 

@@ -1,3 +1,6 @@
+
+
+
 /**
  * Automaton: a collection of states and transitions.
  * 
@@ -5,12 +8,13 @@
  */
 
 class Automaton {
-    constructor() {
+    constructor(canvas) {
         this.states = [];
         this.transitions = [];
+        this._canvas = canvas;
     }
 
-    addState(label) {
+    addState(x, y, label) {
         if (label == undefined) {
             let id = this.states.length;
             while (this.findState(""+id) != null) {
@@ -18,10 +22,12 @@ class Automaton {
             }
             label = "" + id;
         }
-        let newState = new State({label: label});
+        let newState = new AutomatonState(label, this._canvas, 
+            {
+                left: x,
+                top: y
+            });
         this.states.push(newState);
-        newState.left = 200 * Math.random();
-        newState.top = 200 * Math.random();
         return newState;
     }
 
@@ -32,6 +38,25 @@ class Automaton {
                 return s;
         }
         return null;
+    }
+
+    removeState (state) {
+        let tr;
+        let preservedTransitions = [];
+        for (tr of this.transitions) {
+            if (tr.to != state && tr.from != state) {
+                preservedTransitions.push(tr);
+            } else {
+                let trRenderer = tr.getRendering();
+                this._canvas.remove(trRenderer);
+            }
+        }
+        this.transitions = preservedTransitions;
+        let statePos = this.states.indexOf(state);
+        if (statePos >= 0) {
+            this.states.splice(statePos, 1);
+            this._canvas.remove(state.getRendering());
+        }
     }
 
     addTransition (fromState, toState, trigger) {
@@ -46,7 +71,7 @@ class Automaton {
                 
         let t = this.findTransition(from, to);
         if (t == null) {
-            t = new Transition(from, to, {label: trigger});
+            t = new AutomatonTransition(trigger, from, to, this._canvas);
             let tReverse = this.findTransition(to, from);
             if (tReverse != null) {
                 tReverse.curved = true;
@@ -67,19 +92,6 @@ class Automaton {
         }
         return null;
     }
-
-    render(canvas) {
-        let s;
-        for (s of this.states) {
-            console.log("s: " + s);
-            canvas.add(s);
-        }
-        let t;
-        for (t of this.transitions) {
-            canvas.add(t);
-        }
-    }
-
 
 
 }

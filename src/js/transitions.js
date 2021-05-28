@@ -1,5 +1,5 @@
 /**
- * Transition: a potential change from one state to another.
+ * Transition: rendering of a potential change from one state to another.
  * 
  * Displayed as a labelled arrow between two states.
  *
@@ -28,11 +28,11 @@ var Transition = fabric.util.createClass(fabric.Text, {
     },
 
     render: function (ctx) {
-        let x0 = this.from.left + this.from.circle.radius;
-        let y0 = this.from.top + this.from.circle.radius;
+        let x0 = this.from.rendering.left + this.from.rendering.circle.radius;
+        let y0 = this.from.rendering.top + this.from.rendering.circle.radius;
 
-        let x1 = this.to.left + this.to.circle.radius;
-        let y1 = this.to.top + this.to.circle.radius;
+        let x1 = this.to.rendering.left + this.to.rendering.circle.radius;
+        let y1 = this.to.rendering.top + this.to.rendering.circle.radius;
 
         let dx = x1 - x0;
         let dy = y1 - y0;
@@ -46,20 +46,20 @@ var Transition = fabric.util.createClass(fabric.Text, {
         let yc = (y0 + y1) / 2;
 
         let exitAngle = angle - ((this.curved) ? Transition.angleOffset : 0);
-        let fromXc = this.from.left + this.from.circle.radius;
-        let fromYc = this.from.top + this.from.circle.radius;
-        let exitX = fromXc + this.from.circle.radius * Math.cos(exitAngle);
-        let exitY = fromYc + this.from.circle.radius * Math.sin(exitAngle);
+        let fromXc = this.from.rendering.left + this.from.rendering.circle.radius;
+        let fromYc = this.from.rendering.top + this.from.rendering.circle.radius;
+        let exitX = fromXc + this.from.rendering.circle.radius * Math.cos(exitAngle);
+        let exitY = fromYc + this.from.rendering.circle.radius * Math.sin(exitAngle);
 
 
         
 
         if (this.from != this.to) {
             let entryAngle = angle + Math.PI + ((this.curved) ? Transition.angleOffset : 0);
-            let toXc = this.to.left + this.to.circle.radius;
-            let toYc = this.to.top + this.to.circle.radius;
-            let entryX = toXc + this.to.circle.radius * Math.cos(entryAngle);
-            let entryY = toYc + this.to.circle.radius * Math.sin(entryAngle);
+            let toXc = this.to.rendering.left + this.to.rendering.circle.radius;
+            let toYc = this.to.rendering.top + this.to.rendering.circle.radius;
+            let entryX = toXc + this.to.rendering.circle.radius * Math.cos(entryAngle);
+            let entryY = toYc + this.to.rendering.circle.radius * Math.sin(entryAngle);
 
             let arcOffset = ((this.curved) ? Transition.curveOffset : 0);
             let textOffset = ((this.curved) ? 0.75 * Transition.curveOffset : Transition.minTextOffset);
@@ -111,10 +111,10 @@ var Transition = fabric.util.createClass(fabric.Text, {
             // transition from a node to itself
 
             let entryAngle = exitAngle + 2.0 * Transition.angleOffset;
-            let toXc = this.to.left + this.to.circle.radius;
-            let toYc = this.to.top + this.to.circle.radius;
-            let entryX = toXc + this.to.circle.radius * Math.cos(entryAngle);
-            let entryY = toYc + this.to.circle.radius * Math.sin(entryAngle);
+            let toXc = this.to.rendering.left + this.to.rendering.circle.radius;
+            let toYc = this.to.rendering.top + this.to.rendering.circle.radius;
+            let entryX = toXc + this.to.rendering.circle.radius * Math.cos(entryAngle);
+            let entryY = toYc + this.to.rendering.circle.radius * Math.sin(entryAngle);
 
             ctx.save();
             ctx.beginPath();
@@ -124,9 +124,7 @@ var Transition = fabric.util.createClass(fabric.Text, {
                 entryX+Transition.curveOffset, entryY-Transition.curveOffset,
                 entryX, entryY);
             
-            //let yr = y0 - 2.0 * this.from.circle.radius;
-            //ctx.arc (x0, yr, this.from.circle.radius, entryAngle + Math.PI, entryAngle + 3.0*Math.PI - 2.0*Transition.angleOffset);
-
+            
             ctx.strokeStyle = 'black';
             ctx.stroke();
 
@@ -146,7 +144,7 @@ var Transition = fabric.util.createClass(fabric.Text, {
 
             let textOffset = Transition.curveOffset;
             this.left = x0 - this.width/2;
-            this.top = this.from.top - this.from.circle.radius - 0.5 * textOffset  - this.height;
+            this.top = this.from.rendering.top - this.from.rendering.circle.radius - 0.5 * textOffset  - this.height;
         }
 
         this.setCoords();
@@ -169,3 +167,56 @@ Transition.arrowSize = 8;
 Transition.minTextOffset = 5;
 Transition.curveOffset = 30;
 Transition.angleOffset = 2.0 * Math.PI * (15.0 / 360.0);
+
+
+
+
+/**
+ * A renderable transition within an automaton
+ */
+ class AutomatonTransition extends RenderedElement {
+
+    constructor (label, fromState, toState, canvas) {
+        super(canvas);
+        this._label = label;
+        this.from = fromState;
+        this.to = toState;
+        this._curved = false;
+        this._prepareRendering();
+    }
+
+    _prepareRendering()
+    {
+        let rendering = new Transition(this.from, this.to,
+            {
+            label: this._label,
+            curved: this._curved
+        });
+        this.setRendering(rendering, true);
+    }
+
+    get label() {
+        return this._label;
+    }
+
+    set label(newLabel) {
+        if (newLabel != this._label) {
+            this._label = newLabel;
+            this._prepareRendering();
+        }
+    }
+
+    get curved() {
+        return this._curved;
+    }
+
+    set curved(curvedState) {
+        if (curvedState != this._curved) {
+            this._curved = curvedState;
+            this._prepareRendering();
+        }
+    }
+
+    
+   
+}

@@ -6,6 +6,7 @@
   <body>
 	<h1>Automat</h1>
 	<script src="../../libs/fabric.js"> </script>
+	<script src="../js/renderedElement.js"> </script>
 	<script src="../js/states.js"> </script>
 	<script src="../js/transitions.js"> </script>
 	<script src="../js/automaton.js"> </script>
@@ -23,7 +24,39 @@
             <input type="button" value="+Transition"/>
             <input type="button" value="Test"/>
         </div>
-        <div id="stateEditor" class="editors">States</div>
+        <div id="stateEditor" class="editors">
+          <table>
+            <tr>
+              <td>
+                Label:
+              </td>
+              <td>
+                <input type="text" id="state_label" name="state_label"/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Initial?
+              </td>
+              <td>
+                <input type="checkbox" id="stateIsInitial" name="stateIsInitial" value="initial"/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Final?
+              </td>
+              <td>
+                <input type="checkbox" id="stateIsFinal" name="stateIsFinal" value="final"/>
+              </td>
+            </tr>
+          </table>
+          <div>
+            <input type="button" value="Apply" onclick="editor.applyStateChanges()"/>
+            <input type="button" value="Cancel" onclick="editor.fillStateEditor()"/>
+            <input type="button" value="Delete" onclick="editor.deleteState()"/>
+          </div>
+        </div>
         <div id="transitionEditor" class="editors">Transitions</div>
         <div id="messages" class="messages">
             <b>Welcome to the Automat!</b>

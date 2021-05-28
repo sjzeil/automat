@@ -1,6 +1,6 @@
 var canvas = new fabric.Canvas('automatonDemo');
 
-var autom = new Automaton();
+var autom = new Automaton(canvas);
 
 canvas.on('mouse:down', function(event) {
     if (event.target) {
@@ -13,9 +13,9 @@ canvas.on('mouse:down', function(event) {
 {
     let s = autom.addState();
     console.log ("Added " + s + " with label " + s.label);
-    autom.addState();
-    autom.addState();
-    autom.addState();
+    autom.addState(200 * Math.random(), 200 * Math.random());
+    autom.addState(200 * Math.random(), 200 * Math.random());
+    autom.addState(200 * Math.random(), 200 * Math.random());
 }
 
 {
@@ -31,7 +31,6 @@ canvas.on('mouse:down', function(event) {
     }
 }
 
-autom.render(canvas);
 
 canvas.renderAll();
 
