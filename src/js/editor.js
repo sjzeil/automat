@@ -32,6 +32,37 @@ class ComponentEditor {
 
 }
 
+class StateAdder extends ComponentEditor {
+    constructor(editor,automaton) {
+        super(editor,automaton);
+        this.type = this.appliesTo();
+    }
+
+
+
+    appliesTo() {
+        return 'StateAdder';
+    }
+
+    reveal(rendering) {
+        this.editor.displayMessage("Click to position new state.");
+    }
+
+    hide() {
+    }
+
+    
+    fill() {
+        let state = this.editor.editing;
+        this.editor.awaitingClick = true;
+    }
+
+    clicked(x, y) {
+        let newState = this.automaton.addState(x,y);
+        this.editor.selected(newState.rendering);
+    }
+}
+
 class StateEditor extends  ComponentEditor {
     constructor(editor,automaton) {
         super(editor,automaton);
@@ -79,6 +110,49 @@ class StateEditor extends  ComponentEditor {
     }
 }
 
+
+class TransitionAdder extends ComponentEditor {
+    constructor(editor,automaton) {
+        super(editor,automaton);
+        this.type = this.appliesTo();
+        this.from = null;
+        this.to = null;
+    }
+
+
+
+    appliesTo() {
+        return 'TransitionAdder';
+    }
+
+    reveal(rendering) {
+        this.editor.displayMessage("Click on a state to select the source of this transition.");
+    }
+
+    hide() {
+    }
+
+    
+    fill() {
+        this.editor.awaitingState = true;
+    }
+
+    clickedOnState(state) {
+        if (!this.from) {
+            this.from = state.renderingOf;
+            this.editor.displayMessage("Click on a state to select the destination of this transition.");
+            this.editor.awaitingState = true;
+        } else {
+            this.to = state.renderingOf;
+            let tr = this.automaton.findTransition(this.from,this.to);
+            if (!tr) {
+                tr = this.automaton.addTransition(this.from.label, this.to.label, '?');
+            }
+            this.editor.selected(tr.getRendering());
+            this.from = this.to = null;    
+        }
+    }
+}
 
 
 class TransitionEditor extends  ComponentEditor {
@@ -198,6 +272,8 @@ class Editor {
 
         this._editors.stateEditor = new StateEditor(this, this._automaton);
         this._editors.transitionEditor =  new TransitionEditor(this, this._automaton);
+        this._editors.stateAdder = new StateAdder(this, this._automaton);
+        this._editors.transitionAdder = new TransitionAdder(this, this._automaton);
         this.status = 'new';
         this.activeEditor = null;
         this.selected(this);
@@ -249,11 +325,35 @@ class Editor {
         }
     }
 
+    clicked(x, y) {
+        if (this.awaitingClick) {
+            this.activeEditor.clicked(x,y);
+            this.awaitingClick = false;
+        }
+    }
+
+    clickedOnState(state) {
+        if (this.awaitingState) {
+            this.awaitingState = false;
+            this.activeEditor.clickedOnState(state);
+        }
+    }
+
     displayMessage(msg) {
         let msgsDiv = document.getElementById('messages');
         msgsDiv.innerHTML = msg;
     }
 
+
+    addState()
+    {
+        this.selected(this._editors.stateAdder);
+    }
+
+    addTransition()
+    {
+        this.selected(this._editors.transitionAdder);
+    }
 }
 
 var editor = new Editor(canvas);
@@ -261,7 +361,13 @@ var editor = new Editor(canvas);
 
 canvas.on('mouse:down', function(event) {
     if (event.target) {
-        editor.selected(event.target);
+        if (editor.awaitingState && event.target.type == 'State') {
+            editor.clickedOnState(event.target);
+        } else {
+            editor.selected(event.target);
+        }
+    } else {
+        editor.clicked(event.e.offsetX, event.e.offsetY);
     }
   });
 
