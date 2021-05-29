@@ -1,105 +1,109 @@
 var canvas = new fabric.Canvas('editorView');
 
-
-
-
-class Editor {
-    constructor(canvas) {
-        this._canvas = canvas;
-        this._automaton = new Automaton(canvas);
-        this._automaton.addState(100, 100);
-        this._automaton.addState(200, 200);
-        this._automaton.addTransition("0", "1", "0 => 1");
-        this._automaton.addTransition("1", "0", "1 => 0");
-        this._automaton.addTransition("1", "1", "1 => 1");
-        this._status = 'new';
+class ComponentEditor {
+    constructor(editor,automaton) {
+        this.editor = editor;
+        this.automaton = automaton;
     }
 
-    render() {
-        this._canvas.renderAll();
+    appliesTo() {
+        return 'None';
     }
 
-    logCanvasContents() {
-        let ctr = 0;
-        this._canvas.getObjects().forEach (
-            function (targ) {
-                ++ctr;
+    activateEditorFor(rendering) {
+        if (rendering.type == this.appliesTo()) {
+            if (this.editor.status != this.appliesTo) {
+                this.reveal(rendering);
             }
-        );
-        console.log("Canvas has " + ctr + " objects");
-    }
-
-    selected(target) {
-        if (target.type == "State") {
-            this.startStateEditor(target);
-        } else if (target.type == "Transition") {
-            this.startTransitionEditor(target);
+            return true;
+        } else {
+            this.hide();
+            return false;
         }
     }
 
-    displayMessage(msg) {
-        let msgsDiv = document.getElementById('messages');
-        msgsDiv.innerHTML = msg;
+    fill(rendering) {
+
     }
 
-    startStateEditor(state) {
-        if (this._status != 'stateEditor') {
-            this._status = 'stateEditor';
-            let stateEditor = document.getElementById('stateEditor');
-            let transitionEditor = document.getElementById('transitionEditor');
-            stateEditor.style.display = 'block';
-            transitionEditor.style.display = 'none';
-        }
-        this.displayMessage("State: " + state.label);
-        this._editing = state.renderingOf;
-        this.fillStateEditor ();
-        this.render();
+    apply() {
+
+    }
+
+}
+
+class StateEditor extends  ComponentEditor {
+    constructor(editor,automaton) {
+        super(editor,automaton);
+    }
+
+    appliesTo() {
+        return 'State';
+    }
+
+    reveal(rendering) {
+        let stateEditor = document.getElementById('stateEditor');
+        stateEditor.style.display = 'block';
+        this.editor.displayMessage("State: " + rendering.label);
+    }
+
+    hide() {
+        let stateEditor = document.getElementById('stateEditor');
+        stateEditor.style.display = 'none';
     }
 
     
-    fillStateEditor() {
-        document.getElementById('state_label').value = this._editing.label;
-        document.getElementById('stateIsFinal').checked = this._editing.final;
-        document.getElementById('stateIsInitial').checked = this._editing.initial;
+    fill() {
+        let state = this.editor.editing;
+        document.getElementById('state_label').value = state.label;
+        document.getElementById('stateIsFinal').checked = state.final;
+        document.getElementById('stateIsInitial').checked = state.initial;
     }
 
-    applyStateChanges() {
-        let s = this._editing;
+    apply() {
+        let s = this.editor.editing;
         s.label = document.getElementById('state_label').value;
         s.final = document.getElementById('stateIsFinal').checked;
         s.initial = document.getElementById('stateIsInitial').checked;
-        this.render();
+        this.editor.render();
     }
 
     deleteState() {
-        if (this._editing) {
-            let removed = this._editing;
-            this._automaton.removeState(this._editing);
-            this._editing = null;
-            let stateEditor = document.getElementById('stateEditor');
-            stateEditor.style.display = 'none';
-            this.displayMessage("Removed state " + removed.label);
-            this._status = "";
-            this._canvas.renderAll();
+        if (this.editor.editing) {
+            let removed = this.editor.editing;
+            this.automaton.removeState(this.editor.editing);
+            this.editor.reset();
+            this.editor.displayMessage("Removed state " + removed.label);
+            this.editor.render();
         }
     }
+}
 
-    startTransitionEditor(transition) {
-        if (this._status != 'transitionEditor') {
-            this._status = 'transitionEditor';
-            let stateEditor = document.getElementById('stateEditor');
-            let transitionEditor = document.getElementById('transitionEditor');
-            stateEditor.style.display = 'none';
-            transitionEditor.style.display = 'block';
-        }
-        this.displayMessage("From " + transition.from.label + " to " + transition.to.label);
-        this._editing = transition.renderingOf;
-        this.fillTransitionEditor ();
-        this.render();
+
+
+class TransitionEditor extends  ComponentEditor {
+    constructor(editor,automaton) {
+        super(editor,automaton);
     }
 
-    fillTransitionEditor() {
-        let label = this._editing.label;
+    appliesTo() {
+        return 'Transition';
+    }
+
+    reveal(rendering) {
+        let transitionEditor = document.getElementById('transitionEditor');
+        transitionEditor.style.display = 'block';
+        this.editor.displayMessage("From " + rendering.from.label + " to " + rendering.to.label);
+    }
+
+    hide() {
+        let transitionEditor = document.getElementById('transitionEditor');
+        transitionEditor.style.display = 'none';
+    }
+
+    
+    fill() {
+        let label = this.editor.editing.label;
         let options = label.split("\n");
         let selector = document.getElementById('transition_selection');
         while (selector.hasChildNodes()) {
@@ -152,7 +156,10 @@ class Editor {
         labelBox.value="";
     }
 
-    applyTransitionChanges() {
+
+
+
+    apply() {
         let selector = document.getElementById('transition_selection');
         let options = selector.childNodes;
         let option;
@@ -166,12 +173,87 @@ class Editor {
             label += option.innerHTML;
         }
         if (label != '') {
-            this._editing.label = label;
+            this.editor.editing.label = label;
         } else {
-            this._automaton.removeTransition(this._editing);
+            let removed = this.editor.editing;
+            this.automaton.removeTransition(removed);
+            this.editor.reset();
+            this.editor.displayMessage("Removed transition from " + removed.from.label + " to " + removed.to.label);
+            this.editor.render();
+
         }
-        this.render();
+        this.editor.render();
     }
+
+}
+
+
+
+
+class Editor {
+    constructor(canvas) {
+        this._canvas = canvas;
+        this._automaton = new Automaton(canvas);
+        this._editors = {};
+
+        this._editors.stateEditor = new StateEditor(this, this._automaton);
+        this._editors.transitionEditor =  new TransitionEditor(this, this._automaton);
+        this.status = 'new';
+        this.activeEditor = null;
+        this.selected(this);
+
+        this._automaton.addState(100, 100);
+        this._automaton.addState(200, 200);
+        this._automaton.addTransition("0", "1", "0 => 1");
+        this._automaton.addTransition("1", "0", "1 => 0");
+        this._automaton.addTransition("1", "1", "1 => 1");
+    }
+
+    render() {
+        this._canvas.renderAll();
+    }
+
+    logCanvasContents() {
+        let ctr = 0;
+        this._canvas.getObjects().forEach (
+            function (targ) {
+                ++ctr;
+            }
+        );
+        console.log("Canvas has " + ctr + " objects");
+    }
+
+    reset() {
+        let editor;
+        for (const editor in this._editors) {
+            this._editors[editor].hide();
+        }
+        this.editing = null;
+        this.activeEditor = null;
+        this.status = '';
+    }
+
+    selected(target) {
+        let editor;
+        for (const editor in this._editors) {
+            let componentEditor = this._editors[editor];
+            if (componentEditor) {
+               let active = componentEditor.activateEditorFor(target);
+                if (active) {
+                    this.status = componentEditor.appliesTo();
+                    this.activeEditor = componentEditor;
+                    this.editing = target.renderingOf;
+                    componentEditor.fill();
+                }
+            }
+        }
+    }
+
+    displayMessage(msg) {
+        let msgsDiv = document.getElementById('messages');
+        msgsDiv.innerHTML = msg;
+    }
+
 }
 
 var editor = new Editor(canvas);

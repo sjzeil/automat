@@ -52,9 +52,9 @@
             </tr>
           </table>
           <div>
-            <input type="button" value="Apply" onclick="editor.applyStateChanges()"/>
-            <input type="button" value="Cancel" onclick="editor.fillStateEditor()"/>
-            <input type="button" value="Delete" onclick="editor.deleteState()"/>
+            <input type="button" value="Apply" onclick="editor.activeEditor.apply()"/>
+            <input type="button" value="Cancel" onclick="editor.activeEditor.fill()"/>
+            <input type="button" value="Delete" onclick="editor.activeEditor.deleteState()"/>
           </div>
         </div>
         <div id="transitionEditor" class="editors">
@@ -65,22 +65,22 @@
                 <input type="text" id="transition_label" name="transition_label"/>
               </td>
               <td>
-                <select id="transition_selection" size="4" onchange="editor.selectedTransitionOption()">
+                <select id="transition_selection" size="4" onchange="editor.activeEditor.selectedTransitionOption()">
                   <option value="temp">temp</option>
                 </select>
               </td>
               <td>
-                <input type="button" value="Add" id="add_transition_label" onclick="editor.addTransitionOption()"/><br/>
-                <input type="button" value="Replace" id="edit_transition_label" onclick="editor.replaceTransitionOption()"/><br/>
-                <input type="button" value="Remove" id="remove_transition_label" onclick="editor.removeTransitionOption()"/><br/>
-                <input type="button" value="Up" id="up_transition_label" onclick="editor.upTransitionOption()"/><br/>
-                <input type="button" value="Down" id="down_transition_label" onclick="editor.downTransitionOption()"/>
+                <input type="button" value="Add" id="add_transition_label" onclick="editor.activeEditor.addTransitionOption()"/><br/>
+                <input type="button" value="Replace" id="edit_transition_label" onclick="editor.activeEditor.replaceTransitionOption()"/><br/>
+                <input type="button" value="Remove" id="remove_transition_label" onclick="editor.activeEditor.removeTransitionOption()"/><br/>
+                <input type="button" value="Up" id="up_transition_label" onclick="editor.activeEditor.upTransitionOption()"/><br/>
+                <input type="button" value="Down" id="down_transition_label" onclick="editor.activeEditor.downTransitionOption()"/>
               </td>
             </tr>
           </table>
           <div>
-            <input type="button" value="Apply" onclick="editor.applyTransitionChanges()"/>
-            <input type="button" value="Cancel" onclick="editor.fillTransitionEditor()"/>
+            <input type="button" value="Apply" onclick="editor.activeEditor.apply()"/>
+            <input type="button" value="Cancel" onclick="editor.activeEditor.fill()"/>
           </div>
         </div>
         <div id="messages" class="messages">
