@@ -1,9 +1,9 @@
 var canvas = new fabric.Canvas('editorView');
 
 class ComponentEditor {
-    constructor(editor,automaton) {
+    constructor(editor,formalLanguage) {
         this.editor = editor;
-        this.automaton = automaton;
+        this.formalLanguage = formalLanguage;
     }
 
     appliesTo() {
@@ -33,8 +33,8 @@ class ComponentEditor {
 }
 
 class StateAdder extends ComponentEditor {
-    constructor(editor,automaton) {
-        super(editor,automaton);
+    constructor(editor,formalLanguage) {
+        super(editor,formalLanguage);
         this.type = this.appliesTo();
     }
 
@@ -58,14 +58,14 @@ class StateAdder extends ComponentEditor {
     }
 
     clicked(x, y) {
-        let newState = this.automaton.addState(x,y);
+        let newState = this.formalLanguage.addState(x,y);
         this.editor.selected(newState.rendering);
     }
 }
 
 class StateEditor extends  ComponentEditor {
-    constructor(editor,automaton) {
-        super(editor,automaton);
+    constructor(editor,formalLanguage) {
+        super(editor,formalLanguage);
     }
 
     appliesTo() {
@@ -102,7 +102,7 @@ class StateEditor extends  ComponentEditor {
     deleteState() {
         if (this.editor.editing) {
             let removed = this.editor.editing;
-            this.automaton.removeState(this.editor.editing);
+            this.formalLanguage.removeState(this.editor.editing);
             this.editor.reset();
             this.editor.displayMessage("Removed state " + removed.label);
             this.editor.render();
@@ -112,8 +112,8 @@ class StateEditor extends  ComponentEditor {
 
 
 class TransitionAdder extends ComponentEditor {
-    constructor(editor,automaton) {
-        super(editor,automaton);
+    constructor(editor,formalLanguage) {
+        super(editor,formalLanguage);
         this.type = this.appliesTo();
         this.from = null;
         this.to = null;
@@ -144,9 +144,9 @@ class TransitionAdder extends ComponentEditor {
             this.editor.awaitingState = true;
         } else {
             this.to = state.renderingOf;
-            let tr = this.automaton.findTransition(this.from,this.to);
+            let tr = this.formalLanguage.findTransition(this.from,this.to);
             if (!tr) {
-                tr = this.automaton.addTransition(this.from.label, this.to.label, '?');
+                tr = this.formalLanguage.addTransition(this.from.label, this.to.label, '?');
             }
             this.editor.selected(tr.getRendering());
             this.from = this.to = null;    
@@ -156,8 +156,8 @@ class TransitionAdder extends ComponentEditor {
 
 
 class TransitionEditor extends  ComponentEditor {
-    constructor(editor,automaton) {
-        super(editor,automaton);
+    constructor(editor,formalLanguage) {
+        super(editor,formalLanguage);
     }
 
     appliesTo() {
@@ -250,7 +250,7 @@ class TransitionEditor extends  ComponentEditor {
             this.editor.editing.label = label;
         } else {
             let removed = this.editor.editing;
-            this.automaton.removeTransition(removed);
+            this.formalLanguage.removeTransition(removed);
             this.editor.reset();
             this.editor.displayMessage("Removed transition from " + removed.from.label + " to " + removed.to.label);
             this.editor.render();
@@ -262,27 +262,71 @@ class TransitionEditor extends  ComponentEditor {
 }
 
 
+class URLLoader extends ComponentEditor {
+    constructor(editor,formalLanguage) {
+        super(editor,formalLanguage);
+        this.type = this.appliesTo();
+    }
+
+
+
+    appliesTo() {
+        return 'SavedURL';
+    }
+
+    reveal(rendering) {
+        let transitionEditor = document.getElementById('urlLoader');
+        transitionEditor.style.display = 'block';
+        this.editor.displayMessage("Paste a saved language description into the box above and click Apply.");
+    }
+
+    hide() {
+        let transitionEditor = document.getElementById('urlLoader');
+        transitionEditor.style.display = 'none';
+    }
+
+    
+    fill() {
+    }
+
+    apply() {
+        let urlBox = document.getElementById('savedURLText');
+        let savedURL = urlBox.value;
+        let pattern = '?lang=';
+        debugger;
+        let dataStart = savedURL.indexOf(pattern);
+        if (dataStart >= 0) {
+            savedURL = savedURL.substring(dataStart + pattern.length);
+        }
+        let decoded = LZUTF8.decompress(savedURL, {inputEncoding: "Base64"});
+        let langObject = JSON.parse(decoded);
+        this.editor.load(langObject);
+        this.status = 'new';
+        this.editor.selected(this.editor);
+    }
+}
 
 
 class Editor {
     constructor(canvas) {
         this._canvas = canvas;
-        this._automaton = new Automaton(canvas);
+        this._formalLanguage = new Automaton(canvas);
         this._editors = {};
 
-        this._editors.stateEditor = new StateEditor(this, this._automaton);
-        this._editors.transitionEditor =  new TransitionEditor(this, this._automaton);
-        this._editors.stateAdder = new StateAdder(this, this._automaton);
-        this._editors.transitionAdder = new TransitionAdder(this, this._automaton);
+        this._editors.stateEditor = new StateEditor(this, this._formalLanguage);
+        this._editors.transitionEditor =  new TransitionEditor(this, this._formalLanguage);
+        this._editors.stateAdder = new StateAdder(this, this._formalLanguage);
+        this._editors.transitionAdder = new TransitionAdder(this, this._formalLanguage);
+        this._editors.urlLoader = new URLLoader(this, this._formalLanguage);
         this.status = 'new';
         this.activeEditor = null;
         this.selected(this);
 
-        this._automaton.addState(100, 100);
-        this._automaton.addState(200, 200);
-        this._automaton.addTransition("0", "1", "0 => 1");
-        this._automaton.addTransition("1", "0", "1 => 0");
-        this._automaton.addTransition("1", "1", "1 => 1");
+        this._formalLanguage.addState(100, 100);
+        this._formalLanguage.addState(200, 200);
+        this._formalLanguage.addTransition("0", "1", "0 => 1");
+        this._formalLanguage.addTransition("1", "0", "1 => 0");
+        this._formalLanguage.addTransition("1", "1", "1 => 1");
     }
 
     render() {
@@ -353,6 +397,31 @@ class Editor {
     addTransition()
     {
         this.selected(this._editors.transitionAdder);
+    }
+
+    saveLanguage(url) {
+        let json = this._formalLanguage.toJSon();
+        let trimmedURL = url.split('?')[0];
+        let encoded = LZUTF8.compress(json, {outputEncoding: "Base64"});
+        let newURL = trimmedURL + '?lang=' + encoded;
+        let msg = "<div>Save your language description by bookmarking this link for your <a href='"
+            + newURL + "'>" + this._formalLanguage.representation() + "</a> or by right-clicking on" 
+            + " it, copying the link URL, and then pasting it into a document of your choice."
+            + "</div>"
+            + "<div style='overflow-wrap: break-word;'>" + newURL + "</div>";
+        this.displayMessage(msg);
+    }
+
+    loadLanguage() {
+        this.selected(this._editors.urlLoader);
+    }
+
+    load(json) {
+        this._formalLanguage.clear();
+        if (json.representation == 'formalLanguage') {
+            this._formalLanguage = new Automaton(this._canvas);
+            this._formalLanguage.fromJSon(json);
+        }
     }
 }
 

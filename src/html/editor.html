@@ -5,10 +5,12 @@
   </head>
   <body>
 	<h1>Automat</h1>
+  <script src="https://cdn.jsdelivr.net/npm/lzutf8/build/production/lzutf8.min.js"> </script>
 	<script src="../../libs/fabric.js"> </script>
 	<script src="../js/renderedElement.js"> </script>
 	<script src="../js/states.js"> </script>
 	<script src="../js/transitions.js"> </script>
+  <script src="../js/formalLanguage.js"> </script>
 	<script src="../js/automaton.js"> </script>
 	
 
@@ -18,8 +20,8 @@
       </div>
       <div id="editorControls" class="editorControls">
         <div id="editorToolBar" class="editorToolBar">
-            <input type="button" value="Load"/>
-            <input type="button" value="Save"/>
+            <input type="button" value="Load" onclick="editor.loadLanguage()"/>
+            <input type="button" value="Save" onclick="editor.saveLanguage(document.URL)"/>
             <input type="button" value="+State" onclick="editor.addState()"/>
             <input type="button" value="+Transition" onclick="editor.addTransition()"/>
             <input type="button" value="Test"/>
@@ -83,6 +85,22 @@
             <input type="button" value="Cancel" onclick="editor.activeEditor.fill()"/>
           </div>
         </div>
+
+        <div id="urlLoader" class="editors">
+          <table>
+            <tr>
+              <td>
+                <span>Load a formal language:</span>
+                <textarea id="savedURLText" rows="8" cols="40"></textarea>
+              </td>
+            </tr>
+          </table>
+          <div>
+            <input type="button" value="Apply" onclick="editor.activeEditor.apply()"/>
+          </div>
+        </div>
+
+
         <div id="messages" class="messages">
             <b>Welcome to the Automat!</b>
         </div>

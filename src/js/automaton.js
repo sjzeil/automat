@@ -1,17 +1,23 @@
 
-
-
 /**
  * Automaton: a collection of states and transitions.
  * 
  *
  */
 
-class Automaton {
+class Automaton extends FormalLanguage {
     constructor(canvas) {
+        super(canvas);
         this.states = [];
         this.transitions = [];
-        this._canvas = canvas;
+    }
+
+    representation() {
+        return "automaton";
+    }
+
+    automatonType() {
+        return "FiniteAutomaton";
     }
 
     addState(x, y, label) {
@@ -59,6 +65,12 @@ class Automaton {
         }
     }
 
+    clear () {
+        while (this.states.length > 0) {
+            this.removeState(this.states[this.states.length-1]);
+        }
+    }
+
     addTransition (fromState, toState, trigger) {
         let from = this.findState(fromState);
         if (from == null) {
@@ -100,5 +112,53 @@ class Automaton {
         return null;
     }
 
+    toJSon() {
+        let stateList = [];
+        let state;
+        for (state of this.states) {
+            let stateObj = {
+                label: state.label,
+                left: state._rendering.left,
+                top: state._rendering.top,
+                initial: state.initial,
+                final: state.final,
+            };
+            stateList.push(stateObj);
+        }
+        let transitionList = [];
+        let transition;
+        for (transition of this.transitions) {
+            let transObj = {
+                from: transition.from.label,
+                to: transition.to.label,
+                label: transition.label,
+            };
+            transitionList.push(transObj);
+        }
+
+        let object = {
+            representation: this.representation(),
+            automatonType: this.automatonType(),
+            states: stateList,
+            transitions: transitionList,
+        };
+        return JSON.stringify(object);
+    }
+
+    fromJSon(jsonObj) {
+        this.clear();
+        let state;
+        for (state of jsonObj.states) {
+            let newState = this.addState(state.left, state.top, state.label);
+            newState.initial = state.initial;
+            newState.final = state.final;
+        }
+        let transition;
+        for (transition of jsonObj.transitions) {
+            let fromState = this.findState(transition.from);
+            let toState = this.findState(transition.to);
+            this.addTransition(transition.from, transition.to, transition.label);
+        }
+    }
 
 }
