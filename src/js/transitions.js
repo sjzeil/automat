@@ -23,7 +23,7 @@ var Transition = fabric.util.createClass(fabric.Text, {
         }
 
         this.callSuper('initialize', this.label,
-            { fontSize: 13, fontFamily: "cursive" });
+            { fontSize: 14, fontFamily: "sans serif" });
 
     },
 

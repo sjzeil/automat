@@ -20,12 +20,31 @@
       </div>
       <div id="editorControls" class="editorControls">
         <div id="editorToolBar" class="editorToolBar">
-            <input type="button" value="Load" onclick="editor.loadLanguage()"/>
+          <input type="button" value="New" onclick="editor.newLanguage()"/>
+          <input type="button" value="Load" onclick="editor.loadLanguage()"/>
             <input type="button" value="Save" onclick="editor.saveLanguage(document.URL)"/>
+            <!--
             <input type="button" value="+State" onclick="editor.addState()"/>
             <input type="button" value="+Transition" onclick="editor.addTransition()"/>
+            -->
             <input type="button" value="Test"/>
         </div>
+        <div id="addAutomata" class="editorToolBar">
+          <input type="button" value="+State" onclick="editor.addState()"/>
+          <input type="button" value="+Transition" onclick="editor.addTransition()"/>
+        </div>
+        
+        <div id="newLanguageEditor" class="editors">
+          Create a new...
+          <div style="text-align: center;">
+            <input type="button" value="Finite Automaton" onclick="editor.newFA()"/>
+            <input type="button" value="Regular Expression" onclick="editor.newRE()"/><br/>
+            <input type="button" value="Context-Free Grammar" onclick="editor.newCFG()"/>
+            <input type="button" value="Push-Down Automaton" onclick="editor.newPDA()"/><br/>
+            <input type="button" value="Turing Machine" onclick="editor.newTM()"/>
+          </div>
+        </div>
+
         <div id="stateEditor" class="editors">
           <table>
             <tr>
@@ -108,7 +127,8 @@
       </div>
     </div>
 
-    <script src="../js/editor.js"> </script>
+<script src="../js/faEditors.js"> </script>
+<script src="../js/editor.js"> </script>
 
   </body>
 </html>
