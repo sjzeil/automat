@@ -6,7 +6,7 @@ body
   margin:     0;
 }
 
-.editorView {
+.editorCanvas {
 	width: 600px;
 	height: 600px;
     float: left;
@@ -18,7 +18,7 @@ body
     text-align: center;
 }
 
-.editorControls {
+.editorView {
 	border: 1px solid black;
     background-color: #A0A0A0;
 }
