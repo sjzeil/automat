@@ -1,0 +1,53 @@
+plugins {
+    id "com.github.node-gradle.node" version "3.1.0"
+}
+
+defaultTasks 'clean', 'build'
+
+node {
+    version="16.1.0"
+}
+
+
+task buildReactApp(type: NpxTask, dependsOn: 'npmInstall') {
+    command = 'webpack'
+    args = [
+            '--config', './webpack.dev.js'
+    ]
+}
+
+task buildReactAppProduction(type: NpxTask, dependsOn: 'npmInstall') {
+    command = 'webpack'
+    args = [
+            '--config', './webpack.prod.js'
+    ]
+}
+
+task copyResources (type: Copy) {
+	from 'src/editor/resources'
+	into './build/dist'
+}
+
+task build {
+	 description = 'Build the development bundle'
+	 group = build
+	 dependsOn = ['buildReactApp', 'copyResources']
+}
+
+task production	 {
+	 description = 'Build the production bundle'
+	 group = build
+	 dependsOn = ['buildReactAppProduction', 'copyResources']
+}
+
+
+task clean (type: Delete) {
+	delete './build/dist'
+	followSymlinks = true
+}
+
+task cleaner (type: Delete, dependsOn: 'clean') {
+	delete 'node_modules'
+	followSymlinks = true
+}
+

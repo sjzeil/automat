@@ -1,10 +1,11 @@
 <html>
   <head>
 	<title>Automat</title>
-	<link rel="stylesheet" href="../css/editor.css"/>
+	<link rel="stylesheet" href="editor.css"/>
   </head>
   <body>
-	<h1>Automat</h1>
+	<h1>Automat Formal Language Editor</h1>
+	<!--
   <script src="https://cdn.jsdelivr.net/npm/lzutf8/build/production/lzutf8.min.js"> </script>
 	<script src="../../libs/fabric.js"> </script>
 	<script src="../js/renderedElement.js"> </script>
@@ -12,21 +13,20 @@
 	<script src="../js/transitions.js"> </script>
   <script src="../js/formalLanguage.js"> </script>
 	<script src="../js/automaton.js"> </script>
-	
+  <script src="../js/faEditors.js"> </script>
+  <script src="../js/editor.js"> </script>
+    -->
 
-    <div id="editor" class="editor">
-      <div id="editorContainer" class="editorView">
-          <canvas id="editorView" height=600 width=600> </canvas>
-      </div>
+    <div id="editorContainer" class="editorView">
+      <canvas id="editorView" height=600 width=600> </canvas>
+    </div>
+	<div id="react-entry-point"></div>
+	<!--
       <div id="editorControls" class="editorControls">
         <div id="editorToolBar" class="editorToolBar">
           <input type="button" value="New" onclick="editor.newLanguage()"/>
           <input type="button" value="Load" onclick="editor.loadLanguage()"/>
             <input type="button" value="Save" onclick="editor.saveLanguage(document.URL)"/>
-            <!--
-            <input type="button" value="+State" onclick="editor.addState()"/>
-            <input type="button" value="+Transition" onclick="editor.addTransition()"/>
-            -->
             <input type="button" value="Test"/>
         </div>
         <div id="addAutomata" class="editorToolBar">
@@ -125,10 +125,32 @@
         </div>
         
       </div>
-    </div>
+-->
 
-<script src="../js/faEditors.js"> </script>
-<script src="../js/editor.js"> </script>
+<!--
+<script>
+  var canvas = new fabric.Canvas('editorView');
+var editor = new Editor(canvas);
 
+
+canvas.on('mouse:down', function(event) {
+    if (event.target) {
+        if (editor.awaitingState && event.target.type == 'State') {
+            editor.clickedOnState(event.target);
+        } else {
+            editor.selected(event.target);
+        }
+    } else {
+        editor.clicked(event.e.offsetX, event.e.offsetY);
+    }
+  });
+
+editor.newFA();
+var loader = new URLLoader(editor);
+loader.loadEncoded("eyJyZXByZXNlbnRhdGlvbiI6ImF1dG9tYXRvbiIsygxUeXBlIjoiRmluaXRlQcsic3RhdGVzIjpbeyJsYWJlbCI6IjAiLCJsZWZ0IjoxODMsInRvcCI6MTI4LCLEPWlhbCI6dHJ1ZSwiZmluxA1mYWxzZX0sykAxyUA0NzTHQDIzM8tAxTPJQcROfV0sInRyYW5zaeQAxuYAkGZyb23nAI90b8hYx2RhXG5iIsR1xyXEHMUlxC7IJc611SPMSGMifV19");
+editor.render();
+</script>
+-->
+    <script src="./editor.bundle.js"> </script>
   </body>
 </html>

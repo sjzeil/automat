@@ -1,0 +1,32 @@
+{
+  "name": "automat",
+  "version": "1.0.0",
+  "description": "A formal language editor",
+  "keywords": [],
+  "author": "Steven Zeil <zeil@cs.odu.edu>",
+  "homepage": "https://git-community.cs.odu.edu/zeil/automat",
+  "license": "ISC",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --watch",
+    "start": "webpack serve --open --config webpack.dev.js",
+    "server": "node server.js",
+    "build": "webpack --config webpack.prod.js"
+  },
+  "devDependencies": {
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.0",
+    "webpack-dev-middleware": "^3.7.3",
+    "webpack-dev-server": "^3.11.2",
+    "webpack-merge": "^5.7.3"
+  },
+  "dependencies": {
+    "@babel/core": "^7.12.13",
+    "@babel/preset-env": "^7.12.13",
+    "@babel/preset-react": "^7.12.13",
+    "babel-loader": "^8.2.2",
+    "react": "~17.0.1",
+    "react-dom": "~17.0.1"
+  }
+}
