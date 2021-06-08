@@ -1,49 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { fabric } from 'fabric';
 
-import {FLEditorState} from '../../shared/js/fLEditorState.ts'
-
-
-class FLEToolBar extends React.Component {
-	  render() {
-	    return (
-	      <div className="editorToolbar">
-		     {"toolbar"}
-		  </div>
-		);
-	  }
-}
-
-class FLEComponentEditor extends React.Component {
-	  render() {
-	    return (
-	      <div>
-		     {"component editor"}
-		  </div>
-		);
-	  }
-}
+import {FormalLanguageEditor} from './formalLanguageEditor'
 
 
-class FormalLanguageEditor extends React.Component {
-	  render() {
-	    return (
-	      <div className="editorView">
-		     <FLEToolBar/>
-			 <FLEComponentEditor/>
-		  </div>
-		);
-	  }
-}
+
 
 // ========================================
 
-var fLCanvas = document.getElementById('editorView');
-var fles = new FLEditorState( fLCanvas );
-console.log (fles.state);
-
+var flCanvas = new fabric.Canvas('editorView');
+console.log("set up canvas");
 
 ReactDOM.render(
-  <FormalLanguageEditor />,
+  <FormalLanguageEditor canvas={flCanvas} docURL={document.URL}/>,
   document.getElementById('react-entry-point')
 );

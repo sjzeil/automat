@@ -41,6 +41,9 @@
     "webpack-merge": "^5.7.3"
   },
   "dependencies": {
+    "@types/fabric": "^4.2.6",
+    "fabric": "^4.5.0",
+    "lzutf8": "^0.6.0",
     "react": "~17.0.1",
     "react-dom": "~17.0.1"
   }
