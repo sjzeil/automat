@@ -1,17 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { FormalLanguageEditorBase, FormalLanguageModel } from '../../shared/js/formalLanguageEditorBase';
+import { EditorProps, EditorState } from './formalLanguageEditor';
 
 
 export
-    class NewLanguageEditor extends FormalLanguageModel {
+    class NewLanguageEditor extends React.Component<EditorProps, EditorState> {
     /**
      * Base class for specific formal language editors.
      * 
      * @param parent0         the master FL editor 
      */
-    constructor(parent0: FormalLanguageEditorBase) {
-        super("newLanguage", parent0);
+    constructor(props: EditorProps) {
+        super(props);
     }
 
     /**
@@ -19,7 +19,7 @@ export
      * @returns {ReactNode} HTML representation for this editor
      */
     render() {
-        let mainEditor = this.parent as any; // FormalLanguageEditor
+        let mainEditor = this.props.parent as any; // FormalLanguageEditor
         return (
             <div className="editors">
                 Create a new...
