@@ -1,3 +1,17 @@
+import { fabric } from 'fabric';
+import { AutomatonState } from './states';
+import { Rendering, RenderedElement } from './renderedElement';
+
+
+
+
+export interface TransitionOptions extends fabric.ITextOptions {
+	label?: string;
+	curved?: boolean;
+}
+
+
+
 /**
  * Transition: rendering of a potential change from one state to another.
  * 
@@ -9,7 +23,7 @@ var Transition = fabric.util.createClass(fabric.Text, {
 
     type: 'Transition',
 
-    initialize: function (fromState, toState, options) {
+    initialize: function (fromState: AutomatonState, toState: AutomatonState, options: TransitionOptions) {
         options || (options = {});
         this.set('from', fromState);
         this.set('to', toState);
@@ -27,7 +41,7 @@ var Transition = fabric.util.createClass(fabric.Text, {
 
     },
 
-    render: function (ctx) {
+    render: function (ctx: CanvasRenderingContext2D) {
         let x0 = this.from.rendering.left + this.from.rendering.circle.radius;
         let y0 = this.from.rendering.top + this.from.rendering.circle.radius;
 
@@ -153,7 +167,7 @@ var Transition = fabric.util.createClass(fabric.Text, {
 
 });
 
-function drawPoint(ctx, x, y, color) {
+function drawPoint(ctx: CanvasRenderingContext2D, x: number, y: number, color: string) {
     ctx.save();
     ctx.beginPath();
     ctx.fillStyle = color;
@@ -174,9 +188,16 @@ Transition.angleOffset = 2.0 * Math.PI * (15.0 / 360.0);
 /**
  * A renderable transition within an automaton
  */
+ export
  class AutomatonTransition extends RenderedElement {
 
-    constructor (label, fromState, toState, canvas) {
+    _label: string;
+    from: AutomatonState;
+    to: AutomatonState;
+    _curved: boolean;
+
+
+    constructor (label: string, fromState: AutomatonState, toState: AutomatonState, canvas: fabric.Canvas) {
         super(canvas);
         this._label = label;
         this.from = fromState;

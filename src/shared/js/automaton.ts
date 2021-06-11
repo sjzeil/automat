@@ -1,34 +1,36 @@
+import { fabric } from 'fabric';
+import { FormalLanguage } from './formalLanguage';
+import { AutomatonState } from "./states";
+import { AutomatonTransition } from "./transitions";
+import { Rendering, RenderedElement } from './renderedElement';
+
 
 /**
  * Automaton: a collection of states and transitions.
  * 
- *
  */
 
-class Automaton extends FormalLanguage {
-    constructor(canvas) {
+export class Automaton extends FormalLanguage {
+    constructor(canvas: fabric.Canvas) {
         super(canvas);
         this.states = [];
         this.transitions = [];
+        this.specification = "automaton";
     }
 
-    representation() {
-        return "automaton";
-    }
+    states: AutomatonState[];
+    transitions: AutomatonTransition[];
 
-    automatonType() {
-        return "FiniteAutomaton";
-    }
 
-    addState(x, y, label) {
+    addState(x: number, y: number, label?: string) {
         if (label == undefined) {
             let id = this.states.length;
-            while (this.findState(""+id) != null) {
+            while (this.findState("" + id) != null) {
                 ++id;
             }
             label = "" + id;
         }
-        let newState = new AutomatonState(label, this._canvas, 
+        let newState = new AutomatonState(label, this._canvas,
             {
                 left: x,
                 top: y
@@ -37,7 +39,7 @@ class Automaton extends FormalLanguage {
         return newState;
     }
 
-    findState (label) {
+    findState(label: string) {
         let s;
         for (s of this.states) {
             if (s.label == label)
@@ -46,14 +48,14 @@ class Automaton extends FormalLanguage {
         return null;
     }
 
-    removeState (state) {
+    removeState(state: AutomatonState) {
         let tr;
         let preservedTransitions = [];
         for (tr of this.transitions) {
             if (tr.to != state && tr.from != state) {
                 preservedTransitions.push(tr);
             } else {
-                let trRenderer = tr.getRendering();
+                let trRenderer = tr.getRendering() as Rendering;
                 this._canvas.remove(trRenderer);
             }
         }
@@ -61,17 +63,17 @@ class Automaton extends FormalLanguage {
         let statePos = this.states.indexOf(state);
         if (statePos >= 0) {
             this.states.splice(statePos, 1);
-            this._canvas.remove(state.getRendering());
+            this._canvas.remove(state.getRendering() as Rendering);
         }
     }
 
-    clear () {
+    clear() {
         while (this.states.length > 0) {
-            this.removeState(this.states[this.states.length-1]);
+            this.removeState(this.states[this.states.length - 1]);
         }
     }
 
-    addTransition (fromState, toState, trigger) {
+    addTransition(fromState: string, toState: string, trigger: string) {
         let from = this.findState(fromState);
         if (from == null) {
             return null;
@@ -80,7 +82,7 @@ class Automaton extends FormalLanguage {
         if (to == null) {
             return null;
         }
-                
+
         let t = this.findTransition(from, to);
         if (t == null) {
             t = new AutomatonTransition(trigger, from, to, this._canvas);
@@ -96,14 +98,13 @@ class Automaton extends FormalLanguage {
         return t;
     }
 
-    removeTransition(transition)
-    {
-        let trRenderer = transition.getRendering();
+    removeTransition(transition: AutomatonTransition) {
+        let trRenderer = transition.getRendering() as Rendering;
         this._canvas.remove(trRenderer);
         this.transitions.splice(this.transitions.indexOf(transition), 1);
     }
 
-    findTransition (fromState, toState) {
+    findTransition(fromState: AutomatonState, toState: AutomatonState) {
         let tr;
         for (tr of this.transitions) {
             if (tr.to == toState && tr.from == fromState)
@@ -116,10 +117,11 @@ class Automaton extends FormalLanguage {
         let stateList = [];
         let state;
         for (state of this.states) {
+            let rendering = state._rendering as Rendering;
             let stateObj = {
                 label: state.label,
-                left: state._rendering.left,
-                top: state._rendering.top,
+                left: rendering.left,
+                top: rendering.top,
                 initial: state.initial,
                 final: state.final,
             };
@@ -137,15 +139,14 @@ class Automaton extends FormalLanguage {
         }
 
         let object = {
-            representation: this.representation(),
-            automatonType: this.automatonType(),
+            specification: this.specification,
             states: stateList,
             transitions: transitionList,
         };
         return JSON.stringify(object);
     }
 
-    fromJSon(jsonObj) {
+    fromJSon(jsonObj: any) {
         this.clear();
         let state;
         for (state of jsonObj.states) {

@@ -1,14 +1,31 @@
+import { fabric } from 'fabric';
+
+
+export
+class Rendering extends fabric.Object {
+    constructor (options: fabric.IObjectOptions) {
+        super(options);
+        this.renderingOf = null;
+    }
+
+    renderingOf: RenderedElement | null;
+}
+
 /**
  * RenderedElement: a component of an automaton that can be rendered on a canvas.
  *
  */
 
+export
 class RenderedElement {
 
-    constructor(canvas) {
+    constructor(canvas: fabric.Canvas) {
         this.canvas = canvas;
         this._rendering = null;
     }
+
+    canvas: fabric.Canvas;
+    _rendering: Rendering | null; 
 
     /**
      * Get the current rendering of this object.
@@ -26,7 +43,7 @@ class RenderedElement {
     /**
      * Replaces the current rendering in the canvas with a new one.
      */
-    setRendering (newRendering, front)
+    setRendering (newRendering: Rendering, front: boolean)
     {
         if (!Object.is(this.rendering, newRendering)) {
             if (this.rendering) {

@@ -1,16 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { EditorProps, EditorState } from './formalLanguageEditor';
+import { FormalLanguageEditor, MouseLoc } from './formalLanguageEditor';
 
+
+interface NewEditorProps {
+    parent: FormalLanguageEditor;
+}
+
+interface NewEditorState {
+}
 
 export
-    class NewLanguageEditor extends React.Component<EditorProps, EditorState> {
+    class NewLanguageEditor extends React.Component<NewEditorProps, NewEditorState> {
     /**
      * Base class for specific formal language editors.
      * 
      * @param parent0         the master FL editor 
      */
-    constructor(props: EditorProps) {
+    constructor(props: NewEditorProps) {
         super(props);
     }
 
@@ -32,6 +39,14 @@ export
                 </div>
             </div>
         );
+    }
+
+    selected(item: fabric.Object) {
+
+    }
+
+    clicked(x: number, y: number) {
+        
     }
 
 }

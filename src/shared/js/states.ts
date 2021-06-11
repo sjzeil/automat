@@ -1,13 +1,24 @@
+import { fabric } from 'fabric';
+import { RenderedElement } from './renderedElement';
+
+
+export interface StateOptions extends fabric.ICircleOptions {
+	label?: string;
+	selected?: boolean;
+	final?: boolean;
+	initial?: boolean;
+	annotation?: string;
+}
+
 /**
  * State: rendering of an automaton state, displayed as a short string within a circle
  *
  */
-
 var State = fabric.util.createClass(fabric.Group, {
 
 	type: 'State',
 
-	initialize: function(options) {
+	initialize: function(options: StateOptions) {
 		options || (options = { });
 		this.set('label', options.label || ' ');
 		this.set('selected', options.selected || false);
@@ -49,8 +60,8 @@ var State = fabric.util.createClass(fabric.Group, {
 				}
 			));
 
-		let annotText = options.annotation || "";
-		this.set('annotation', new fabric.Text(annotText, 
+		let annotationText = options.annotation || "";
+		this.set('annotation', new fabric.Text(annotationText, 
 			{
 				fontSize:this.text.fontSize,
 				fontFamily: 'monospace',
@@ -69,7 +80,7 @@ var State = fabric.util.createClass(fabric.Group, {
 		});
 	},
 
-	render: function(ctx) {
+	render: function(ctx: CanvasRenderingContext2D) {
 		this.callSuper('render', ctx);
 		if (this.initial) {
 			ctx.beginPath();
@@ -92,11 +103,11 @@ var State = fabric.util.createClass(fabric.Group, {
 		}
 	},
 
-	select: function(yesNo) {
+	select: function(yesNo: boolean) {
 		this.fill = yesNo ? State.selectedColor: State.unselectedColor;
 	},
 
-	changeLabel(newLabel) {
+	changeLabel(newLabel: string) {
 		if (this.label != newLabel) {
 			this.label = newLabel;
 			let newText = new fabric.Text(newLabel, {
@@ -114,7 +125,7 @@ var State = fabric.util.createClass(fabric.Group, {
 		}
 	},
 
-	_render: function(ctx) {
+	_render: function(ctx: CanvasRenderingContext2D) {
 		this.callSuper('_render', ctx);
 		alert("in _render");
 		if (this.final) {
@@ -138,9 +149,10 @@ State.initMarkerSize = 3*State.rimOffSet;
 /**
  * A renderable state within an automaton
  */
+export
  class AutomatonState extends RenderedElement {
 
-    constructor (label, canvas, renderingOptions) {
+    constructor (label: string, canvas: fabric.Canvas, renderingOptions: StateOptions) {
         super(canvas);
         this._label = label;
         this._selected = false;
@@ -150,7 +162,13 @@ State.initMarkerSize = 3*State.rimOffSet;
         this._prepareRendering(renderingOptions);
     }
 
-    _prepareRendering(renderingOptions)
+	_label: string;
+	_selected: boolean;
+	_initial: boolean;
+	_final: boolean;
+	_annotation: string;
+
+    _prepareRendering(renderingOptions: StateOptions)
     {
 		let options = (renderingOptions) ? renderingOptions : {};
 		let left = (options.left) ? options.left : ((this.rendering) ? this.rendering.left : 50);
@@ -175,7 +193,7 @@ State.initMarkerSize = 3*State.rimOffSet;
     set label(newLabel) {
         if (newLabel != this._label) {
 			this._label = newLabel;
-            this._prepareRendering();
+            this._prepareRendering({});
         }
     }
 
@@ -186,7 +204,7 @@ State.initMarkerSize = 3*State.rimOffSet;
     set annotation(newAnnotation) {
         if (newAnnotation != this._annotation) {
             this._annotation = newAnnotation;
-            this._prepareRendering();
+            this._prepareRendering({});
         }
     }
 
@@ -197,7 +215,7 @@ State.initMarkerSize = 3*State.rimOffSet;
     set selected(selectionState) {
         if (selectionState != this._selected) {
             this._selected = selectionState;
-            this._prepareRendering();
+            this._prepareRendering({});
         }
     }
     
@@ -208,7 +226,7 @@ State.initMarkerSize = 3*State.rimOffSet;
     set initial(initialState) {
         if (initialState != this._initial) {
             this._initial = initialState;
-            this._prepareRendering();
+            this._prepareRendering({});
         }
     }
     
@@ -219,7 +237,7 @@ State.initMarkerSize = 3*State.rimOffSet;
     set final(finalState) {
         if (finalState != this._final) {
             this._final = finalState;
-            this._prepareRendering();
+            this._prepareRendering({});
         }
     }
     
