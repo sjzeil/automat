@@ -33,7 +33,15 @@ class StateEditor extends React.Component<StateEditorProps, StateEditorState> {
                 final: props.selected.final,
             }
         );
+
+        this.labelChanged = this.labelChanged.bind(this);
+        this.initialChanged = this.initialChanged.bind(this);
+        this.finalChanged = this.finalChanged.bind(this);
+        this.apply = this.apply.bind(this);
+        this.fill = this.fill.bind(this);
+        this.deleteState = this.deleteState.bind(this);
     }
+
 
     componentDidMount() {
         console.log("StateEditor mounted");
@@ -41,41 +49,85 @@ class StateEditor extends React.Component<StateEditorProps, StateEditorState> {
 
     componentDidUpdate() {
         console.log("StateEditor updated");
+        let selectedElement = this.props.parent.props.parent.state.editing;
+        console.dir(selectedElement);
+        console.dir(this.props.selected.rendering);
+
+        if (selectedElement == null) {
+            this.props.parent.setState ({
+                status: "new",
+            });
+        } else if (this.props.selected.label != this.state.label) {
+            let state = this.props.selected;
+            this.setState({
+                label: state.label,
+                initial: state.initial,
+                final: state.final,
+            });
+        }
     }
 
     componentWillUnmount() {
         console.log("StateEditor unmounted");
     }
 
+    handleChange(event: any) {
+        console.log("in event handler");
+    }
+
+    labelChanged(newLabel: string) {
+        this.setState({
+            label: newLabel,
+        });
+    }
+
+    initialChanged(checked: boolean) {
+        this.setState({
+            initial: checked,
+        });
+    }
+
+    finalChanged(checked: boolean) {
+        this.setState({
+            final: checked,
+        });
+    }
+
+
     render() {
         console.log("StateEditor rendering");
         return (
             <div id="stateEditor" className="editors">
                 <table>
-                    <tr>
-                        <td>
-                            Label:
-              </td>
-                        <td>
-                            <input type="text" id="state_label" value={this.state.label} />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Initial?
-              </td>
-                        <td>
-                            <input type="checkbox" id="stateIsInitial" name="stateIsInitial" checked={this.state.initial} />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Final?
-              </td>
-                        <td>
-                            <input type="checkbox" id="stateIsFinal" name="stateIsFinal" checked={this.state.final} />
-                        </td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <td>
+                                Label:
+                            </td>
+                            <td>
+                                <input type="text" id="state_label" value={this.state.label}
+                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>): void => this.labelChanged(ev.target.value)} />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Initial?
+                            </td>
+                            <td>
+                                <input type="checkbox" id="stateIsInitial" name="stateIsInitial" checked={this.state.initial}
+                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>): void => this.initialChanged(ev.target.checked)} />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Final?
+                            </td>
+                            <td>
+                                <input type="checkbox" id="stateIsFinal" name="stateIsFinal" checked={this.state.final}
+                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>): void => this.finalChanged(ev.target.checked)} />
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
                 <div>
                     <input type="button" value="Apply" onClick={this.apply} />
@@ -86,12 +138,28 @@ class StateEditor extends React.Component<StateEditorProps, StateEditorState> {
         );
     }
 
-    apply() {
 
+
+    apply() {
+        let state = this.props.selected;
+        if (state.label != this.state.label) {
+            state.label = this.state.label;
+        }
+        if (state.initial != this.state.initial) {
+            state.initial = this.state.initial;
+        }
+        if (state.final != this.state.final) {
+            state.final = this.state.final;
+        }
     }
 
     fill() {
-
+        let state = this.props.selected;
+        this.setState({
+            label: state.label,
+            initial: state.initial,
+            final: state.final,
+        });
     }
 
     deleteState() {
@@ -174,13 +242,15 @@ export
             let a = this.props.parent.language as Automaton;
             let loc = this.props.parent.state.clicked as MouseLoc;
             let newState = a.addState(loc.x, loc.y);
-            this.parent.setState ({
+            this.parent.setState({
                 clicked: null,
                 editing: newState.rendering,
             });
-            this.setState ({
+            this.setState({
                 status: "state",
             });
+        } else if (this.state.status == "state") {
+            console.log("updated Automaton editor in state mode");
         }
     }
 
@@ -200,12 +270,14 @@ export
         if (this.state.status == "new") {
             editorDetail = <span></span>;
         } else if (this.state.status == "addingState" && this.props.parent.state.clicked == null) {
-            editorDetail = "<p>Click to position the new state.</p>"
+            editorDetail = (<p>Click to position the new state.</p>);
         } else if (this.state.status == "state") {
-            let selected = this.state.selected1 as any as AutomatonState;
-            editorDetail = <StateEditor parent={this} selected={selected} />;
+            let selectedRendering = this.props.parent.state.editing as any;
+            let selectedState = selectedRendering.renderingOf as AutomatonState;
+            editorDetail = <StateEditor parent={this} selected={selectedState} />;
         } else if (this.state.status == "transition") {
-            let selected = this.state.selected1 as any as AutomatonTransition;
+            let selectedRendering = this.props.parent.state.editing as any;
+            let selected = selectedRendering.renderingOf as AutomatonTransition;
             editorDetail = <TransitionEditor parent={this} selected={selected} />;
         } else {
             editorDetail = (<div>bad state {this.state.status}</div>);
@@ -251,7 +323,7 @@ export
             this.setState(
                 {
                     status: "state",
-                    //editing: itemO.renderingOf,
+                    //editing: item,
                 }
             );
             console.log("-set state 1:");
