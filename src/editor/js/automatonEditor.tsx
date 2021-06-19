@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { FormalLanguage } from '../../shared/js/formalLanguage';
 import { FormalLanguageEditor, MouseLoc } from './formalLanguageEditor';
 import { Automaton } from '../../shared/js/automaton';
@@ -102,7 +101,6 @@ export
             }
 
         } else if (this.state.status == "state") {
-            debugger;
             console.log("updated Automaton editor in state mode");
             let selectedItem = this.props.parent.state.editing;
             if (selectedItem != null && selectedItem.type == "Transition") {
@@ -111,12 +109,28 @@ export
                 });
             }
         } else if (this.state.status == "transition") {
-            debugger;
             console.log("updated Automaton editor in transition mode");
             let selectedItem = this.props.parent.state.editing;
             if (selectedItem != null && selectedItem.type == "State") {
                 this.setState({
                     status: "state",
+                });
+            } else if (selectedItem != null && selectedItem.type == "Transition") {
+                if (this.props.selected != this.props.parent.state.editing) {
+                    this.props.parent.setState ({
+                        
+                    });
+                }
+            }
+        } else if (this.state.status == "new") {
+            let selectedItem = this.props.parent.state.editing;
+            if (selectedItem != null && selectedItem.type == "State") {
+                this.setState({
+                    status: "state",
+                });
+            } else if (selectedItem != null && selectedItem.type == "Transition") {
+                this.setState({
+                    status: "transition",
                 });
             }
         }
@@ -189,6 +203,9 @@ export
                 selected2: null,
             }
         );
+        this.parent.setState({
+            clicked: null,
+        });
     }
 
     addTransition() {
@@ -239,7 +256,6 @@ export
                         status: "state",
                     }
                 );
-                debugger;
                 this.props.parent.setState ({
                     editing: itemObj,
                 });

@@ -15,6 +15,7 @@ interface StateEditorProps {
 
 interface StateEditorState {
     selected: AutomatonState;
+    workingLabel: string;
     label: string;
     initial: boolean;
     final: boolean;
@@ -28,6 +29,7 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
         this.state = (
             {
                 selected: props.selected,
+                workingLabel: props.selected.label,
                 label: props.selected.label,
                 initial: props.selected.initial,
                 final: props.selected.final,
@@ -60,6 +62,7 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
         } else if (this.props.selected.label != this.state.label) {
             let state = this.props.selected;
             this.setState({
+                workingLabel: state.label,
                 label: state.label,
                 initial: state.initial,
                 final: state.final,
@@ -77,7 +80,7 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
 
     labelChanged(newLabel: string) {
         this.setState({
-            label: newLabel,
+            workingLabel: newLabel,
         });
     }
 
@@ -105,7 +108,7 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
                                 Label:
                             </td>
                             <td>
-                                <input type="text" id="state_label" value={this.state.label}
+                                <input type="text" id="state_label" value={this.state.workingLabel}
                                     onChange={(ev: React.ChangeEvent<HTMLInputElement>): void => this.labelChanged(ev.target.value)} />
                             </td>
                         </tr>
@@ -142,8 +145,11 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
 
     apply() {
         let state = this.props.selected;
-        if (state.label != this.state.label) {
-            state.label = this.state.label;
+        if (state.label != this.state.workingLabel) {
+            state.label = this.state.workingLabel;
+            this.setState({
+                label: this.state.workingLabel,
+            });
         }
         if (state.initial != this.state.initial) {
             state.initial = this.state.initial;
@@ -156,6 +162,7 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
     fill() {
         let state = this.props.selected;
         this.setState({
+            workingLabel: state.label,
             label: state.label,
             initial: state.initial,
             final: state.final,
