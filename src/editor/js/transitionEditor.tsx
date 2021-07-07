@@ -102,7 +102,6 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
     render() {
         console.log("TransitionEditor rendering");
         
-        debugger;
         let transitionsText = this.state.workingLabel.split("\n");
         let keyedTransitions: optionListItem[] = [];
         transitionsText.forEach((transitionLabel) => keyedTransitions.push({id: keyedTransitions.length, value: transitionLabel}));

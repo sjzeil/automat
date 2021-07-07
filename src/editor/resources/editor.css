@@ -30,3 +30,9 @@ body
 .centered {
     text-align: center;
 }
+
+.wrapped {
+    word-wrap: break-word;
+    border: solid;
+    margin: 0.5ex;
+}
