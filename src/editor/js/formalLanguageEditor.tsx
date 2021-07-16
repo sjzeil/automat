@@ -3,7 +3,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { NewLanguageEditor } from './newLanguageEditor';
 import { AutomatonEditor } from './automatonEditor';
+import { GrammarEditor } from './grammarEditor';
 import { SaveEditor } from './saveEditor';
+import { Grammar } from '../../shared/js/grammar';
 import { Automaton } from '../../shared/js/automaton';
 import { FormalLanguage } from '../../shared/js/formalLanguage';
 import LZUTF8 from 'lzutf8';
@@ -78,6 +80,7 @@ export
       }
     });
 
+    this.newCFG = this.newCFG.bind(this);
     this.newFA = this.newFA.bind(this);
     this.newLanguage = this.newLanguage.bind(this);
     this.clicked = this.clicked.bind(this);
@@ -170,6 +173,8 @@ export
         selected = (<NewLanguageEditor parent={this} />);
       } else if (this.state.status == "automaton") {
         selected = (<AutomatonEditor parent={this} selected={this.state.editing} language={this.language as FormalLanguage} />);
+      } else if (this.state.status == "grammar") {
+        selected = (<GrammarEditor parent={this} selected={this.state.editing} language={this.language as FormalLanguage} />);
       } else if (this.state.status == "saving") {
         selected = (<SaveEditor parent={this} language={this.language as FormalLanguage} />);
       } else {
@@ -201,6 +206,18 @@ export
     });
   }
 
+/**
+   * Create a new automaton and set up the automaton editor.
+   */
+ newCFG() {
+  console.log("in newCFG");
+  this.language = new Grammar(this.props.canvas);
+  this.setState({
+    status: "grammar",
+    editing: null,
+    clicked: null,
+  });
+}
 
   selected(obj: fabric.Object) {
     this.setState({

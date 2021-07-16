@@ -1,0 +1,304 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { FormalLanguage } from '../../shared/js/formalLanguage';
+import { FormalLanguageEditor, MouseLoc } from './formalLanguageEditor';
+import { GrammarEditor } from './grammarEditor';
+import { Grammar, Production } from '../../shared/js/grammar';
+import { fabric } from 'fabric';
+
+
+
+interface ProductionEditorProps {
+    parent: GrammarEditor;
+}
+
+interface ProductionEditorState {
+    selected: Production | null;
+    workingLabel: string;
+    production: Production | null;
+    selectedOption: number;
+    partialProduction: Production;
+}
+
+interface optionListItem {
+    id: number;
+    value: string;
+}
+
+
+
+export class ProductionEditor extends React.Component<ProductionEditorProps, ProductionEditorState> {
+    constructor(props: ProductionEditorProps) {
+        super(props);
+        console.log("ProductionEditor constructed");
+        let partial = {lhs: "S", rhs: ""};
+        this.state = (
+            {
+                selected: null,
+                workingLabel: "S\u21D2",
+                production: null,
+                selectedOption: 0,
+                partialProduction:  partial,
+            }
+        );
+
+        this.handleChange = this.handleChange.bind(this);
+        this.lhsChanged = this.lhsChanged.bind(this);
+        this.rhsChanged = this.rhsChanged.bind(this);
+        this.addProductionOption = this.addProductionOption.bind(this);
+        this.replaceProductionOption = this.replaceProductionOption.bind(this);
+        this.selectedProductionOption = this.selectedProductionOption.bind(this);
+        this.upProductionOption = this.upProductionOption.bind(this);
+        this.downProductionOption = this.downProductionOption.bind(this);
+        this.removeProductionOption = this.removeProductionOption.bind(this);
+        //this.fill = this.fill.bind(this);
+    }
+
+
+    componentDidMount() {
+        console.log("ProductionEditor mounted");
+    }
+
+    componentDidUpdate() {
+        console.log("ProductionEditor updated");
+        let selectedElement = this.props.parent.props.parent.state.editing;
+        console.dir(selectedElement);
+        /*
+        if (selectedElement == null) {
+            this.props.parent.setState({
+                status: "new",
+            });
+        } else if (this.props.selected.label != this.state.label) {
+            let transition = this.props.selected;
+            this.setState({
+                workingLabel: transition.label,
+                label: transition.label,
+                selectedOption: 0,
+                partialLabel: "",
+            });
+        }
+        */
+    }
+
+    componentWillUnmount() {
+        console.log("ProductionEditor unmounted");
+    }
+
+    handleChange(event: any) {
+        console.log("in event handler");
+    }
+
+    lhsChanged(newLHS: string) {
+        let newProd = {lhs: newLHS, rhs: this.state.partialProduction.rhs}
+        this.setState ({
+            partialProduction: newProd,
+        });
+    }
+    rhsChanged(newRHS: string) {
+        let newProd = {lhs: this.state.partialProduction.lhs, rhs: newRHS}
+        this.setState ({
+            partialProduction: newProd,
+        });
+    }
+
+
+    render() {
+        console.log("ProductionEditor rendering");
+        
+        let productionsText = this.state.workingLabel.split("\n");
+        let keyedProductions: optionListItem[] = [];
+        productionsText.forEach((productionLabel) => keyedProductions.push({id: keyedProductions.length, value: productionLabel}));
+        let optionSet = (<React.Fragment>
+            {
+                keyedProductions.map((item) => (
+                    <option key={"production" + item.id} value={"production" + item.id} 
+                        >{item.value}</option>
+                ))
+            }
+        </React.Fragment>);
+        return (
+            <div id="productionEditor" className="editors">
+                <h2>Productions</h2>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <span>Production:</span>
+                                <input type="text" id="production_lhs" name="production_lhs" 
+                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>): void => this.lhsChanged(ev.target.value)}
+                                    value={this.state.partialProduction.lhs}
+                                    className="lhs"
+                                    maxLength={1}
+                                    />
+                                <span>{'\u21D2'}</span>
+                                <input type="text" id="production_rhs" name="production_rhs" 
+                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>): void => this.rhsChanged(ev.target.value)}
+                                    value={this.state.partialProduction.rhs}
+                                    />
+                            </td>
+                            <td>
+                                <select id="production_selection" size={8} 
+                                    onChange={this.selectedProductionOption}
+                                    //onChange={(ev: React.ChangeEvent<HTMLInputElement>): void => this.selectedProductionOption(ev.target.value)}
+                                    value={"production" + this.state.selectedOption}>
+                                    {optionSet}
+                                </select>
+                            </td>
+                            <td>
+                                <input type="button" value="Add" id="add_production_label" 
+                                    onClick={this.addProductionOption} /><br />
+                                <input type="button" value="Replace" id="edit_production_label" 
+                                    onClick={this.replaceProductionOption} /><br />
+                                <input type="button" value="Remove" id="remove_production_label" 
+                                    onClick={this.removeProductionOption} /><br />
+                                <input type="button" value="Up" id="up_production_label" 
+                                    onClick={this.upProductionOption} /><br />
+                                <input type="button" value="Down" id="down_production_label" 
+                                    onClick={this.downProductionOption} />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div className="explanation">
+                    Left-hand side of each production must be a single non-terminal (A-Z).
+                </div>
+                <div className="explanation">
+                    Right-hand side of each production can be a string of mixed non-terminals and terminals (printable characters other than A-Z).
+                </div>
+            </div>
+        );
+    }
+
+    parseProd(prodStr: string) {
+        let divider = '\u21D2';
+        let k = prodStr.indexOf(divider);
+        let production = {
+            lhs: prodStr.substr(0, k),
+            rhs: prodStr.substr(k + divider.length)
+        }
+        return production;
+    }
+
+    packProd(prod: Production) {
+        let divider = '\u21D2';
+        return prod.lhs + divider + prod.rhs;
+    }
+
+
+
+    selectedProductionOption(event: any) {
+        let target = event.target;
+        let selectedNum: number;
+        let productionsText = this.state.workingLabel.split("\n");
+        for (selectedNum = 0; selectedNum < target.length; ++selectedNum)
+        {
+            if (target[selectedNum].selected) {
+                this.setState ({
+                    selectedOption: selectedNum,
+                    partialProduction: this.parseProd(productionsText[selectedNum]),
+                });
+                break;
+            }
+        }
+    }
+
+    addProductionOption() {
+        let productionsText = this.state.workingLabel.split("\n");
+        let newLabel = this.state.workingLabel + "\n" + this.packProd(this.state.partialProduction);
+        this.setState({
+            workingLabel: newLabel,
+            selectedOption: productionsText.length,
+        });
+        this.fillProductions(newLabel);
+    }
+
+    replaceProductionOption() {
+        let productionsText = this.state.workingLabel.split("\n");
+        if (this.state.selectedOption >= 0 && this.state.selectedOption <= productionsText.length) {
+            productionsText[this.state.selectedOption] = this.packProd(this.state.partialProduction);
+            let newLabel = productionsText.join("\n");
+            this.fillProductions(newLabel);
+            this.setState ({
+                workingLabel: productionsText.join("\n"),
+            })
+        }
+    }
+
+    removeProductionOption() {
+        let productionsText = this.state.workingLabel.split("\n");
+        if (productionsText.length > 0 && this.state.selectedOption >= 0 && this.state.selectedOption < productionsText.length) {
+            productionsText.splice(this.state.selectedOption, 1);
+            let newText = productionsText.join("\n");
+            this.setState({
+                workingLabel: newText,
+                selectedOption: 0,
+            });
+            this.fillProductions(newText);
+        }
+    }
+
+    downProductionOption() {
+        let productionsText = this.state.workingLabel.split("\n");
+        if (productionsText.length > 1 && this.state.selectedOption < productionsText.length - 1) {
+            let temp = productionsText[this.state.selectedOption];
+            productionsText[this.state.selectedOption] = productionsText[this.state.selectedOption+1];
+            productionsText[this.state.selectedOption+1] = temp;
+            let newText = productionsText.join("\n");
+            this.setState({
+                workingLabel: newText,
+                selectedOption: this.state.selectedOption + 1,
+            });
+            this.fillProductions(newText);
+        }
+    }
+
+    upProductionOption() {
+        let productionsText = this.state.workingLabel.split("\n");
+        if (productionsText.length > 1 && this.state.selectedOption > 0) {
+            let temp = productionsText[this.state.selectedOption];
+            productionsText[this.state.selectedOption] = productionsText[this.state.selectedOption-1];
+            productionsText[this.state.selectedOption-1] = temp;
+            let newText = productionsText.join("\n");
+            this.setState({
+                workingLabel: newText,
+                selectedOption: this.state.selectedOption - 1,
+            });
+            this.fillProductions(newText);
+        }
+
+    }
+
+    /*
+    apply() {
+        let transition = this.props.selected;
+        if (transition.label != this.state.workingLabel) {
+            if (this.state.workingLabel != "") {
+                transition.label = this.state.workingLabel;
+                this.setState ({
+                    label: this.state.workingLabel,
+                });
+            } else {
+                this.props.parent.automaton.removeProduction(this.state.selected);
+                this.props.parent.setState({
+                    status: "new",
+                });
+            }
+        }
+    }
+    
+*/
+    fillProductions(workingText: string) {
+        let language = this.props.parent.language;
+        language.productions = [];
+        let productionsText = workingText.split("\n");
+        let i;
+        for (i = 0; i < productionsText.length; ++i)
+        {
+            language.productions.push(this.parseProd(productionsText[i]));
+        }
+        language.resetDerivations();
+    }
+
+
+}
+

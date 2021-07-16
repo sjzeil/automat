@@ -36,3 +36,12 @@ body
     border: solid;
     margin: 0.5ex;
 }
+
+.lhs {
+    width: 2em;
+}
+
+.explanation {
+    font-size: small;
+    font-style: italic;
+}
