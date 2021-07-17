@@ -131,6 +131,14 @@ export
 			return result;
 		}
 	}
+
+	clearSelections()
+	{
+		this.selected = false;
+		for (const child of this.children) {
+			child.clearSelections();
+		}
+	}
 	
     _prepareRendering(renderingOptions: PTNodeOptions)
     {

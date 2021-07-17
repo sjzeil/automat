@@ -10,13 +10,13 @@ import { fabric } from 'fabric';
 
 interface ProductionEditorProps {
     parent: GrammarEditor;
+    selectedOption: number;
 }
 
 interface ProductionEditorState {
     selected: Production | null;
     workingLabel: string;
     production: Production | null;
-    selectedOption: number;
     partialProduction: Production;
 }
 
@@ -37,7 +37,6 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
                 selected: null,
                 workingLabel: "S\u21D2",
                 production: null,
-                selectedOption: 0,
                 partialProduction:  partial,
             }
         );
@@ -140,7 +139,7 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
                                 <select id="production_selection" size={8} 
                                     onChange={this.selectedProductionOption}
                                     //onChange={(ev: React.ChangeEvent<HTMLInputElement>): void => this.selectedProductionOption(ev.target.value)}
-                                    value={"production" + this.state.selectedOption}>
+                                    value={"production" + this.props.parent.state.selectedProduction}>
                                     {optionSet}
                                 </select>
                             </td>
@@ -194,8 +193,11 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
         {
             if (target[selectedNum].selected) {
                 this.setState ({
-                    selectedOption: selectedNum,
+                    //selectedOption: selectedNum,
                     partialProduction: this.parseProd(productionsText[selectedNum]),
+                });
+                this.props.parent.setState ({
+                    selectedProduction: selectedNum,
                 });
                 break;
             }
@@ -207,15 +209,17 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
         let newLabel = this.state.workingLabel + "\n" + this.packProd(this.state.partialProduction);
         this.setState({
             workingLabel: newLabel,
-            selectedOption: productionsText.length,
+        });
+        this.props.parent.setState({
+            selectedProduction: productionsText.length,
         });
         this.fillProductions(newLabel);
     }
 
     replaceProductionOption() {
         let productionsText = this.state.workingLabel.split("\n");
-        if (this.state.selectedOption >= 0 && this.state.selectedOption <= productionsText.length) {
-            productionsText[this.state.selectedOption] = this.packProd(this.state.partialProduction);
+        if (this.props.selectedOption >= 0 && this.props.selectedOption <= productionsText.length) {
+            productionsText[this.props.selectedOption] = this.packProd(this.state.partialProduction);
             let newLabel = productionsText.join("\n");
             this.fillProductions(newLabel);
             this.setState ({
@@ -226,12 +230,14 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
 
     removeProductionOption() {
         let productionsText = this.state.workingLabel.split("\n");
-        if (productionsText.length > 0 && this.state.selectedOption >= 0 && this.state.selectedOption < productionsText.length) {
-            productionsText.splice(this.state.selectedOption, 1);
+        if (productionsText.length > 0 && this.props.selectedOption >= 0 && this.props.selectedOption < productionsText.length) {
+            productionsText.splice(this.props.selectedOption, 1);
             let newText = productionsText.join("\n");
             this.setState({
                 workingLabel: newText,
-                selectedOption: 0,
+            });
+            this.props.parent.setState ({
+                selectedProduction: 0,
             });
             this.fillProductions(newText);
         }
@@ -239,14 +245,16 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
 
     downProductionOption() {
         let productionsText = this.state.workingLabel.split("\n");
-        if (productionsText.length > 1 && this.state.selectedOption < productionsText.length - 1) {
-            let temp = productionsText[this.state.selectedOption];
-            productionsText[this.state.selectedOption] = productionsText[this.state.selectedOption+1];
-            productionsText[this.state.selectedOption+1] = temp;
+        if (productionsText.length > 1 && this.props.selectedOption < productionsText.length - 1) {
+            let temp = productionsText[this.props.selectedOption];
+            productionsText[this.props.selectedOption] = productionsText[this.props.selectedOption+1];
+            productionsText[this.props.selectedOption+1] = temp;
             let newText = productionsText.join("\n");
             this.setState({
                 workingLabel: newText,
-                selectedOption: this.state.selectedOption + 1,
+            });
+            this.props.parent.setState({
+                selectedProduction: this.props.selectedOption + 1,
             });
             this.fillProductions(newText);
         }
@@ -254,14 +262,16 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
 
     upProductionOption() {
         let productionsText = this.state.workingLabel.split("\n");
-        if (productionsText.length > 1 && this.state.selectedOption > 0) {
-            let temp = productionsText[this.state.selectedOption];
-            productionsText[this.state.selectedOption] = productionsText[this.state.selectedOption-1];
-            productionsText[this.state.selectedOption-1] = temp;
+        if (productionsText.length > 1 && this.props.selectedOption > 0) {
+            let temp = productionsText[this.props.selectedOption];
+            productionsText[this.props.selectedOption] = productionsText[this.props.selectedOption-1];
+            productionsText[this.props.selectedOption-1] = temp;
             let newText = productionsText.join("\n");
             this.setState({
                 workingLabel: newText,
-                selectedOption: this.state.selectedOption - 1,
+            });
+            this.props.parent.setState({
+                selectedProduction: this.props.selectedOption - 1,
             });
             this.fillProductions(newText);
         }

@@ -52,7 +52,7 @@ export class Grammar extends FormalLanguage {
                 this.startingSymbol = this.productions[0].lhs;
             }
             this.derivations = [];
-            this.addDerivation(-1, -1);
+            this.addDerivation(-1, -1, new ParseTreeNode(this.startingSymbol, this._canvas, {}));
         }
     }
 
@@ -70,7 +70,7 @@ export class Grammar extends FormalLanguage {
         this.startingSymbol = "";
     }
 
-    addDerivation(symbolNum: number, productionNum: number) {
+    addDerivation(symbolNum: number, productionNum: number, leaf: ParseTreeNode) {
         let derivation;
         if (this.derivations.length > 0) {
             let prior = this.derivations[this.derivations.length - 1];
@@ -81,29 +81,29 @@ export class Grammar extends FormalLanguage {
                 expansion: prior.expansion.substring(0, symbolNum)
                     + this.productions[productionNum].rhs
                     + prior.expansion.substring(symbolNum + 1),
-                tree: treeRoot.leafAfter(prior.expansion.substring(0, symbolNum)
-                        + this.productions[productionNum].rhs).found as ParseTreeNode,
+                tree: leaf,
             };
             if (this.productions[productionNum].rhs.length > 0) {
                 let i;
                 for (i = 0; i < this.productions[productionNum].rhs.length; ++i) {
                     let symbol = this.productions[productionNum].rhs.substring(i, i + 1);
                     let child = new ParseTreeNode(symbol, this._canvas, {});
-                    prior.tree.children.push(child);
+                    leaf.children.push(child);
+                    child.parent = leaf;
                 }
             } else {
                 let child = new ParseTreeNode(' ', this._canvas, {});
                 prior.tree.children.push(child);
                 child.parent = prior.tree;
             }
-            
+
 
         } else {
             derivation = {
                 expandedSymbol: -1,
                 selectedProduction: -1,
-                expansion: this.startingSymbol,
-                tree: new ParseTreeNode(this.startingSymbol, this._canvas, {}),
+                expansion: leaf.label,
+                tree: leaf,
             };
             this.root = derivation.tree;
         }
@@ -129,10 +129,31 @@ export class Grammar extends FormalLanguage {
     }
 
 
+    tx: number = 0;
 
+    _doLayout(tree: ParseTreeNode, x: number, y: number, hOffset: number, vOffset: number) {
+        let wTotal = 0;
+        for (const child of tree.children) {
+            let w = this._doLayout(child, x+wTotal, y + vOffset, hOffset, vOffset);
+            wTotal += w;
+        }
+        wTotal = Math.max(wTotal, hOffset);
+        const theRendering = tree.rendering as any;
+        theRendering.top = y;
+        theRendering.left = Math.max(0, x + wTotal / 2 - hOffset / 2) ;
+        theRendering.setCoords();
+        return Math.max(wTotal, hOffset);
+    }
 
     treeLayout() {
-
+        if (this.root != null) {
+            let renderedNode = this.root.rendering as any;
+            if (renderedNode != null) {
+                let horizontalOffset = 3 * renderedNode.width / 2;
+                let verticalOffset = 3 * renderedNode.height / 2;
+                this._doLayout(this.root, 20, 0, horizontalOffset, verticalOffset)
+            }
+        }
     }
 
     resetDerivations() {
@@ -140,7 +161,7 @@ export class Grammar extends FormalLanguage {
         this.root = null;
         this.derivations = [];
         this.startingSymbol = (this.productions.length > 0) ? this.productions[0].lhs : 'S';
-        this.addDerivation(-1, -1);
+        this.addDerivation(-1, -1, new ParseTreeNode(this.startingSymbol, this._canvas, {}));
     }
 
 
