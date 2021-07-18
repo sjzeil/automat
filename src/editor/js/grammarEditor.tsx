@@ -76,7 +76,7 @@ export
                         selectedNode: null,
                         error: "Can only select leaves of the parse tree.",
                     });
-                    this.parent.setState ({
+                    this.parent.setState({
                         editing: null,
                     });
                 } else {
@@ -84,7 +84,7 @@ export
                         selectedNode: null,
                         error: "Selected leaf does not contain a non-terminal symbol.",
                     });
-                    this.parent.setState ({
+                    this.parent.setState({
                         editing: null,
                     });
 
@@ -107,18 +107,18 @@ export
         return (
             <React.Fragment>
                 <div className="editors">
-                    <ProductionEditor parent={this} selectedOption={this.state.selectedProduction}/>
+                    <ProductionEditor parent={this} selectedOption={this.state.selectedProduction} />
                 </div>
                 <div id="derivationEditor" className="editors">
                     <h2>Derivation</h2>
+                    <div className="derivation">
+                        {this.language.fullDerivation()}
+                    </div>
                     <div>
                         <input type="button" value="+step" id="add_derivationStep"
                             onClick={this.addDerivationStep} />
                         <input type="button" value="-step" id="retract_derivationStep"
                             onClick={this.retractDerivationStep} />
-                    </div>
-                    <div className="derivation">
-                        {this.language.fullDerivation()}
                     </div>
                     <div className="explanation">
                         To add a derivation step, select a non-terminal leaf
@@ -135,33 +135,56 @@ export
 
 
     addDerivationStep() {
-        if (this.props.selected != null) {
-            if (this.state.selectedNode != null) {
-                let sym = this.state.selectedNode.label;
-                let prodPos = this.state.selectedProduction;
-                if (sym == this.language.productions[prodPos].lhs) {
-                    let symbolPos = this.language.derivations[this.language.derivations.length - 1].expansion.indexOf(sym);
-                    if (symbolPos >= 0) {
-                        this.language.addDerivation(symbolPos, prodPos, this.state.selectedNode);
-                    }
-                    this.setState ({
-                        error: "",
-                    });
-                } else {
-                    this.setState({
-                        error: "Left-hand side of selected production does not match the selected parse tree node."
-                    });
-                }
-            } else {
-                this.setState ({
-                    error: "No parse tree node has been selected."
-                });
-            }
-        } else {
-            this.setState ({
-                error: "No production selected.",
+        if (this.props.selected == null) {
+            this.setState({
+                error: "No parse tree node has been selected."
+            });
+            return;
+        }
+        if (this.state.selectedNode == null) {
+            this.setState({
+                error: "No parse tree node has been selected."
+            });
+            return;
+        }
+        if (this.state.selectedNode.children.length > 0) {
+            this.setState({
+                error: "Selected parse tree node is not a leaf."
+            });
+            return;
+        }
+        let sym = this.state.selectedNode.label;
+        let prodPos = this.state.selectedProduction;
+        if (sym != this.language.productions[prodPos].lhs) {
+            this.setState({
+                error: "Left-hand side of selected production does not match the selected parse tree node."
+            });
+            return;
+        }
+        if (this.language.root == null) {
+            this.setState({
+                error: "**Error: parse tree is empty."
+            });
+            return;
+        }
+        let leaves = this.language.root.leaves(false);
+        let symbolPos = leaves.indexOf(this.state.selectedNode);
+        if (symbolPos < 0) {
+            this.setState({
+                error: "**Error: unexpected mismatch in derivation."
             });
         }
+        this.language.addDerivation(symbolPos, prodPos, this.state.selectedNode);
+        if (this.language.root != null) {
+            this.language.root.clearSelections();
+        }
+        this.setState({
+            error: "",
+            selectedNode: null,
+        });
+        this.parent.setState({
+            editing: null,
+        });
     }
 
 
@@ -170,7 +193,17 @@ export
 
     retractDerivationStep() {
         console.log("retract");
+        if (this.language.root != null) {
+            this.language.root.clearSelections();
+        }
         this.language.retractDerivation();
+        this.setState({
+            error: "",
+            selectedNode: null,
+        });
+        this.parent.setState({
+            editing: null,
+        });
     }
 
 

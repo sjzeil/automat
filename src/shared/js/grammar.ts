@@ -93,8 +93,8 @@ export class Grammar extends FormalLanguage {
                 }
             } else {
                 let child = new ParseTreeNode(' ', this._canvas, {});
-                prior.tree.children.push(child);
-                child.parent = prior.tree;
+                leaf.children.push(child);
+                child.parent = leaf;
             }
 
 
@@ -119,11 +119,14 @@ export class Grammar extends FormalLanguage {
             let finalStep = this.derivations.pop() as Derivation;
             let treeRoot = this.root as ParseTreeNode;
             let i;
-            for (i = 0; i < finalStep.tree.children.length; ++i) {
-                let child = finalStep.tree.children[i];
+            for (let child of finalStep.tree.children) {
                 this._canvas.remove(child.rendering as fabric.Object);
             }
+            for (let connector of finalStep.tree.connectors) {
+                this._canvas.remove(connector);
+            }
             finalStep.tree.children = [];
+            finalStep.tree.connectors = [];
             this.treeLayout();
         }
     }
@@ -142,6 +145,7 @@ export class Grammar extends FormalLanguage {
         theRendering.top = y;
         theRendering.left = Math.max(0, x + wTotal / 2 - hOffset / 2) ;
         theRendering.setCoords();
+        tree.addConnectors();
         return Math.max(wTotal, hOffset);
     }
 

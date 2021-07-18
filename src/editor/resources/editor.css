@@ -46,6 +46,12 @@ body
     font-style: italic;
 }
 
+.derivation {
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+    margin-left: 1ex;
+}
+
 .errors {
     color: red;
 }
