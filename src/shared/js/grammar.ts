@@ -14,6 +14,8 @@ export interface Derivation {
     expandedSymbol: number;
     selectedProduction: number;
     expansion: string;
+    leftmost: boolean;
+    rightmost: boolean;
     tree: ParseTreeNode;
 }
 
@@ -73,13 +75,19 @@ export class Grammar extends FormalLanguage {
         if (this.derivations.length > 0) {
             let prior = this.derivations[this.derivations.length - 1];
             let treeRoot = this.root as ParseTreeNode;
+            let leftPart = prior.expansion.substring(0, symbolNum);
+            let leftmost = !(/[A-Z]/.test(leftPart));
+            let rightPart = prior.expansion.substring(symbolNum + 1);
+            let rightmost = !(/[A-Z]/.test(rightPart));
             derivation = {
                 expandedSymbol: symbolNum,
                 selectedProduction: productionNum,
-                expansion: prior.expansion.substring(0, symbolNum)
+                expansion: leftPart
                     + this.productions[productionNum].rhs
-                    + prior.expansion.substring(symbolNum + 1),
+                    + rightPart,
                 tree: leaf,
+                leftmost: prior.leftmost && leftmost,
+                rightmost: prior.rightmost && rightmost,
             };
             if (this.productions[productionNum].rhs.length > 0) {
                 let i;
@@ -102,6 +110,8 @@ export class Grammar extends FormalLanguage {
                 selectedProduction: -1,
                 expansion: leaf.label,
                 tree: leaf,
+                leftmost: true,
+                rightmost: true,
             };
             this.root = derivation.tree;
         }

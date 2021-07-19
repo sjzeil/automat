@@ -46,7 +46,7 @@ export
         this.retractDerivationStep = this.retractDerivationStep.bind(this);
         this.startTest = this.startTest.bind(this);
         this.language = this.props.language as Grammar;
-        if (this.language.productions .length == 0) {
+        if (this.language.productions.length == 0) {
             this.language.addProduction({ lhs: "S", rhs: "" });
         }
     }
@@ -105,7 +105,16 @@ export
      */
     render() {
         console.log("GrammarEditor rendering");
-
+        let lastStep = this.language.derivations[this.language.derivations.length - 1];
+        let derivationType = "";
+        if (lastStep.leftmost && lastStep.rightmost) {
+            derivationType = "Derivation is leftmost and rightmost."
+        } else if (lastStep.leftmost) {
+            derivationType = "Derivation is leftmost."
+        }
+        else if (lastStep.rightmost) {
+            derivationType = "Derivation is rightmost."
+        }
         return (
             <React.Fragment>
                 <div className="editors">
@@ -115,6 +124,9 @@ export
                     <h2>Derivation</h2>
                     <div className="derivation">
                         {this.language.fullDerivation()}
+                    </div>
+                    <div className="wrapped">
+                        {derivationType}
                     </div>
                     <div>
                         <input type="button" value="+step" id="add_derivationStep"

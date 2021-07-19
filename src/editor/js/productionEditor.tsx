@@ -31,13 +31,26 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
     constructor(props: ProductionEditorProps) {
         super(props);
         console.log("ProductionEditor constructed");
-        let partial = {lhs: "S", rhs: ""};
+        let workingText = "";
+        let initialProd = null;
+        for (let prod of props.parent.language.productions) {
+            if (workingText != "") {
+                workingText += "\n";
+            } else {
+                initialProd = prod;
+            }
+            workingText += prod.lhs + "\u21D2" + prod.rhs;
+        }
+        if (workingText == "") {
+            workingText = "S\u21D2";
+            initialProd = {lhs: "S", rhs: ""};
+        }
         this.state = (
             {
                 selected: null,
-                workingLabel: "S\u21D2",
+                workingLabel: workingText,
                 production: null,
-                partialProduction:  partial,
+                partialProduction:  initialProd as Production,
             }
         );
 
@@ -62,21 +75,6 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
         console.log("ProductionEditor updated");
         let selectedElement = this.props.parent.props.parent.state.editing;
         console.dir(selectedElement);
-        /*
-        if (selectedElement == null) {
-            this.props.parent.setState({
-                status: "new",
-            });
-        } else if (this.props.selected.label != this.state.label) {
-            let transition = this.props.selected;
-            this.setState({
-                workingLabel: transition.label,
-                label: transition.label,
-                selectedOption: 0,
-                partialLabel: "",
-            });
-        }
-        */
     }
 
     componentWillUnmount() {
@@ -158,11 +156,14 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
                         </tr>
                     </tbody>
                 </table>
-                <div className="explanation">
-                    Left-hand side of each production must be a single non-terminal (A-Z).
+                <div className="wrapped">
+                    Starting symbol is: <code>{this.props.parent.language.productions[0].lhs}</code>
                 </div>
                 <div className="explanation">
-                    Right-hand side of each production can be a string of mixed non-terminals and terminals (printable characters other than A-Z).
+                    The left-hand side of each production must be a single non-terminal (A-Z).
+                </div>
+                <div className="explanation">
+                    The right-hand side of each production can be a string of mixed non-terminals and terminals (printable characters other than A-Z).
                 </div>
             </div>
         );
@@ -230,7 +231,7 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
 
     removeProductionOption() {
         let productionsText = this.state.workingLabel.split("\n");
-        if (productionsText.length > 0 && this.props.selectedOption >= 0 && this.props.selectedOption < productionsText.length) {
+        if (productionsText.length > 1 && this.props.selectedOption >= 0 && this.props.selectedOption < productionsText.length) {
             productionsText.splice(this.props.selectedOption, 1);
             let newText = productionsText.join("\n");
             this.setState({
@@ -278,25 +279,7 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
 
     }
 
-    /*
-    apply() {
-        let transition = this.props.selected;
-        if (transition.label != this.state.workingLabel) {
-            if (this.state.workingLabel != "") {
-                transition.label = this.state.workingLabel;
-                this.setState ({
-                    label: this.state.workingLabel,
-                });
-            } else {
-                this.props.parent.automaton.removeProduction(this.state.selected);
-                this.props.parent.setState({
-                    status: "new",
-                });
-            }
-        }
-    }
     
-*/
     fillProductions(workingText: string) {
         let language = this.props.parent.language;
         language.productions = [];
