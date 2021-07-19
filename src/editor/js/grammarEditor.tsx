@@ -45,8 +45,10 @@ export
         this.addDerivationStep = this.addDerivationStep.bind(this);
         this.retractDerivationStep = this.retractDerivationStep.bind(this);
         this.startTest = this.startTest.bind(this);
-        this.language = new Grammar(this.parent.props.canvas);
-        this.language.addProduction({ lhs: "S", rhs: "" });
+        this.language = this.props.language as Grammar;
+        if (this.language.productions .length == 0) {
+            this.language.addProduction({ lhs: "S", rhs: "" });
+        }
     }
 
     parent: FormalLanguageEditor;

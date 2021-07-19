@@ -5,14 +5,12 @@ import { Rendering, RenderedElement } from './renderedElement';
 import { ParseTreeNode } from './parseTreeNodes';
 
 
-export
-    interface Production {
+export interface Production {
     lhs: string;
     rhs: string;
 }
 
-export
-    interface Derivation {
+export interface Derivation {
     expandedSymbol: number;
     selectedProduction: number;
     expansion: string;
@@ -132,18 +130,17 @@ export class Grammar extends FormalLanguage {
     }
 
 
-    tx: number = 0;
 
     _doLayout(tree: ParseTreeNode, x: number, y: number, hOffset: number, vOffset: number) {
         let wTotal = 0;
         for (const child of tree.children) {
-            let w = this._doLayout(child, x+wTotal, y + vOffset, hOffset, vOffset);
+            let w = this._doLayout(child, x + wTotal, y + vOffset, hOffset, vOffset);
             wTotal += w;
         }
         wTotal = Math.max(wTotal, hOffset);
         const theRendering = tree.rendering as any;
         theRendering.top = y;
-        theRendering.left = Math.max(0, x + wTotal / 2 - hOffset / 2) ;
+        theRendering.left = Math.max(0, x + wTotal / 2 - hOffset / 2);
         theRendering.setCoords();
         tree.addConnectors();
         return Math.max(wTotal, hOffset);
@@ -180,5 +177,46 @@ export class Grammar extends FormalLanguage {
         return steps.join(` ${Grammar.DerivesChar} `);
     }
 
-}
 
+    toJSon() {
+        let productionList = [];
+        for (let production of this.productions) {
+            productionList.push(production);
+        }
+        let derivationList = [];
+        for (let step of this.derivations) {
+            let stepObj = {
+                symbol: step.expandedSymbol,
+                production: step.selectedProduction,
+            };
+            derivationList.push(stepObj);
+        }
+
+        let object = {
+            specification: this.specification,
+            productions: productionList,
+            derivation: derivationList,
+        };
+        return JSON.stringify(object);
+    }
+
+    fromJSon(jsonObj: any) {
+        this.clear();
+        this.productions = [];
+        for (let prod of jsonObj.productions) {
+            this.addProduction(prod);
+        }
+        this.derivations = [];
+        this._canvas.clear();
+        for (let step of jsonObj.derivation) {
+            if (this.derivations.length == 0) {
+                this.addDerivation(step.symbol, step.production, new ParseTreeNode(this.startingSymbol, this._canvas, {}));
+            } else {
+                let root = this.root as ParseTreeNode;
+                let leaves = root.leaves(false);
+                this.addDerivation(step.symbol, step.production, leaves[step.symbol]);
+            }
+        }
+    }
+
+}

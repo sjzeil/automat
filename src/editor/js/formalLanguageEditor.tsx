@@ -153,13 +153,17 @@ export
         editing: null,
         clicked: null,
       }
-      /*this.setState({
-        status: "automaton",
-        editing: null,
-        clicked: null,
-      });*/
       return lang;
     } else if (jsonObj.specification == "grammar") {
+      let lang = new Grammar(this.props.canvas);
+      lang.fromJSon(jsonObj);
+      this.state = {
+        status: "grammar",
+        oldStatus: "new",
+        editing: null,
+        clicked: null,
+      }
+      return lang;
     } else if (jsonObj.specification == "regexp") {
     }
     return new FormalLanguage(this.props.canvas);
