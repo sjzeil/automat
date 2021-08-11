@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { fabric } from 'fabric';
 
-import {FormalLanguageEditor} from './formalLanguageEditor'
-
+import {FormalLanguageEditor} from './formalLanguageEditor';
+import "../css/editor.css";
 
 
 
