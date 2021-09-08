@@ -106,7 +106,7 @@ class Editor {
     logCanvasContents() {
         let ctr = 0;
         this._canvas.getObjects().forEach (
-            function (targ) {
+            function (target) {
                 ++ctr;
             }
         );

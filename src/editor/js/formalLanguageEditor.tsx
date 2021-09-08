@@ -7,8 +7,10 @@ import { GrammarEditor } from './grammarEditor';
 import { SaveEditor } from './saveEditor';
 import { Grammar } from '../../shared/js/grammar';
 import { Automaton } from '../../shared/js/automaton';
+import { RegularExpressionEditor } from './regularExpressionEditor';
 import { FormalLanguage } from '../../shared/js/formalLanguage';
 import LZUTF8 from 'lzutf8';
+import { RegularExpression } from '../../shared/js/regularExpression';
 
 
 export class MouseLoc {
@@ -82,6 +84,7 @@ export
 
     this.newCFG = this.newCFG.bind(this);
     this.newFA = this.newFA.bind(this);
+    this.newRE = this.newRE.bind(this);
     this.newLanguage = this.newLanguage.bind(this);
     this.clicked = this.clicked.bind(this);
     this.selected = this.selected.bind(this);
@@ -165,6 +168,15 @@ export
       }
       return lang;
     } else if (jsonObj.specification == "regexp") {
+      let lang = new RegularExpression(this.props.canvas);
+      lang.fromJSon(jsonObj);
+      this.state = {
+        status: "regexp",
+        oldStatus: "new",
+        editing: null,
+        clicked: null,
+      }
+      return lang;
     }
     return new FormalLanguage(this.props.canvas);
   }
@@ -179,6 +191,8 @@ export
         selected = (<AutomatonEditor parent={this} selected={this.state.editing} language={this.language as FormalLanguage} />);
       } else if (this.state.status == "grammar") {
         selected = (<GrammarEditor parent={this} selected={this.state.editing} language={this.language as FormalLanguage} />);
+      } else if (this.state.status == "regexp") {
+        selected = (<RegularExpressionEditor parent={this} selected={null} language={this.language as FormalLanguage} />);
       } else if (this.state.status == "saving") {
         selected = (<SaveEditor parent={this} language={this.language as FormalLanguage} />);
       } else {
@@ -218,6 +232,19 @@ export
   this.language = new Grammar(this.props.canvas);
   this.setState({
     status: "grammar",
+    editing: null,
+    clicked: null,
+  });
+}
+
+/**
+   * Create a new regular expression and set up the regexp editor.
+   */
+ newRE() {
+  console.log("in newRE");
+  this.language = new RegularExpression(this.props.canvas);
+  this.setState({
+    status: "regexp",
     editing: null,
     clicked: null,
   });

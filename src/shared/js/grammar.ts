@@ -171,14 +171,12 @@ export class Grammar extends FormalLanguage {
     }
 
     treeLayout() {
-        debugger;
         if (this.root != null) {
             let renderedNode = this.root.rendering as any;
             if (renderedNode != null) {
                 let horizontalOffset = 3 * renderedNode.width / 2;
                 let verticalOffset = 3 * renderedNode.height / 2;
                 let w = this._doLayout(this.root, 20, 0, horizontalOffset, verticalOffset);
-                debugger;
                 this.summary.set("text", this.productionSummary());
                 this.summary.set("left", w+10);
             }
