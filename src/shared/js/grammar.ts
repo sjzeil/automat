@@ -32,12 +32,15 @@ export class Grammar extends FormalLanguage {
         this.startingSymbol = "";
         this.specification = "grammar";
         this.root = null;
+        this.summary = new fabric.Text('hello', {left: 100, top: 2, fontSize: 16});
+        this._canvas.add(this.summary);
     }
 
     productions: Production[];
     derivations: Derivation[];
     startingSymbol: string;
     root: ParseTreeNode | null;
+    summary: fabric.Text;
 
     static ProducesChar = "\u2192";
     static DerivesChar = "\u21D2";
@@ -140,6 +143,17 @@ export class Grammar extends FormalLanguage {
     }
 
 
+    productionSummary() {
+        let result = "";
+        for (const production of this.productions) {
+            let productionString = production.lhs + " \u21D2 " + production.rhs;
+            if (result != "") {
+                result += "\n";
+            }
+            result += productionString;
+        }
+        return result;
+    }
 
     _doLayout(tree: ParseTreeNode, x: number, y: number, hOffset: number, vOffset: number) {
         let wTotal = 0;
@@ -157,22 +171,28 @@ export class Grammar extends FormalLanguage {
     }
 
     treeLayout() {
+        debugger;
         if (this.root != null) {
             let renderedNode = this.root.rendering as any;
             if (renderedNode != null) {
                 let horizontalOffset = 3 * renderedNode.width / 2;
                 let verticalOffset = 3 * renderedNode.height / 2;
-                this._doLayout(this.root, 20, 0, horizontalOffset, verticalOffset)
+                let w = this._doLayout(this.root, 20, 0, horizontalOffset, verticalOffset);
+                debugger;
+                this.summary.set("text", this.productionSummary());
+                this.summary.set("left", w+10);
             }
         }
     }
 
     resetDerivations() {
         this._canvas.clear();
+        this._canvas.add(this.summary);
         this.root = null;
         this.derivations = [];
         this.startingSymbol = (this.productions.length > 0) ? this.productions[0].lhs : 'S';
         this.addDerivation(-1, -1, new ParseTreeNode(this.startingSymbol, this._canvas, {}));
+        this.treeLayout();
     }
 
 
