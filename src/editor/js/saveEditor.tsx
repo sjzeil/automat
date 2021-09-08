@@ -84,7 +84,7 @@ export
         if (this.parent.language != null) {
             let json = this.parent.language.toJSon();
             let encoded = LZUTF8.compress(json, {outputEncoding: "Base64"});
-            console.log("json length: " + json.length + "  encoded length: " | + encoded.length);
+            console.log("json length: " + json.length + "  encoded length: " + encoded.length);
             let newURL = trimmedURL + '?lang=' + encoded;
             return newURL;
         } else {

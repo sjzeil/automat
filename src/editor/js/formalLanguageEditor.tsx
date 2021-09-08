@@ -74,13 +74,49 @@ export
     let thisFLE = this;
 
     props.canvas.on('mouse:down', function (event) {
-      if (event.target) {
-        thisFLE.selected(event.target);
+      let evt = event.e as any;
+      if (evt.altKey === true) {
+        let thisCanvas = this as fabric.Canvas;
+        thisCanvas.isDragging = true;
+        thisCanvas.selection = false;
+        thisCanvas.lastPosX = evt.clientX;
+        thisCanvas.lastPosY = evt.clientY;
       } else {
-        let eventDetails = event.e as any;
-        thisFLE.clicked(eventDetails.offsetX, eventDetails.offsetY);
+        if (event.target) {
+          thisFLE.selected(event.target);
+        } else {
+          let eventDetails = event.e as any;
+          var vpt = this.viewportTransform;
+          thisFLE.clicked(eventDetails.offsetX-vpt[4], eventDetails.offsetY-vpt[5]);
+        }
       }
     });
+
+    props.canvas.on('mouse:move', function (opt) {
+      let thisCanvas = this as any;
+      if (thisCanvas.isDragging) {
+        var e = opt.e as any;
+        var vpt = thisCanvas.viewportTransform;
+        let dx = e.clientX - thisCanvas.lastPosX;
+        let dy = e.clientY - thisCanvas.lastPosY;
+        vpt[4] += dx;
+        if (vpt[4] < 0) vpt[4] = 0;
+        vpt[5] += dy;
+        if (vpt[5] < 0) vpt[5] = 0;
+        thisCanvas.requestRenderAll();
+        thisCanvas.lastPosX = e.clientX;
+        thisCanvas.lastPosY = e.clientY;
+      }
+    });
+    props.canvas.on('mouse:up', function (opt) {
+      // on mouse up we want to recalculate new interaction
+      // for all objects, so we call setViewportTransform
+      let thisCanvas = this as any;
+      thisCanvas.setViewportTransform(thisCanvas.viewportTransform);
+      thisCanvas.isDragging = false;
+      thisCanvas.selection = true;
+    });
+
 
     this.newCFG = this.newCFG.bind(this);
     this.newFA = this.newFA.bind(this);
@@ -224,31 +260,31 @@ export
     });
   }
 
-/**
-   * Create a new automaton and set up the automaton editor.
-   */
- newCFG() {
-  console.log("in newCFG");
-  this.language = new Grammar(this.props.canvas);
-  this.setState({
-    status: "grammar",
-    editing: null,
-    clicked: null,
-  });
-}
+  /**
+     * Create a new automaton and set up the automaton editor.
+     */
+  newCFG() {
+    console.log("in newCFG");
+    this.language = new Grammar(this.props.canvas);
+    this.setState({
+      status: "grammar",
+      editing: null,
+      clicked: null,
+    });
+  }
 
-/**
-   * Create a new regular expression and set up the regexp editor.
-   */
- newRE() {
-  console.log("in newRE");
-  this.language = new RegularExpression(this.props.canvas);
-  this.setState({
-    status: "regexp",
-    editing: null,
-    clicked: null,
-  });
-}
+  /**
+     * Create a new regular expression and set up the regexp editor.
+     */
+  newRE() {
+    console.log("in newRE");
+    this.language = new RegularExpression(this.props.canvas);
+    this.setState({
+      status: "regexp",
+      editing: null,
+      clicked: null,
+    });
+  }
 
   selected(obj: fabric.Object) {
     this.setState({
