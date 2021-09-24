@@ -13,7 +13,8 @@ var flCanvas = new fabric.Canvas('editorView');
 
 
 ReactDOM.render(
-  (<FormalLanguageEditor canvas={flCanvas} docURL={document.URL}/>),
+  (<FormalLanguageEditor canvas={flCanvas} docURL={document.URL}
+        user={document.username} problemID={document.problem} lock={document.lock}/>),
   document.getElementById('react-entry-point')
 );
 

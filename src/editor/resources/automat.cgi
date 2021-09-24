@@ -17,6 +17,11 @@ if (!defined($username)) {
 	$username="anonymous";
 }
 
+my $testUser = $query->param("test");
+if (defined($testuser)) {
+	$username = "__" . $testUser;
+}
+
 my $action = $query->param("action");
 if (!defined($action)) {
 	$action=$actions[0];
@@ -89,10 +94,17 @@ sub loadProperties
 	}
 	defined($properties{"title"}) || ($properties{"title"} = "Formal Language Editor");
 	defined($properties{"solution"}) || ($properties{"solution"} = "");
-	defined($properties{"locked"}) || ($properties{"locked"} = ($problem ne ''));
 	defined($properties{"instructors"}) || ($properties{"instructors"} = '');
 	$properties{"user"} = $username;
 	$properties{"problem"} = $problem;
+	if (!defined($properties{"lock"})) {
+		$properties{"lock"} = 1000000 + int rand(1000000);
+		if (-w "$problemINI") {
+			open INIOUT, ">>$problemINI" || die "Could not append to $problemINI";
+			print INIOUT, "lock=" . $properties{"lock"} . "\n";
+			close INIOUT;
+		}
+	}
 }
 
 sub identifyInstructors {

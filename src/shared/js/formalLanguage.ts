@@ -10,13 +10,17 @@ import { fabric } from 'fabric';
  */
 export
 class FormalLanguage {
-    constructor(canvas: fabric.Canvas) {
+    constructor(canvas: fabric.Canvas, user: string) {
         this._canvas = canvas;
         this.specification = "unspecified";
+        this.createdBy = user;
+        this.unlocked = true;
     }
 
     _canvas: fabric.Canvas;
     specification: string;
+    createdBy: string;
+    unlocked: boolean;
 
     clear() {
 

@@ -43,8 +43,9 @@ export
   interface FLEProps {
   canvas: fabric.Canvas,
   docURL: string;
-  user: string | null;
-  problemID: string | null;
+  user: string;
+  problemID: string;
+  lock: string;
 };
 
 export
@@ -69,14 +70,14 @@ export
       clicked: null,
     }
 
-    this.language = new FormalLanguage(props.canvas);
+    this.language = new FormalLanguage(props.canvas, props.user);
 
     let thisFLE = this;
 
-    props.canvas.on('mouse:down', function (event) {
+    props.canvas.on('mouse:down', function (this: fabric.Canvas, event: any) {
       let evt = event.e as any;
       if (evt.altKey === true) {
-        let thisCanvas = this as fabric.Canvas;
+        let thisCanvas = this as any;
         thisCanvas.isDragging = true;
         thisCanvas.selection = false;
         thisCanvas.lastPosX = evt.clientX;
@@ -85,14 +86,15 @@ export
         if (event.target) {
           thisFLE.selected(event.target);
         } else {
+          let thisCanvas = this as any;
           let eventDetails = event.e as any;
-          var vpt = this.viewportTransform;
+          var vpt = thisCanvas.viewportTransform;
           thisFLE.clicked(eventDetails.offsetX-vpt[4], eventDetails.offsetY-vpt[5]);
         }
       }
     });
 
-    props.canvas.on('mouse:move', function (opt) {
+    props.canvas.on('mouse:move', function (this: fabric.Canvas, opt: any) {
       let thisCanvas = this as any;
       if (thisCanvas.isDragging) {
         var e = opt.e as any;
@@ -108,7 +110,7 @@ export
         thisCanvas.lastPosY = e.clientY;
       }
     });
-    props.canvas.on('mouse:up', function (opt) {
+    props.canvas.on('mouse:up', function (this: fabric.Canvas, opt: any) {
       // on mouse up we want to recalculate new interaction
       // for all objects, so we call setViewportTransform
       let thisCanvas = this as any;
@@ -128,9 +130,16 @@ export
     this.loadLanguage = this.loadLanguage.bind(this);
 
     this.loadEncodedLang(props.docURL);
+
+    this.blocked = false;
+    if (this.language.createdBy != '' && this.props.user != 'Instructor' && this.language.createdBy != this.props.user) {
+      this.blocked = !this.language.unlocked;
+    }
+
   }
 
-  language: FormalLanguage | null;
+  language: FormalLanguage;
+  blocked: boolean;
 
 
   componentDidMount() {
@@ -170,7 +179,7 @@ export
 
   loadEncodedLang(encoded: string) {
     let protocolMark = encoded.indexOf('://');
-    this.language = new FormalLanguage(this.props.canvas);
+    this.language = new FormalLanguage(this.props.canvas, this.props.user);
     if (protocolMark >= 0 && protocolMark < 8) {
       let languageIndicator = "?lang=";
       if (encoded.includes(languageIndicator)) {
@@ -214,7 +223,7 @@ export
       }
       return lang;
     }
-    return new FormalLanguage(this.props.canvas);
+    return new FormalLanguage(this.props.canvas, this.props.user);
   }
 
   render() {
