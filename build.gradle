@@ -28,10 +28,38 @@ task copyResources (type: Copy) {
 	into './build/dist'
 }
 
+task copyDistForTest (type: Copy, dependsOn: ['buildReactApp', 'copyResources']) {
+	from './build/dist'
+	into './build/test'
+}
+
+task copyTestResources (type: Copy) {
+	from 'test/resources'
+	into './build/test'
+}
+
+
+task setupTest {
+	description "set up test environment in build/test"
+	group = "test"
+	dependsOn =['copyTestResources', 'copyDistForTest']
+	doLast {
+		new ProcessBuilder('perl',  'automat.cgi',  'action=editor',  'problem=testProblem') .
+		directory(new File('build/test')) .
+		redirectOutput(new File('build/test/editTestProblem.html')) .
+		start()
+
+		new ProcessBuilder('perl',  'automat.cgi',  'action=editor',  'problem=selfAssessProblem') .
+		directory(new File('build/test')) .
+		redirectOutput(new File('build/test/editSAProblem.html')) .
+		start()
+	}
+}
+
 task build {
 	 description = 'Build the development bundle'
 	 group = build
-	 dependsOn = ['buildReactApp', 'copyResources']
+	 dependsOn = ['buildReactApp', 'copyResources', 'setupTest']
 }
 
 task production	 {
@@ -40,14 +68,18 @@ task production	 {
 	 dependsOn = ['buildReactAppProduction', 'copyResources']
 }
 
+task cleanTests (type: Delete) {
+	delete './build/test'
+	followSymlinks = false
+}
 
-task clean (type: Delete) {
+task clean (type: Delete, dependsOn: 'cleanTests') {
 	delete './build/dist'
-	followSymlinks = true
+	followSymlinks = false
 }
 
 task cleaner (type: Delete, dependsOn: 'clean') {
 	delete 'node_modules'
-	followSymlinks = true
+	followSymlinks = false
 }
 

@@ -17,11 +17,6 @@ if (!defined($username)) {
 	$username="anonymous";
 }
 
-my $testUser = $query->param("test");
-if (defined($testuser)) {
-	$username = "__" . $testUser;
-}
-
 my $action = $query->param("action");
 if (!defined($action)) {
 	$action=$actions[0];
@@ -99,9 +94,10 @@ sub loadProperties
 	$properties{"problem"} = $problem;
 	if (!defined($properties{"lock"})) {
 		$properties{"lock"} = 1000000 + int rand(1000000);
+		my $problemINI = $properties{"base"} . "/$problem/$problem.ini";
 		if (-w "$problemINI") {
 			open INIOUT, ">>$problemINI" || die "Could not append to $problemINI";
-			print INIOUT, "lock=" . $properties{"lock"} . "\n";
+			print INIOUT "lock=" . $properties{"lock"} . "\n";
 			close INIOUT;
 		}
 	}
