@@ -8,9 +8,11 @@ import { SaveEditor } from './saveEditor';
 import { Grammar } from '../../shared/js/grammar';
 import { Automaton } from '../../shared/js/automaton';
 import { RegularExpressionEditor } from './regularExpressionEditor';
+import { BadLanguageEditor } from './badLanguageEditor';
 import { FormalLanguage } from '../../shared/js/formalLanguage';
 import LZUTF8 from 'lzutf8';
 import { RegularExpression } from '../../shared/js/regularExpression';
+import { BadLanguage } from '../../shared/js/badLanguage';
 
 
 export class MouseLoc {
@@ -123,6 +125,7 @@ export
     this.newCFG = this.newCFG.bind(this);
     this.newFA = this.newFA.bind(this);
     this.newRE = this.newRE.bind(this);
+    this.newPDA = this.newPDA.bind(this);
     this.newLanguage = this.newLanguage.bind(this);
     this.clicked = this.clicked.bind(this);
     this.selected = this.selected.bind(this);
@@ -251,6 +254,8 @@ export
         selected = (<RegularExpressionEditor parent={this} selected={null} language={this.language as FormalLanguage} />);
       } else if (this.state.status == "saving") {
         selected = (<SaveEditor parent={this} language={this.language as FormalLanguage} />);
+      } else if (this.state.status == "badLang") {
+        selected = (<BadLanguageEditor parent={this} selected={null} language={this.language as FormalLanguage} />);
       } else {
         selected = (<div>Bad status: {this.state.status}</div>);
       }
@@ -275,6 +280,19 @@ export
     this.language = new Automaton(this.props.canvas);
     this.setState({
       status: "automaton",
+      editing: null,
+      clicked: null,
+    });
+  }
+
+  /**
+   * Create a new automaton and set up the automaton editor.
+   */
+   newPDA() {
+    console.log("in newPDA");
+    this.language = new BadLanguage(this.props.canvas, this.props.user, "PDAs are not yet implemented");
+    this.setState({
+      status: "badLang",
       editing: null,
       clicked: null,
     });
