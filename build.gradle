@@ -91,7 +91,7 @@ task deployForTest (dependsOn: 'setupTest') {
 task build {
 	 description = 'Build the development bundle'
 	 group = build
-	 dependsOn = ['buildReactApp', 'copyResources', 'setupTest']
+	 dependsOn = ['buildReactApp', 'copyResources', 'deployForTest']
 }
 
 task production	 {

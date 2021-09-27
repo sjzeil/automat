@@ -14,8 +14,13 @@ my $query = new CGI;
 
 my $username = $ENV{"REMOTE_USER"};
 if (!defined($username)) {
-	$username="anonymous";
+	$username="Anonymous";
 }
+my $testName = $query->param("test");
+if (defined($testName)) {
+	$username = "**$testName";
+}
+
 
 my $action = $query->param("action");
 if (!defined($action)) {
@@ -106,12 +111,18 @@ sub loadProperties
 sub identifyInstructors {
 	my $instructors = $properties{"instructors"};
 	if (index(",$instructors,", $username) >= 0) {
+		$username = "Instructor";
 		$properties{"user"} = "Instructor";
 	}
 }
 
 
 sub performSubstutitions {
+	if ($problem eq "" && $username eq "Anonymous") {
+		$htmlText =~ s/<h2>[@]problem.*?<\/h2>//g;
+	} elsif ($problem eq "") {
+		$htmlText =~ s/<h2>[@]problem[@] /<h2>/g;
+	}
 	while (my ($key, $value) = each(%properties)) {
 		$htmlText =~ s/[@]$key[@]/$value/g;
 	}

@@ -14,10 +14,6 @@ var flCanvas = new fabric.Canvas('editorView');
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 
-if (urlParams.has('test')) {
-  document.username = '__' + urlParams.get('test');
-}
-
 ReactDOM.render(
   (<FormalLanguageEditor canvas={flCanvas} docURL={document.URL}
         user={document.username} problemID={document.problem} lock={document.lock}/>),

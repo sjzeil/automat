@@ -4,6 +4,7 @@
   </head>
   <body>
     <h1>@title@</h1>
+    <h2>@problem@ by @user@</h2>
     
     <div>
       <div id="editorContainer" class="editorCanvas">
@@ -13,9 +14,9 @@
     </div>
 
     <script>
-        problem = "@problem@";
-        username = "@user@";
-        lock = "@lock@";
+        document.problem = "@problem@";
+        document.username = "@user@";
+        document.lock = "@lock@";
     </script>
     <div id="react-entry-point"></div>
     <script src="./editor.bundle.js"> </script>

@@ -155,11 +155,22 @@ export
   }
 
   toolbar() {
+    let gradeButton = () => {
+      let gButton = (<span></span>);
+      if (this.props.problemID != "") {
+          if ((this.props.user === "Instructor") || (this.props.lock == "")) {
+            gButton = (<input type="button" value="Grade Report"
+                        onClick={this.loadLanguage} 
+                        disabled={this.state.status == "new"} />);
+          }
+        }
+      return gButton;
+      };
     return (
       <div className="editorToolbar">
         <input type="button" value="New" onClick={this.newLanguage} disabled={this.state.status == "new"} />
-        <input type="button" value="Load" onClick={this.loadLanguage} />
         <input type="button" value="Save" onClick={this.saveLanguage} disabled={this.state.status == "new"} />
+        {gradeButton()}
       </div>
     );
   }
@@ -241,7 +252,7 @@ export
       } else if (this.state.status == "saving") {
         selected = (<SaveEditor parent={this} language={this.language as FormalLanguage} />);
       } else {
-        selected = (<div>Bad status {this.state.status}</div>);
+        selected = (<div>Bad status: {this.state.status}</div>);
       }
       return selected;
     };
