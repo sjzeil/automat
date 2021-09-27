@@ -39,10 +39,10 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
             } else {
                 initialProd = prod;
             }
-            workingText += prod.lhs + "\u21D2" + prod.rhs;
+            workingText += prod.lhs + Grammar.ProducesChar + prod.rhs;
         }
         if (workingText == "") {
-            workingText = "S\u21D2";
+            workingText = 'S' + Grammar.ProducesChar;
             initialProd = {lhs: "S", rhs: ""};
         }
         this.state = (
@@ -127,7 +127,7 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
                                     className="lhs"
                                     maxLength={1}
                                     />
-                                <span>{'\u21D2'}</span>
+                                <span>{Grammar.ProducesChar}</span>
                                 <input type="text" id="production_rhs" name="production_rhs" 
                                     onChange={(ev: React.ChangeEvent<HTMLInputElement>): void => this.rhsChanged(ev.target.value)}
                                     value={this.state.partialProduction.rhs}
@@ -170,7 +170,7 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
     }
 
     parseProd(prodStr: string) {
-        let divider = '\u21D2';
+        let divider = Grammar.ProducesChar;
         let k = prodStr.indexOf(divider);
         let production = {
             lhs: prodStr.substr(0, k),
@@ -180,7 +180,7 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
     }
 
     packProd(prod: Production) {
-        let divider = '\u21D2';
+        let divider = Grammar.ProducesChar;
         return prod.lhs + divider + prod.rhs;
     }
 

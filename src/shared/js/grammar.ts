@@ -25,15 +25,17 @@ export interface Derivation {
  */
 
 export class Grammar extends FormalLanguage {
-    constructor(canvas: fabric.Canvas) {
-        super(canvas);
+    constructor(canvas: fabric.Canvas, user: string) {
+        super(canvas, user);
         this.productions = [];
         this.derivations = [];
         this.startingSymbol = "";
         this.specification = "grammar";
         this.root = null;
-        this.summary = new fabric.Text('hello', {left: 100, top: 2, fontSize: 16});
+        this.summary = new fabric.Text('hello', {left: 10, top: 2, fontSize: 16});
+        this.derivation = new fabric.Text('goodbye', {left: 100, top: 2, fontSize: 16});
         this._canvas.add(this.summary);
+        this._canvas.add(this.derivation);
     }
 
     productions: Production[];
@@ -41,6 +43,7 @@ export class Grammar extends FormalLanguage {
     startingSymbol: string;
     root: ParseTreeNode | null;
     summary: fabric.Text;
+    derivation: fabric.Text;
 
     static ProducesChar = "\u2192";
     static DerivesChar = "\u21D2";
@@ -146,7 +149,7 @@ export class Grammar extends FormalLanguage {
     productionSummary() {
         let result = "";
         for (const production of this.productions) {
-            let productionString = production.lhs + " \u21D2 " + production.rhs;
+            let productionString = production.lhs + ' ' + Grammar.ProducesChar + ' ' + production.rhs;
             if (result != "") {
                 result += "\n";
             }
@@ -174,11 +177,13 @@ export class Grammar extends FormalLanguage {
         if (this.root != null) {
             let renderedNode = this.root.rendering as any;
             if (renderedNode != null) {
+                this.summary.set("text", this.productionSummary());
+                this.derivation.set("text", this.fullDerivation() + '\n' + this.derivationProperties());
+                this.derivation.set("left", this.summary.get("width")! + 50);
                 let horizontalOffset = 3 * renderedNode.width / 2;
                 let verticalOffset = 3 * renderedNode.height / 2;
-                let w = this._doLayout(this.root, 20, 0, horizontalOffset, verticalOffset);
-                this.summary.set("text", this.productionSummary());
-                this.summary.set("left", w+10);
+                let treeY = Math.max(this.summary.get("height")!, this.derivation.get("height")!);
+                this._doLayout(this.root, 20, treeY+10, horizontalOffset, verticalOffset);
             }
         }
     }
@@ -186,6 +191,7 @@ export class Grammar extends FormalLanguage {
     resetDerivations() {
         this._canvas.clear();
         this._canvas.add(this.summary);
+        this._canvas.add(this.derivation);
         this.root = null;
         this.derivations = [];
         this.startingSymbol = (this.productions.length > 0) ? this.productions[0].lhs : 'S';
@@ -197,12 +203,40 @@ export class Grammar extends FormalLanguage {
 
 
     fullDerivation() {
+        let counter = 0;
+        let result = "";
         let d;
-        let steps = [];
         for (d of this.derivations) {
-            steps.push(d.expansion);
+            if (counter > 0) {
+                result += ' ' + Grammar.DerivesChar + ' ';
+            }
+            result += d.expansion;
+            if (counter % 4 == 3) {
+                result += '\n';
+            }
+            ++counter;
         }
-        return steps.join(` ${Grammar.DerivesChar} `);
+        return result;
+    }
+
+    derivationProperties() {
+        let lastStep = this.derivations[this.derivations.length - 1];
+        let derivationType = "";
+        if (lastStep.leftmost && lastStep.rightmost) {
+            derivationType = "leftmost and rightmost"
+        } else if (lastStep.leftmost) {
+            derivationType = "leftmost"
+        }
+        else if (lastStep.rightmost) {
+            derivationType = "rightmost"
+        } else {
+            derivationType = "neither leftmost nor rightmost"
+        }
+        let derivationStatus = "completed";
+        if (lastStep.expansion.toLowerCase() != lastStep.expansion) { // has at least one nonTerminal A..Z 
+            derivationStatus = "incomplete";
+        }
+        return "Derivation is " + derivationStatus + ", " + derivationType + ".";
     }
 
 

@@ -106,15 +106,7 @@ export
     render() {
         console.log("GrammarEditor rendering");
         let lastStep = this.language.derivations[this.language.derivations.length - 1];
-        let derivationType = "";
-        if (lastStep.leftmost && lastStep.rightmost) {
-            derivationType = "Derivation is leftmost and rightmost."
-        } else if (lastStep.leftmost) {
-            derivationType = "Derivation is leftmost."
-        }
-        else if (lastStep.rightmost) {
-            derivationType = "Derivation is rightmost."
-        }
+        let derivationType = this.language.derivationProperties();
         return (
             <React.Fragment>
                 <div className="editors">

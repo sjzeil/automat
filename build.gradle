@@ -55,12 +55,12 @@ task setupTest {
 	group = "test"
 	dependsOn =['copyTestResources', 'copyDistForTest']
 	doLast {
-		new ProcessBuilder('perl',  'automat.cgi',  'action=editor',  'problem=testProblem') .
+		new ProcessBuilder('perl',  'automat.cgi',  'action=editor',  'problem=testProblem', 'test=instr1') .
 		directory(new File('build/test')) .
 		redirectOutput(new File('build/test/editTestProblem.html')) .
 		start()
 
-		new ProcessBuilder('perl',  'automat.cgi',  'action=editor',  'problem=selfAssessProblem') .
+		new ProcessBuilder('perl',  'automat.cgi',  'action=editor',  'problem=selfAssessProblem', 'test=student1') .
 		directory(new File('build/test')) .
 		redirectOutput(new File('build/test/editSAProblem.html')) .
 		start()
