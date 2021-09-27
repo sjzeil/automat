@@ -277,6 +277,7 @@ export
    */
   newFA() {
     console.log("in newFA");
+    this.props.canvas.clear();
     this.language = new Automaton(this.props.canvas);
     this.setState({
       status: "automaton",
@@ -290,6 +291,7 @@ export
    */
    newPDA() {
     console.log("in newPDA");
+    this.props.canvas.clear();
     this.language = new BadLanguage(this.props.canvas, this.props.user, "PDAs are not yet implemented");
     this.setState({
       status: "badLang",
@@ -303,6 +305,7 @@ export
      */
   newCFG() {
     console.log("in newCFG");
+    this.props.canvas.clear();
     this.language = new Grammar(this.props.canvas, this.props.user);
     this.setState({
       status: "grammar",
@@ -316,6 +319,7 @@ export
      */
   newRE() {
     console.log("in newRE");
+    this.props.canvas.clear();
     this.language = new RegularExpression(this.props.canvas, this.props.user);
     this.setState({
       status: "regexp",
