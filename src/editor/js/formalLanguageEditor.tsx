@@ -102,9 +102,9 @@ export
         let dx = e.clientX - thisCanvas.lastPosX;
         let dy = e.clientY - thisCanvas.lastPosY;
         vpt[4] += dx;
-        if (vpt[4] < 0) vpt[4] = 0;
+        if (vpt[4] > 0) vpt[4] = 0;
         vpt[5] += dy;
-        if (vpt[5] < 0) vpt[5] = 0;
+        if (vpt[5] > 0) vpt[5] = 0;
         thisCanvas.requestRenderAll();
         thisCanvas.lastPosX = e.clientX;
         thisCanvas.lastPosY = e.clientY;
