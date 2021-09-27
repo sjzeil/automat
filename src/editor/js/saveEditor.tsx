@@ -81,11 +81,15 @@ export
 
     saveLanguage(url: string) {
         let trimmedURL = url.split('?')[0];
+        const queryString = window.location.search;
+        let urlParams = new URLSearchParams(queryString);
+        urlParams.delete('lang');
         if (this.parent.language != null) {
             let json = this.parent.language.toJSon();
             let encoded = LZUTF8.compress(json, {outputEncoding: "Base64"});
             console.log("json length: " + json.length + "  encoded length: " + encoded.length);
-            let newURL = trimmedURL + '?lang=' + encoded;
+            urlParams.append('lang', encoded);
+            let newURL = trimmedURL + '?' + urlParams.toString();
             return newURL;
         } else {
             return trimmedURL;

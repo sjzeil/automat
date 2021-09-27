@@ -189,13 +189,13 @@ export
   }
 
   loadEncodedLang(encoded: string) {
-    let protocolMark = encoded.indexOf('://');
+    const queryString = encoded.split('?')[1];
     this.language = new FormalLanguage(this.props.canvas, this.props.user);
-    if (protocolMark >= 0 && protocolMark < 8) {
-      let languageIndicator = "?lang=";
-      if (encoded.includes(languageIndicator)) {
-        encoded = encoded.substr(encoded.indexOf(languageIndicator) + languageIndicator.length);
-        let decoded = LZUTF8.decompress(encoded, { inputEncoding: "Base64" });
+    if (queryString) {
+      let urlParams = new URLSearchParams(queryString);
+      if (urlParams.has('lang')) {
+        let lang = urlParams.get('lang');
+        let decoded = LZUTF8.decompress(lang, { inputEncoding: "Base64" });
         let langObject = JSON.parse(decoded);
         this.language = this.loadLanguageFromJSon(langObject);
       }
@@ -214,7 +214,7 @@ export
       }
       return lang;
     } else if (jsonObj.specification == "grammar") {
-      let lang = new Grammar(this.props.canvas);
+      let lang = new Grammar(this.props.canvas, this.props.user);
       lang.fromJSon(jsonObj);
       this.state = {
         status: "grammar",
@@ -224,7 +224,7 @@ export
       }
       return lang;
     } else if (jsonObj.specification == "regexp") {
-      let lang = new RegularExpression(this.props.canvas);
+      let lang = new RegularExpression(this.props.canvas, this.props.user);
       lang.fromJSon(jsonObj);
       this.state = {
         status: "regexp",
@@ -285,7 +285,7 @@ export
      */
   newCFG() {
     console.log("in newCFG");
-    this.language = new Grammar(this.props.canvas);
+    this.language = new Grammar(this.props.canvas, this.props.user);
     this.setState({
       status: "grammar",
       editing: null,
@@ -298,7 +298,7 @@ export
      */
   newRE() {
     console.log("in newRE");
-    this.language = new RegularExpression(this.props.canvas);
+    this.language = new RegularExpression(this.props.canvas, this.props.user);
     this.setState({
       status: "regexp",
       editing: null,
