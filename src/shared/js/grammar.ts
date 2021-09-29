@@ -265,6 +265,7 @@ export class Grammar extends FormalLanguage {
 
     fromJSon(jsonObj: any) {
         this.clear();
+        super.fromJSon(jsonObj);
         this.productions = [];
         for (let prod of jsonObj.productions) {
             this.addProduction(prod);

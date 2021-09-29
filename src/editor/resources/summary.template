@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>@title@</title>
+  </head>
+  <body>
+    <h2>@problem@ by <span id='creatorName'>anonymous</span></h2>
+    
+    <div>
+      <div id="editorContainer" class="summaryCanvas">
+        <canvas id="editorView" height=600 width=600> </canvas>
+        <div>(Hold Alt key to drag diagram horizontally or vertically.)</div>
+      </div>
+    </div>
+
+    <script>
+        document.problem = "@problem@";
+        document.username = "@user@";
+        document.lock = "@lock@";
+    </script>
+    <div id="react-entry-point" class="suppressed"></div>
+    <script src="./editor.bundle.js"> </script>
+  </body>
+</html>

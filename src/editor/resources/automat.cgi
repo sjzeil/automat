@@ -8,9 +8,11 @@ use List::Util 'any';
 
 use strict;
 
-my @actions=("editor", "grade", "summary");
+my @actions=("editor", "grading", "summary");
 
 my $query = new CGI;
+
+my $page_url = "https://" . $ENV{SERVER_NAME} . $ENV{REQUEST_URI};
 
 my $username = $ENV{"REMOTE_USER"};
 if (!defined($username)) {
@@ -41,6 +43,17 @@ if (!defined($problem)) {
 
 print $query->header();
 loadProperties();
+
+# Special properties for grade reports
+my $studentSummaryURL = $page_url;
+$studentSummaryURL =~ s/action=grading/action=summary/;
+$properties{"studentSummaryURL"} = $studentSummaryURL;
+
+my $instructorSummaryURL = $studentSummaryURL;
+$instructorSummaryURL =~ s/lang=[^&]*//;
+$instructorSummaryURL .= '&lang=' . $properties{'solution'};
+$properties{"instructorSummaryURL"} = $instructorSummaryURL;
+
 identifyInstructors();
 my $htmlText = readFileIntoString($action . ".template");
 performSubstutitions();

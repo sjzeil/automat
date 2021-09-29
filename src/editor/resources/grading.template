@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <title>@title@</title>
+    <link rel="stylesheet" href="grading.css">
+  </head>
+  <body>
+    <h1>@title@</h1>
+    
+    <div>
+      <div class="studentSummary">
+      <h2>Student's Submission</h2>
+        <iframe class='summaryFrame'
+                src='@studentSummaryURL@'
+                scrolling='auto'>
+        </iframe>
+      </div>
+      <div class="instructorSummary">
+        <h2>Instructor's Solution</h2>
+        <details>
+          <summary>Click to reveal</summary>
+          <iframe class='summaryFrame'
+                src='@instructorSummaryURL@'
+                scrolling='auto'>
+          </iframe>
+        </details>
+      </div>
+    </div>
+    <div class='reportBody'>
+       @reportBody@
+    </div>
+    <script>
+        document.problem = "@problem@";
+        document.username = "@user@";
+        document.lock = "@lock@";
+    </script>
+  </body>
+</html>

@@ -41,6 +41,7 @@ export class RegularExpression extends FormalLanguage {
     }
 
     fromJSon(jsonObj: any) {
+        super.fromJSon(jsonObj);
         this.regexp = jsonObj.regexp;
     }
 
