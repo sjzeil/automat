@@ -271,7 +271,6 @@ export class Grammar extends FormalLanguage {
             this.addProduction(prod);
         }
         this.derivations = [];
-        this._canvas.clear();
         for (let step of jsonObj.derivation) {
             if (this.derivations.length == 0) {
                 this.addDerivation(step.symbol, step.production, new ParseTreeNode(this.startingSymbol, this._canvas, {}));

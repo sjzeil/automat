@@ -25,21 +25,7 @@ export class MouseLoc {
   }
 }
 
-/*
-export
-  interface EditorProps {
-  parent: FormalLanguageEditor;
-  specification: string;
-}
 
-export
-  interface EditorState {
-  status: string;
-  selected1: fabric.Object | null;
-  selected2: fabric.Object | null;
-  editing: any;
-}
-*/
 
 export
   interface FLEProps {
@@ -132,6 +118,7 @@ export
     this.selected = this.selected.bind(this);
     this.saveLanguage = this.saveLanguage.bind(this);
     this.loadLanguage = this.loadLanguage.bind(this);
+    this.gradeReport = this.gradeReport.bind(this);
 
     this.loadEncodedLang(props.docURL);
 
@@ -168,7 +155,7 @@ export
       if (this.props.problemID != "") {
         if ((this.props.user === "Instructor") || (this.props.lock == "")) {
           gButton = (<input type="button" value="Grade Report"
-            onClick={this.loadLanguage}
+            onClick={this.gradeReport}
             disabled={this.state.status == "new"} />);
         }
       }
@@ -194,6 +181,16 @@ export
       oldStatus: this.state.status,
       status: 'saving',
     });
+  }
+
+  gradeReport() {
+    let newURL = this.props.docURL;
+    if (newURL.indexOf("action=editor") >= 0) {
+      newURL.replace("action=editor", "action=grading");
+    } else {
+      newURL += "&action=grading";
+    }
+    window.location.href = newURL;
   }
 
   loadEncodedLang(encoded: string) {
