@@ -34,6 +34,7 @@ export class RegularExpression extends FormalLanguage {
 
         let object = {
             specification: this.specification,
+            createdBy: this.createdBy,
             regexp: this.regexp,
         };
         return JSON.stringify(object);

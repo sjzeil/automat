@@ -13,9 +13,10 @@ var flCanvas = new fabric.Canvas('editorView');
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
+const creatorName = document.getElementById('creatorName');
 
 ReactDOM.render(
-  (<FormalLanguageEditor canvas={flCanvas} docURL={document.URL}
+  (<FormalLanguageEditor canvas={flCanvas} creatorName={creatorName} docURL={document.URL}
         user={document.username} problemID={document.problem} lock={document.lock}/>),
   document.getElementById('react-entry-point')
 );

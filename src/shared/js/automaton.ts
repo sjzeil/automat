@@ -11,8 +11,8 @@ import { Rendering, RenderedElement } from './renderedElement';
  */
 
 export class Automaton extends FormalLanguage {
-    constructor(canvas: fabric.Canvas) {
-        super(canvas);
+    constructor(canvas: fabric.Canvas, user: string) {
+        super(canvas, user);
         this.states = [];
         this.transitions = [];
         this.specification = "automaton";
@@ -140,6 +140,7 @@ export class Automaton extends FormalLanguage {
 
         let object = {
             specification: this.specification,
+            createdBy: this.createdBy,
             states: stateList,
             transitions: transitionList,
         };
@@ -148,6 +149,7 @@ export class Automaton extends FormalLanguage {
 
     fromJSon(jsonObj: any) {
         this.clear();
+        super.fromJSon(jsonObj);
         let state;
         for (state of jsonObj.states) {
             let newState = this.addState(state.left, state.top, state.label);

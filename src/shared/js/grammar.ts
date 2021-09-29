@@ -256,6 +256,7 @@ export class Grammar extends FormalLanguage {
 
         let object = {
             specification: this.specification,
+            createdBy: this.createdBy,
             productions: productionList,
             derivation: derivationList,
         };

@@ -27,10 +27,12 @@ class FormalLanguage {
     }
 
     toJSon() {
-        return '"specification": "' + this.specification + '"\n';
+        return '"specification": "' + this.specification + '"\n' +
+               '"createdBy": "' + this.createdBy + '"\n' 
     }
 
     fromJSon(jsonObj: any) {
+        this.createdBy = jsonObj.createdBy;
     }
 
 }

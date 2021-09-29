@@ -1,5 +1,5 @@
 import { fabric } from 'fabric';
-import React from 'react';
+import React, { DOMElement } from 'react';
 import ReactDOM from 'react-dom';
 import { NewLanguageEditor } from './newLanguageEditor';
 import { AutomatonEditor } from './automatonEditor';
@@ -48,6 +48,7 @@ export
   user: string;
   problemID: string;
   lock: string;
+  creatorName: any;
 };
 
 export
@@ -91,7 +92,7 @@ export
           let thisCanvas = this as any;
           let eventDetails = event.e as any;
           var vpt = thisCanvas.viewportTransform;
-          thisFLE.clicked(eventDetails.offsetX-vpt[4], eventDetails.offsetY-vpt[5]);
+          thisFLE.clicked(eventDetails.offsetX - vpt[4], eventDetails.offsetY - vpt[5]);
         }
       }
     });
@@ -134,6 +135,10 @@ export
 
     this.loadEncodedLang(props.docURL);
 
+    if (props.creatorName) {
+      props.creatorName.innerHTML = this.language.createdBy;
+    }
+
     this.blocked = false;
     if (this.language.createdBy != '' && this.props.user != 'Instructor' && this.language.createdBy != this.props.user) {
       this.blocked = !this.language.unlocked;
@@ -161,14 +166,14 @@ export
     let gradeButton = () => {
       let gButton = (<span></span>);
       if (this.props.problemID != "") {
-          if ((this.props.user === "Instructor") || (this.props.lock == "")) {
-            gButton = (<input type="button" value="Grade Report"
-                        onClick={this.loadLanguage} 
-                        disabled={this.state.status == "new"} />);
-          }
+        if ((this.props.user === "Instructor") || (this.props.lock == "")) {
+          gButton = (<input type="button" value="Grade Report"
+            onClick={this.loadLanguage}
+            disabled={this.state.status == "new"} />);
         }
+      }
       return gButton;
-      };
+    };
     return (
       <div className="editorToolbar">
         <input type="button" value="New" onClick={this.newLanguage} disabled={this.state.status == "new"} />
@@ -193,6 +198,7 @@ export
 
   loadEncodedLang(encoded: string) {
     const queryString = encoded.split('?')[1];
+    debugger;
     this.language = new FormalLanguage(this.props.canvas, this.props.user);
     if (queryString) {
       let urlParams = new URLSearchParams(queryString);
@@ -205,39 +211,76 @@ export
     }
   }
 
-  loadLanguageFromJSon(jsonObj: any): FormalLanguage {
-    if (jsonObj.specification == "automaton") {
-      let lang = new Automaton(this.props.canvas);
-      lang.fromJSon(jsonObj);
-      this.state = {
-        status: "automaton",
-        oldStatus: "new",
-        editing: null,
-        clicked: null,
-      }
-      return lang;
-    } else if (jsonObj.specification == "grammar") {
-      let lang = new Grammar(this.props.canvas, this.props.user);
-      lang.fromJSon(jsonObj);
-      this.state = {
-        status: "grammar",
-        oldStatus: "new",
-        editing: null,
-        clicked: null,
-      }
-      return lang;
-    } else if (jsonObj.specification == "regexp") {
-      let lang = new RegularExpression(this.props.canvas, this.props.user);
-      lang.fromJSon(jsonObj);
-      this.state = {
-        status: "regexp",
-        oldStatus: "new",
-        editing: null,
-        clicked: null,
-      }
-      return lang;
+  _loadPermitted(jsonObj: any): boolean {
+    if (this.props.user == "Instructor") {
+      // Instructors can see anything
+      return true;
     }
-    return new FormalLanguage(this.props.canvas, this.props.user);
+    if (this.props.user == jsonObj.createdBy) {
+      // Anyone can see their own work
+      return true;
+    }
+    if (jsonObj.createdBy == "Anonymous") {
+      // Anyone can see anonymously generated languages
+      return true;
+    }
+    return false;
+  }
+
+  loadLanguageFromJSon(jsonObj: any): FormalLanguage {
+    if (this._loadPermitted(jsonObj)) {
+      if (jsonObj.specification == "automaton") {
+        let lang = new Automaton(this.props.canvas, this.props.user);
+        lang.fromJSon(jsonObj);
+        this.state = {
+          status: "automaton",
+          oldStatus: "new",
+          editing: null,
+          clicked: null,
+        }
+        return lang;
+      } else if (jsonObj.specification == "grammar") {
+        let lang = new Grammar(this.props.canvas, this.props.user);
+        lang.fromJSon(jsonObj);
+        this.state = {
+          status: "grammar",
+          oldStatus: "new",
+          editing: null,
+          clicked: null,
+        }
+        return lang;
+      } else if (jsonObj.specification == "regexp") {
+        let lang = new RegularExpression(this.props.canvas, this.props.user);
+        lang.fromJSon(jsonObj);
+        this.state = {
+          status: "regexp",
+          oldStatus: "new",
+          editing: null,
+          clicked: null,
+        }
+        return lang;
+      } else {
+        let lang = new BadLanguage(this.props.canvas, this.props.user,
+          "Unknown language specification: " + jsonObj.specification);
+        this.state = {
+          status: "badLang",
+          oldStatus: "new",
+          editing: null,
+          clicked: null,
+        }
+        return lang;
+      }
+    } else {
+      let lang = new BadLanguage(this.props.canvas, this.props.user,
+        this.props.user + " cannot view languages created by " + jsonObj.createdBy);
+      this.state = {
+        status: "badLang",
+        oldStatus: "new",
+        editing: null,
+        clicked: null,
+      }
+      return lang
+    }
   }
 
   render() {
@@ -278,7 +321,7 @@ export
   newFA() {
     console.log("in newFA");
     this.props.canvas.clear();
-    this.language = new Automaton(this.props.canvas);
+    this.language = new Automaton(this.props.canvas, this.props.user);
     this.setState({
       status: "automaton",
       editing: null,
@@ -289,7 +332,7 @@ export
   /**
    * Create a new automaton and set up the automaton editor.
    */
-   newPDA() {
+  newPDA() {
     console.log("in newPDA");
     this.props.canvas.clear();
     this.language = new BadLanguage(this.props.canvas, this.props.user, "PDAs are not yet implemented");
