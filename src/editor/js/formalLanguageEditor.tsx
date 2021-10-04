@@ -10,6 +10,7 @@ import { Automaton } from '../../shared/js/automaton';
 import { RegularExpressionEditor } from './regularExpressionEditor';
 import { BadLanguageEditor } from './badLanguageEditor';
 import { FormalLanguage } from '../../shared/js/formalLanguage';
+import { LanguageFactory } from '../../shared/js/languageFactory';
 import LZUTF8 from 'lzutf8';
 import { RegularExpression } from '../../shared/js/regularExpression';
 import { BadLanguage } from '../../shared/js/badLanguage';
@@ -201,84 +202,22 @@ export
       let urlParams = new URLSearchParams(queryString);
       if (urlParams.has('lang')) {
         let lang = urlParams.get('lang');
-        let decoded = LZUTF8.decompress(lang, { inputEncoding: "Base64" });
-        let langObject = JSON.parse(decoded);
-        this.language = this.loadLanguageFromJSon(langObject);
+        if (lang) {
+          let factory = new LanguageFactory(this.props.canvas, this.props.user);
+          this.language = factory.load(lang);
+          this.state = {
+            status: this.language.specification,
+            oldStatus: "new",
+            editing: null,
+            clicked: null,
+          }
+        }
+
       }
     }
   }
 
-  _loadPermitted(jsonObj: any): boolean {
-    if (this.props.user == "Instructor") {
-      // Instructors can see anything
-      return true;
-    }
-    if (this.props.user == jsonObj.createdBy) {
-      // Anyone can see their own work
-      return true;
-    }
-    if (jsonObj.createdBy == "Anonymous") {
-      // Anyone can see anonymously generated languages
-      return true;
-    }
-    return false;
-  }
 
-  loadLanguageFromJSon(jsonObj: any): FormalLanguage {
-    if (this._loadPermitted(jsonObj)) {
-      if (jsonObj.specification == "automaton") {
-        let lang = new Automaton(this.props.canvas, this.props.user);
-        lang.fromJSon(jsonObj);
-        this.state = {
-          status: "automaton",
-          oldStatus: "new",
-          editing: null,
-          clicked: null,
-        }
-        return lang;
-      } else if (jsonObj.specification == "grammar") {
-        let lang = new Grammar(this.props.canvas, this.props.user);
-        lang.fromJSon(jsonObj);
-        this.state = {
-          status: "grammar",
-          oldStatus: "new",
-          editing: null,
-          clicked: null,
-        }
-        return lang;
-      } else if (jsonObj.specification == "regexp") {
-        let lang = new RegularExpression(this.props.canvas, this.props.user);
-        lang.fromJSon(jsonObj);
-        this.state = {
-          status: "regexp",
-          oldStatus: "new",
-          editing: null,
-          clicked: null,
-        }
-        return lang;
-      } else {
-        let lang = new BadLanguage(this.props.canvas, this.props.user,
-          "Unknown language specification: " + jsonObj.specification);
-        this.state = {
-          status: "badLang",
-          oldStatus: "new",
-          editing: null,
-          clicked: null,
-        }
-        return lang;
-      }
-    } else {
-      let lang = new BadLanguage(this.props.canvas, this.props.user,
-        this.props.user + " cannot view languages created by " + jsonObj.createdBy);
-      this.state = {
-        status: "badLang",
-        oldStatus: "new",
-        editing: null,
-        clicked: null,
-      }
-      return lang
-    }
-  }
 
   render() {
     console.log("FormalLanguageEditor rendering");

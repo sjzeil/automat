@@ -4,17 +4,27 @@
  * Usage: node grader.ts --problem=path-to-problem.ini --lang=encoded-formal-language
  */
 
+ import { fabric } from 'fabric';
+
+ import {FormalLanguage} from '../../shared/js/formalLanguage';
+ import {LanguageFactory} from '../../shared/js/languageFactory';
+ import "../../editor/css/editor.css";
+ 
+
+
 const args = require('minimist')(process.argv.slice(2))
 
+const user = args['user']
+const lang = args['lang']
+
 console.log ("<pre>");
-process.argv.forEach((val, index) => {
-    console.log(`${index}: ${val}`)
-  })
-  console.log('lang is ' + args['lang']);
+console.log('user is ' + user);
+console.log('lang is ' + lang);
+
+let factory = new LanguageFactory(null, user);
+let language = factory.load(lang);
+
+console.log ('specification: ' + language.specification);
 
 
-function sum (num1:number, num2:number){
-    return num1 + num2;
-}
-console.log(sum(8,4))
 console.log ("</pre>");
