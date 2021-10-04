@@ -8,6 +8,11 @@ use List::Util 'any';
 
 use strict;
 
+my $nodePath="/home/zeil/.nvm/versions/node/v14.17.6/bin/node";
+if (!-x $nodePath) {
+	$nodePath = "/usr/bin/node";
+}
+
 my @actions=("editor", "grading", "summary");
 
 my $query = new CGI;
@@ -56,6 +61,17 @@ $properties{"instructorSummaryURL"} = $instructorSummaryURL;
 
 identifyInstructors();
 my $htmlText = readFileIntoString($action . ".template");
+
+
+if ($action eq "grading") {
+	# Run the grade report
+	$studentSummaryURL =~ /lang=([^&]*)/;
+	my $lang = $1;
+	my $reportOut = `$nodePath grader.bundle.js --user=$username --lang=$lang`;
+	$properties{'reportBody'} = $reportOut;
+}
+
+
 performSubstutitions();
 print $htmlText;
 

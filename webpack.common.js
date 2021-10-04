@@ -4,6 +4,7 @@ const webpack = require('webpack')
 module.exports = {
     entry: {
         editor: './src/editor/js/index.jsx',
+        grader: './src/grader/js/grader.ts',
     },
     output: {
         filename: '[name].bundle.js',

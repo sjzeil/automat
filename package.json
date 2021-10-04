@@ -1,5 +1,9 @@
 {
   "name": "automat",
+  "exports": {
+    "./src/editor/js/index.jsx": "build/dist/editor.bundle.js",
+    "./src/grader/js/grader.ts": "build/dist/grader.bundle.js"
+  },
   "version": "1.0.0",
   "description": "A formal language editor",
   "keywords": [],
@@ -47,6 +51,7 @@
     "fabric": "^4.5.0",
     "lzutf8": "^0.6.0",
     "react": "~17.0.1",
-    "react-dom": "~17.0.1"
+    "react-dom": "~17.0.1",
+    "minimist": "1.2.5"
   }
 }
