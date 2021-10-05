@@ -2,8 +2,8 @@ import { fabric } from 'fabric';
 
 
 export
-class Rendering extends fabric.Object {
-    constructor (options: fabric.IObjectOptions) {
+    class Rendering extends fabric.Object {
+    constructor(options: fabric.IObjectOptions) {
         super(options);
         this.renderingOf = null;
     }
@@ -17,47 +17,45 @@ class Rendering extends fabric.Object {
  */
 
 export
-class RenderedElement {
+    class RenderedElement {
 
-    constructor(canvas: fabric.Canvas) {
+    constructor(canvas: fabric.Canvas | null) {
         this.canvas = canvas;
         this._rendering = null;
     }
 
-    canvas: fabric.Canvas;
-    _rendering: Rendering | null; 
+    canvas: fabric.Canvas | null;
+    _rendering: Rendering | null;
 
     /**
      * Get the current rendering of this object.
      */
-    get rendering()
-    {
+    get rendering() {
         return this._rendering;
     }
 
-    getRendering()
-    {
+    getRendering() {
         return this._rendering;
     }
 
     /**
      * Replaces the current rendering in the canvas with a new one.
      */
-    setRendering (newRendering: Rendering, front: boolean)
-    {
-        if (!Object.is(this.rendering, newRendering)) {
-            if (this.rendering) {
-                this.canvas.remove(this.rendering);
-            }
-            if (newRendering) {
-                this._rendering = newRendering;
-                this.canvas.add(newRendering);
-                if (front) {
-                    this.canvas.bringToFront(newRendering);
+    setRendering(newRendering: Rendering, front: boolean) {
+        if (this.canvas) {
+            if (!Object.is(this.rendering, newRendering)) {
+                if (this.rendering) {
+                    this.canvas.remove(this.rendering);
                 }
-                this._rendering.renderingOf = this;
+                if (newRendering) {
+                    this._rendering = newRendering;
+                    this.canvas.add(newRendering);
+                    if (front) {
+                        this.canvas.bringToFront(newRendering);
+                    }
+                    this._rendering.renderingOf = this;
+                }
             }
         }
     }
-
 }

@@ -197,7 +197,7 @@ Transition.angleOffset = 2.0 * Math.PI * (15.0 / 360.0);
     _curved: boolean;
 
 
-    constructor (label: string, fromState: AutomatonState, toState: AutomatonState, canvas: fabric.Canvas) {
+    constructor (label: string, fromState: AutomatonState, toState: AutomatonState, canvas: fabric.Canvas | null) {
         super(canvas);
         this._label = label;
         this.from = fromState;

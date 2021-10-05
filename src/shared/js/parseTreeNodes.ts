@@ -96,7 +96,7 @@ interface LeafSearch {
 export
 	class ParseTreeNode extends RenderedElement {
 
-	constructor(label: string, canvas: fabric.Canvas, renderingOptions: PTNodeOptions) {
+	constructor(label: string, canvas: fabric.Canvas | null, renderingOptions: PTNodeOptions) {
 		super(canvas);
 		this._label = label;
 		this._selected = false;
@@ -160,82 +160,84 @@ export
 	}
 
 	addConnectors() {
-		for (let connector of this.connectors) {
-			this.canvas.remove(connector);
+		if (this.canvas) {
+			for (let connector of this.connectors) {
+				this.canvas.remove(connector);
+			}
+			this.connectors = [];
+			for (let i = 0; i < this.children.length; ++i) {
+				let parentRendering = this.rendering as any;
+				let childRendering = this.children[i].rendering as any;
+				let x0 = parentRendering.left + parentRendering.width / 2;
+				let y0 = parentRendering.top + parentRendering.width / 2;
+
+				let x1 = childRendering.left + childRendering.width / 2;
+				let y1 = childRendering.top + childRendering.width / 2;
+
+
+				let dx = x1 - x0;
+				let dy = y1 - y0;
+				let angle = Math.atan2(dy, dx);
+
+				let exitAngle = angle;
+				let exitX = x0 + (parentRendering.width / 2) * Math.cos(exitAngle);
+				let exitY = y0 + (parentRendering.width / 2) * Math.sin(exitAngle);
+
+				let entryAngle = angle + Math.PI;
+				let entryX = x1 + (childRendering.width / 2) * Math.cos(entryAngle);
+				let entryY = y1 + (childRendering.width / 2) * Math.sin(entryAngle);
+
+				let connector = new fabric.Line([exitX, exitY, entryX, entryY], {
+					fill: 'black',
+					stroke: 'clack',
+					strokeWidth: 1,
+					selectable: false,
+					evented: false,
+				});
+				this.connectors.push(connector);
+				this.canvas.add(connector);
+			}
 		}
-		this.connectors = [];
-		for (let i = 0; i < this.children.length; ++i) {
-			let parentRendering = this.rendering as any;
-			let childRendering = this.children[i].rendering as any;
-			let x0 = parentRendering.left + parentRendering.width / 2;
-			let y0 = parentRendering.top + parentRendering.width / 2;
+	}
 
-			let x1 = childRendering.left + childRendering.width / 2;
-			let y1 = childRendering.top + childRendering.width / 2;
+	_prepareRendering(renderingOptions: PTNodeOptions) {
+		let options = (renderingOptions) ? renderingOptions : {};
 
+		let left = ('left' in options) ? options.left : ((this.rendering) ? this.rendering.left : Math.floor(Math.random() * 100.0));
+		let top = ('top' in options) ? options.top : ((this.rendering) ? this.rendering.top : Math.floor(Math.random() * 100.0));
 
-			let dx = x1 - x0;
-			let dy = y1 - y0;
-			let angle = Math.atan2(dy, dx);
+		let rendering = new PTNodeRendering({
+			label: this.label,
+			selected: this.selected,
+			left: left,
+			top: top
+		});
+		this.setRendering(rendering, false);
 
-			let exitAngle = angle;
-			let exitX = x0 + (parentRendering.width / 2) * Math.cos(exitAngle);
-			let exitY = y0 + (parentRendering.width / 2) * Math.sin(exitAngle);
+	}
 
-			let entryAngle = angle + Math.PI;
-			let entryX = x1 + (childRendering.width / 2) * Math.cos(entryAngle);
-			let entryY = y1 + (childRendering.width / 2) * Math.sin(entryAngle);
+	get label() {
+		return this._label;
+	}
 
-			let connector = new fabric.Line([exitX, exitY, entryX, entryY], {
-				fill: 'black',
-				stroke: 'clack',
-				strokeWidth: 1,
-				selectable: false,
-				evented: false,
-			  });
-			this.connectors.push(connector);
-			this.canvas.add(connector);
+	set label(newLabel) {
+		if (newLabel != this._label) {
+			this._label = newLabel;
+			this._prepareRendering({});
 		}
 	}
 
-_prepareRendering(renderingOptions: PTNodeOptions) {
-	let options = (renderingOptions) ? renderingOptions : {};
 
-	let left = ('left' in options) ? options.left : ((this.rendering) ? this.rendering.left : Math.floor(Math.random() * 100.0));
-	let top = ('top' in options) ? options.top : ((this.rendering) ? this.rendering.top : Math.floor(Math.random() * 100.0));
-
-	let rendering = new PTNodeRendering({
-		label: this.label,
-		selected: this.selected,
-		left: left,
-		top: top
-	});
-	this.setRendering(rendering, false);
-
-}
-
-get label() {
-	return this._label;
-}
-
-set label(newLabel) {
-	if (newLabel != this._label) {
-		this._label = newLabel;
-		this._prepareRendering({});
+	get selected() {
+		return this._selected;
 	}
-}
 
-
-get selected() {
-	return this._selected;
-}
-
-set selected(selectionState) {
-	if (selectionState != this._selected) {
-		this._selected = selectionState;
-		this._prepareRendering({});
+	set selected(selectionState) {
+		if (selectionState != this._selected) {
+			this._selected = selectionState;
+			this._prepareRendering({});
+		}
 	}
-}
 
 
 }

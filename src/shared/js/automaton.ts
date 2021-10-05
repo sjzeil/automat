@@ -11,7 +11,7 @@ import { Rendering, RenderedElement } from './renderedElement';
  */
 
 export class Automaton extends FormalLanguage {
-    constructor(canvas: fabric.Canvas, user: string) {
+    constructor(canvas: fabric.Canvas | null, user: string) {
         super(canvas, user);
         this.states = [];
         this.transitions = [];
@@ -56,14 +56,14 @@ export class Automaton extends FormalLanguage {
                 preservedTransitions.push(tr);
             } else {
                 let trRenderer = tr.getRendering() as Rendering;
-                this._canvas.remove(trRenderer);
+                this._canvas?.remove(trRenderer);
             }
         }
         this.transitions = preservedTransitions;
         let statePos = this.states.indexOf(state);
         if (statePos >= 0) {
             this.states.splice(statePos, 1);
-            this._canvas.remove(state.getRendering() as Rendering);
+            this._canvas?.remove(state.getRendering() as Rendering);
         }
     }
 
@@ -100,7 +100,7 @@ export class Automaton extends FormalLanguage {
 
     removeTransition(transition: AutomatonTransition) {
         let trRenderer = transition.getRendering() as Rendering;
-        this._canvas.remove(trRenderer);
+        this._canvas?.remove(trRenderer);
         this.transitions.splice(this.transitions.indexOf(transition), 1);
     }
 

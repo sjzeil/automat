@@ -25,17 +25,17 @@ export interface Derivation {
  */
 
 export class Grammar extends FormalLanguage {
-    constructor(canvas: fabric.Canvas, user: string) {
+    constructor(canvas: fabric.Canvas | null, user: string) {
         super(canvas, user);
         this.productions = [];
         this.derivations = [];
         this.startingSymbol = "";
         this.specification = "grammar";
         this.root = null;
-        this.summary = new fabric.Text('hello', {left: 10, top: 2, fontSize: 16});
-        this.derivation = new fabric.Text('goodbye', {left: 100, top: 2, fontSize: 16});
-        this._canvas.add(this.summary);
-        this._canvas.add(this.derivation);
+        this.summary = new fabric.Text('hello', { left: 10, top: 2, fontSize: 16 });
+        this.derivation = new fabric.Text('goodbye', { left: 100, top: 2, fontSize: 16 });
+        this._canvas?.add(this.summary);
+        this._canvas?.add(this.derivation);
     }
 
     productions: Production[];
@@ -133,11 +133,13 @@ export class Grammar extends FormalLanguage {
             let finalStep = this.derivations.pop() as Derivation;
             let treeRoot = this.root as ParseTreeNode;
             let i;
-            for (let child of finalStep.tree.children) {
-                this._canvas.remove(child.rendering as fabric.Object);
-            }
-            for (let connector of finalStep.tree.connectors) {
-                this._canvas.remove(connector);
+            if (this._canvas) {
+                for (let child of finalStep.tree.children) {
+                    this._canvas.remove(child.rendering as fabric.Object);
+                }
+                for (let connector of finalStep.tree.connectors) {
+                    this._canvas.remove(connector);
+                }
             }
             finalStep.tree.children = [];
             finalStep.tree.connectors = [];
@@ -183,15 +185,15 @@ export class Grammar extends FormalLanguage {
                 let horizontalOffset = 3 * renderedNode.width / 2;
                 let verticalOffset = 3 * renderedNode.height / 2;
                 let treeY = Math.max(this.summary.get("height")!, this.derivation.get("height")!);
-                this._doLayout(this.root, 20, treeY+10, horizontalOffset, verticalOffset);
+                this._doLayout(this.root, 20, treeY + 10, horizontalOffset, verticalOffset);
             }
         }
     }
 
     resetDerivations() {
-        this._canvas.clear();
-        this._canvas.add(this.summary);
-        this._canvas.add(this.derivation);
+        this._canvas?.clear();
+        this._canvas?.add(this.summary);
+        this._canvas?.add(this.derivation);
         this.root = null;
         this.derivations = [];
         this.startingSymbol = (this.productions.length > 0) ? this.productions[0].lhs : 'S';

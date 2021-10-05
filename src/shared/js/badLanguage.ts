@@ -10,21 +10,23 @@ import { fabric } from 'fabric';
  */
 
 export class BadLanguage extends FormalLanguage {
-    constructor(canvas: fabric.Canvas, user: string, message: string) {
+    constructor(canvas: fabric.Canvas | null, user: string, message: string) {
         super(canvas, user);
         this.message = message;
         this.specification = "badLang";
-        this.rendering = new fabric.Text("", {left: 10, top: 10, fontSize:20, fontWeight: 'bold'});
-        canvas.add(this.rendering);
+        this.rendering = new fabric.Text("", { left: 10, top: 10, fontSize: 20, fontWeight: 'bold' });
+        canvas?.add(this.rendering);
     }
 
     message: string;
     rendering: fabric.Text;
-    
+
     render() {
-        this.rendering.set('text', this.message);
-        this._canvas.clear();
-        this._canvas.add(this.rendering);
+        if (this._canvas) {
+            this.rendering.set('text', this.message);
+            this._canvas.clear();
+            this._canvas.add(this.rendering);
+        }
         return this.message;
     }
 

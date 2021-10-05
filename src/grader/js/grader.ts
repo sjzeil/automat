@@ -4,7 +4,8 @@
  * Usage: node grader.ts --problem=path-to-problem.ini --lang=encoded-formal-language
  */
 
- import { fabric } from 'fabric';
+ import { Canvas } from 'canvas';
+import { fabric } from 'fabric';
 
  import {FormalLanguage} from '../../shared/js/formalLanguage';
  import {LanguageFactory} from '../../shared/js/languageFactory';
