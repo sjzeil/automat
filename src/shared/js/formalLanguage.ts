@@ -1,4 +1,3 @@
-import { fabric } from 'fabric';
 
 /**
  * FormalLanguage
@@ -10,14 +9,12 @@ import { fabric } from 'fabric';
  */
 export
 class FormalLanguage {
-    constructor(canvas: fabric.Canvas | null, user: string) {
-        this._canvas = canvas;
+    constructor(user: string) {
         this.specification = "unspecified";
         this.createdBy = user;
         this.unlocked = true;
     }
 
-    _canvas: fabric.Canvas | null;
     specification: string;
     createdBy: string;
     unlocked: boolean;

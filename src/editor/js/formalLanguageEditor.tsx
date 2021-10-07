@@ -10,10 +10,15 @@ import { Automaton } from '../../shared/js/automaton';
 import { RegularExpressionEditor } from './regularExpressionEditor';
 import { BadLanguageEditor } from './badLanguageEditor';
 import { FormalLanguage } from '../../shared/js/formalLanguage';
-import { LanguageFactory } from '../../shared/js/languageFactory';
+import { LanguageRendering } from '../../shared/js/renderedLanguage';
+import { RenderedLanguageFactory } from '../../shared/js/renderedLanguageFactory';
 import LZUTF8 from 'lzutf8';
 import { RegularExpression } from '../../shared/js/regularExpression';
 import { BadLanguage } from '../../shared/js/badLanguage';
+import { AutomatonRendering } from '../../shared/js/renderedAutomaton';
+import { BadLanguageRendering } from '../../shared/js/renderedBadLanguage';
+import { GrammarRendering } from '../../shared/js/renderedGrammar';
+import { RegularExpressionRendering } from '../../shared/js/renderedRegularExpression';
 
 
 export class MouseLoc {
@@ -60,7 +65,7 @@ export
       clicked: null,
     }
 
-    this.language = new FormalLanguage(props.canvas, props.user);
+    this.rendering = new LanguageRendering(props.canvas, props.user);
 
     let thisFLE = this;
 
@@ -124,17 +129,17 @@ export
     this.loadEncodedLang(props.docURL);
 
     if (props.creatorName) {
-      props.creatorName.innerHTML = this.language.createdBy;
+      props.creatorName.innerHTML = this.rendering.language.createdBy;
     }
 
     this.blocked = false;
-    if (this.language.createdBy != '' && this.props.user != 'Instructor' && this.language.createdBy != this.props.user) {
-      this.blocked = !this.language.unlocked;
+    if (this.rendering.language.createdBy != '' && this.props.user != 'Instructor' && this.rendering.language.createdBy != this.props.user) {
+      this.blocked = !this.rendering.language.unlocked;
     }
 
   }
 
-  language: FormalLanguage;
+  rendering: LanguageRendering;
   blocked: boolean;
 
 
@@ -197,16 +202,16 @@ export
   loadEncodedLang(encoded: string) {
     const queryString = encoded.split('?')[1];
     debugger;
-    this.language = new FormalLanguage(this.props.canvas, this.props.user);
+    this.rendering = new LanguageRendering(this.props.canvas, this.props.user);
     if (queryString) {
       let urlParams = new URLSearchParams(queryString);
       if (urlParams.has('lang')) {
         let lang = urlParams.get('lang');
         if (lang) {
-          let factory = new LanguageFactory(this.props.canvas, this.props.user);
-          this.language = factory.load(lang);
+          let factory = new RenderedLanguageFactory(this.props.canvas, this.props.user);
+          this.rendering = factory.load(lang);
           this.state = {
-            status: this.language.specification,
+            status: this.rendering.language.specification,
             oldStatus: "new",
             editing: null,
             clicked: null,
@@ -226,15 +231,15 @@ export
       if (this.state.status == "new") {
         selected = (<NewLanguageEditor parent={this} />);
       } else if (this.state.status == "automaton") {
-        selected = (<AutomatonEditor parent={this} selected={this.state.editing} language={this.language as FormalLanguage} />);
+        selected = (<AutomatonEditor parent={this} selected={this.state.editing} language={this.rendering} />);
       } else if (this.state.status == "grammar") {
-        selected = (<GrammarEditor parent={this} selected={this.state.editing} language={this.language as FormalLanguage} />);
+        selected = (<GrammarEditor parent={this} selected={this.state.editing} language={this.rendering} />);
       } else if (this.state.status == "regexp") {
-        selected = (<RegularExpressionEditor parent={this} selected={null} language={this.language as FormalLanguage} />);
+        selected = (<RegularExpressionEditor parent={this} selected={null} language={this.rendering} />);
       } else if (this.state.status == "saving") {
-        selected = (<SaveEditor parent={this} language={this.language as FormalLanguage} />);
+        selected = (<SaveEditor parent={this} language={this.rendering} />);
       } else if (this.state.status == "badLang") {
-        selected = (<BadLanguageEditor parent={this} selected={null} language={this.language as FormalLanguage} />);
+        selected = (<BadLanguageEditor parent={this} selected={null} language={this.rendering} />);
       } else {
         selected = (<div>Bad status: {this.state.status}</div>);
       }
@@ -257,7 +262,7 @@ export
   newFA() {
     console.log("in newFA");
     this.props.canvas.clear();
-    this.language = new Automaton(this.props.canvas, this.props.user);
+    this.rendering = new AutomatonRendering(this.props.canvas, this.props.user);
     this.setState({
       status: "automaton",
       editing: null,
@@ -271,7 +276,7 @@ export
   newPDA() {
     console.log("in newPDA");
     this.props.canvas.clear();
-    this.language = new BadLanguage(this.props.canvas, this.props.user, "PDAs are not yet implemented");
+    this.rendering = new BadLanguageRendering(this.props.canvas, this.props.user, "PDAs are not yet implemented");
     this.setState({
       status: "badLang",
       editing: null,
@@ -285,7 +290,7 @@ export
   newCFG() {
     console.log("in newCFG");
     this.props.canvas.clear();
-    this.language = new Grammar(this.props.canvas, this.props.user);
+    this.rendering = new GrammarRendering(this.props.canvas, this.props.user);
     this.setState({
       status: "grammar",
       editing: null,
@@ -299,7 +304,7 @@ export
   newRE() {
     console.log("in newRE");
     this.props.canvas.clear();
-    this.language = new RegularExpression(this.props.canvas, this.props.user);
+    this.rendering = new RegularExpressionRendering(this.props.canvas, this.props.user);
     this.setState({
       status: "regexp",
       editing: null,

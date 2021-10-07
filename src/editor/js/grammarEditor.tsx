@@ -6,14 +6,15 @@ import { Grammar } from '../../shared/js/grammar';
 import { ProductionEditor } from './productionEditor'
 import { fabric } from 'fabric';
 import { ParseTreeNode } from '../../shared/js/parseTreeNodes'
-
+import { LanguageRendering } from '../../shared/js/renderedLanguage';
+import { GrammarRendering } from '../../shared/js/renderedGrammar';
 
 
 
 interface GrammarEditorProps {
     parent: FormalLanguageEditor;
     selected: fabric.Object | null;
-    language: FormalLanguage;
+    language: LanguageRendering;
 }
 
 interface GrammarEditorState {
@@ -45,14 +46,14 @@ export
         this.addDerivationStep = this.addDerivationStep.bind(this);
         this.retractDerivationStep = this.retractDerivationStep.bind(this);
         this.startTest = this.startTest.bind(this);
-        this.language = this.props.language as Grammar;
-        if (this.language.productions.length == 0) {
-            this.language.addProduction({ lhs: "S", rhs: "" });
+        this.rendering = this.props.language as GrammarRendering;
+        if (this.rendering.language.productions.length == 0) {
+            this.rendering.addProduction({ lhs: "S", rhs: "" });
         }
     }
 
     parent: FormalLanguageEditor;
-    language: Grammar;
+    rendering: GrammarRendering;
 
     componentDidMount() {
         console.log("GrammarEditor mounted");
@@ -60,10 +61,10 @@ export
 
     componentDidUpdate() {
         console.log("GrammarEditor updated");
-        if (this.language.root != null) {
+        if (this.rendering.root != null) {
             let baseSelected = this.props.selected as any;
             if (baseSelected && baseSelected.renderingOf !== this.state.selectedNode) {
-                this.language.root.clearSelections();
+                this.rendering.root.clearSelections();
                 let nodeRendering = this.props.selected as Rendering;
                 let tree = nodeRendering.renderingOf as ParseTreeNode;
                 let symbol = tree.label;
@@ -105,8 +106,8 @@ export
      */
     render() {
         console.log("GrammarEditor rendering");
-        let lastStep = this.language.derivations[this.language.derivations.length - 1];
-        let derivationType = this.language.derivationProperties();
+        let lastStep = this.rendering.derivations[this.rendering.derivations.length - 1];
+        let derivationType = this.rendering.derivationProperties();
         return (
             <React.Fragment>
                 <div className="editors">
@@ -115,7 +116,7 @@ export
                 <div id="derivationEditor" className="editors">
                     <h2>Derivation</h2>
                     <div className="derivation">
-                        {this.language.fullDerivation()}
+                        {this.rendering.fullDerivation()}
                     </div>
                     <div className="wrapped">
                         {derivationType}
@@ -161,28 +162,28 @@ export
         }
         let sym = this.state.selectedNode.label;
         let prodPos = this.state.selectedProduction;
-        if (sym != this.language.productions[prodPos].lhs) {
+        if (sym != this.rendering.language.productions[prodPos].lhs) {
             this.setState({
                 error: "Left-hand side of selected production does not match the selected parse tree node."
             });
             return;
         }
-        if (this.language.root == null) {
+        if (this.rendering.root == null) {
             this.setState({
                 error: "**Error: parse tree is empty."
             });
             return;
         }
-        let leaves = this.language.root.leaves(false);
+        let leaves = this.rendering.root.leaves(false);
         let symbolPos = leaves.indexOf(this.state.selectedNode);
         if (symbolPos < 0) {
             this.setState({
                 error: "**Error: unexpected mismatch in derivation."
             });
         }
-        this.language.addDerivation(symbolPos, prodPos, this.state.selectedNode);
-        if (this.language.root != null) {
-            this.language.root.clearSelections();
+        this.rendering.addDerivation(symbolPos, prodPos, this.state.selectedNode);
+        if (this.rendering.root != null) {
+            this.rendering.root.clearSelections();
         }
         this.setState({
             error: "",
@@ -199,10 +200,10 @@ export
 
     retractDerivationStep() {
         console.log("retract");
-        if (this.language.root != null) {
-            this.language.root.clearSelections();
+        if (this.rendering.root != null) {
+            this.rendering.root.clearSelections();
         }
-        this.language.retractDerivation();
+        this.rendering.retractDerivation();
         this.setState({
             error: "",
             selectedNode: null,

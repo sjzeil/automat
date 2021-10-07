@@ -1,6 +1,5 @@
 import { JavascriptModulesPlugin } from 'webpack';
 import { FormalLanguage } from './formalLanguage';
-import { fabric } from 'fabric';
 
 
 
@@ -10,25 +9,13 @@ import { fabric } from 'fabric';
  */
 
 export class BadLanguage extends FormalLanguage {
-    constructor(canvas: fabric.Canvas | null, user: string, message: string) {
-        super(canvas, user);
+    constructor(user: string, message: string) {
+        super(user);
         this.message = message;
         this.specification = "badLang";
-        this.rendering = new fabric.Text("", { left: 10, top: 10, fontSize: 20, fontWeight: 'bold' });
-        canvas?.add(this.rendering);
     }
 
     message: string;
-    rendering: fabric.Text;
-
-    render() {
-        if (this._canvas) {
-            this.rendering.set('text', this.message);
-            this._canvas.clear();
-            this._canvas.add(this.rendering);
-        }
-        return this.message;
-    }
 
     toJSon() {
 

@@ -7,6 +7,8 @@ import { AutomatonTransition } from '../../shared/js/transitions';
 import { StateEditor } from './stateEditor';
 import { TransitionEditor } from './transitionEditor';
 import { fabric } from 'fabric';
+import { LanguageRendering } from '../../shared/js/renderedLanguage';
+import { AutomatonRendering } from '../../shared/js/renderedAutomaton';
 
 
 
@@ -14,7 +16,7 @@ import { fabric } from 'fabric';
 interface AutomatonEditorProps {
     parent: FormalLanguageEditor;
     selected: fabric.Object | null;
-    language: FormalLanguage;
+    language: LanguageRendering;
 }
 
 interface AutomatonEditorState {
@@ -47,11 +49,11 @@ export
         this.clicked = this.clicked.bind(this);
         this.selected = this.selected.bind(this);
         this.cancelAdd = this.cancelAdd.bind(this);
-        this.automaton = new Automaton(this.parent.props.canvas);
+        this.automaton = new AutomatonRendering(this.parent.props.canvas, this.parent.props.user);
     }
 
     parent: FormalLanguageEditor;
-    automaton: Automaton;
+    automaton: AutomatonRendering;
 
     componentDidMount() {
         console.log("AutomatonEditor mounted");
@@ -60,16 +62,18 @@ export
     componentDidUpdate() {
         console.log("AutomatonEditor updated");
         if (this.state.status == "addingState" && this.props.parent.state.clicked != null) {
-            let a = this.props.parent.language as Automaton;
+            let a = this.props.parent.rendering as AutomatonRendering;
             let loc = this.props.parent.state.clicked as MouseLoc;
             let newState = a.addState(loc.x, loc.y);
-            this.parent.setState({
-                clicked: null,
-                editing: newState.rendering,
-            });
-            this.setState({
-                status: "state",
-            });
+            if (newState) {
+                this.parent.setState({
+                    clicked: null,
+                    editing: newState._rendering,
+                });
+                this.setState({
+                    status: "state",
+                });
+            }
         } else if (this.state.status == "addingTransition" && this.props.parent.state.editing != null) {
             if (this.state.selected1 == null) {
                 let rendering = this.props.parent.state.editing;
@@ -84,20 +88,22 @@ export
                 this.setState({
                     selected2: rendering,
                 });
-                let a = this.props.parent.language as Automaton;
+                let a = this.props.parent.rendering as AutomatonRendering;
                 let loc = this.props.parent.state.clicked as MouseLoc;
                 let sourceState = this.state.selected1 as any;
                 let destState = this.props.parent.state.editing as any;
-                let newTransition = a.addTransition(sourceState.label, destState.label, "?") as AutomatonTransition;
-                this.parent.setState({
-                    clicked: null,
-                    editing: newTransition.rendering,
-                });
-                this.setState({
-                    status: "transition",
-                    selected1: null,
-                    selected2: null,
-                });
+                let newTransition = a.addTransition(sourceState.label, destState.label, "?");
+                if (newTransition) {
+                    this.parent.setState({
+                        clicked: null,
+                        editing: newTransition._rendering,
+                    });
+                    this.setState({
+                        status: "transition",
+                        selected1: null,
+                        selected2: null,
+                    });
+                }
             }
 
         } else if (this.state.status == "state") {
@@ -117,8 +123,8 @@ export
                 });
             } else if (selectedItem != null && selectedItem.type == "Transition") {
                 if (this.props.selected != this.props.parent.state.editing) {
-                    this.props.parent.setState ({
-                        
+                    this.props.parent.setState({
+
                     });
                 }
             }
@@ -256,7 +262,7 @@ export
                         status: "state",
                     }
                 );
-                this.props.parent.setState ({
+                this.props.parent.setState({
                     editing: itemObj,
                 });
             }
