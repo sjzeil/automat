@@ -9,6 +9,8 @@ import { TransitionEditor } from './transitionEditor';
 import { fabric } from 'fabric';
 import { LanguageRendering } from '../../shared/js/renderedLanguage';
 import { AutomatonRendering } from '../../shared/js/renderedAutomaton';
+import { AutomatonStateRendering } from '../../shared/js/stateRendering';
+import { TransitionRendering } from '../../shared/js/renderedTransitions';
 
 
 
@@ -178,11 +180,11 @@ export
             }
         } else if (this.state.status == "state") {
             let selectedRendering = this.props.parent.state.editing as any;
-            let selectedState = selectedRendering.renderingOf as AutomatonState;
+            let selectedState = selectedRendering.renderingOf as AutomatonStateRendering;
             editorDetail = <StateEditor parent={this} selected={selectedState} />;
         } else if (this.state.status == "transition") {
             let selectedRendering = this.props.parent.state.editing as any;
-            let selected = selectedRendering.renderingOf as AutomatonTransition;
+            let selected = selectedRendering.renderingOf as TransitionRendering;
             editorDetail = <TransitionEditor parent={this} selected={selected} />;
         } else {
             editorDetail = (<div>bad state {this.state.status}</div>);

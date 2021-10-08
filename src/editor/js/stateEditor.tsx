@@ -4,17 +4,18 @@ import { FormalLanguage } from '../../shared/js/formalLanguage';
 import { AutomatonEditor } from './automatonEditor';
 import { Automaton } from '../../shared/js/automaton';
 import { AutomatonState } from '../../shared/js/states';
+import { AutomatonStateRendering } from '../../shared/js/stateRendering';
 import { AutomatonTransition } from '../../shared/js/transitions';
 import { fabric } from 'fabric';
 
 
 interface StateEditorProps {
     parent: AutomatonEditor;
-    selected: AutomatonState;
+    selected: AutomatonStateRendering;
 }
 
 interface StateEditorState {
-    selected: AutomatonState;
+    selected: AutomatonStateRendering;
     workingLabel: string;
     label: string;
     initial: boolean;

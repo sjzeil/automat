@@ -33,7 +33,7 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
         console.log("ProductionEditor constructed");
         let workingText = "";
         let initialProd = null;
-        for (let prod of props.parent.language.productions) {
+        for (let prod of props.parent.rendering.language.productions) {
             if (workingText != "") {
                 workingText += "\n";
             } else {
@@ -157,7 +157,7 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
                     </tbody>
                 </table>
                 <div className="wrapped">
-                    Starting symbol is: <code>{this.props.parent.language.productions[0].lhs}</code>
+                    Starting symbol is: <code>{this.props.parent.rendering.language.productions[0].lhs}</code>
                 </div>
                 <div className="explanation">
                     The left-hand side of each production must be a single non-terminal (A-Z).
@@ -281,7 +281,7 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
 
     
     fillProductions(workingText: string) {
-        let language = this.props.parent.language;
+        let language = this.props.parent.rendering.language;
         language.productions = [];
         let productionsText = workingText.split("\n");
         let i;

@@ -48,6 +48,7 @@ export
         this.startTest = this.startTest.bind(this);
         this.rendering = this.props.language as GrammarRendering;
         if (this.rendering.language.productions.length == 0) {
+            debugger;
             this.rendering.addProduction({ lhs: "S", rhs: "" });
         }
     }

@@ -51,24 +51,24 @@ class LanguageFactory {
       _loadLanguageFromJSon(jsonObj: any): FormalLanguage {
         if (this._loadPermitted(jsonObj)) {
           if (jsonObj.specification == "automaton") {
-            let lang = new Automaton(this._canvas, this.user);
+            let lang = new Automaton(this.user);
             lang.fromJSon(jsonObj);
             return lang;
           } else if (jsonObj.specification == "grammar") {
-            let lang = new Grammar(this._canvas, this.user);
+            let lang = new Grammar(this.user);
             lang.fromJSon(jsonObj);
             return lang;
           } else if (jsonObj.specification == "regexp") {
-            let lang = new RegularExpression(this._canvas, this.user);
+            let lang = new RegularExpression(this.user);
             lang.fromJSon(jsonObj);
             return lang;
           } else {
-            let lang = new BadLanguage(this._canvas, this.user,
+            let lang = new BadLanguage(this.user,
               "Unknown language specification: " + jsonObj.specification);
             return lang;
           }
         } else {
-          let lang = new BadLanguage(this._canvas, this.user,
+          let lang = new BadLanguage(this.user,
           this.user + " cannot view languages created by " + jsonObj.createdBy);
           return lang
         }

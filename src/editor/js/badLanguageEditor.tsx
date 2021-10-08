@@ -3,6 +3,8 @@ import { FormalLanguage } from '../../shared/js/formalLanguage';
 import { FormalLanguageEditor, MouseLoc } from './formalLanguageEditor';
 import { BadLanguage } from '../../shared/js/badLanguage';
 import { fabric } from 'fabric';
+import { LanguageRendering } from '../../shared/js/renderedLanguage';
+import { BadLanguageRendering } from '../../shared/js/renderedBadLanguage';
 
 
 
@@ -10,7 +12,7 @@ import { fabric } from 'fabric';
 interface BadLanguageEditorProps {
     parent: FormalLanguageEditor;
     selected: fabric.Object | null;
-    language: FormalLanguage;
+    language: LanguageRendering;
 }
 
 interface BadLanguageEditorState {
@@ -38,11 +40,11 @@ export
         };
         this.parent = props.parent;
         this.startTest = this.startTest.bind(this);
-        this.language = this.props.language as BadLanguage;
+        this.rendering = this.props.language as BadLanguageRendering;
     }
 
     parent: FormalLanguageEditor;
-    language: BadLanguage;
+    rendering: BadLanguageRendering;
 
     componentDidMount() {
         console.log("BadLanguageEditor mounted");
@@ -68,7 +70,7 @@ export
                 <div className="editors">
                     <h2>Error</h2>
                     <div className="regexp">
-                        {this.language.render()}
+                        {this.rendering.render()}
                     </div>
                     
                     <div className="errors">

@@ -153,9 +153,10 @@ State.initMarkerSize = 3*State.rimOffSet;
 export
  class AutomatonStateRendering extends RenderedElement {
 
-    constructor (state: AutomatonState, canvas: fabric.Canvas) {
+    constructor (state: AutomatonState, canvas: fabric.Canvas, renderingOptions: StateOptions) {
         super(canvas);
         this._state = state;
+		this._prepareRendering(renderingOptions);
     }
 
 	_state: AutomatonState;

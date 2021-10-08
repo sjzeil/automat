@@ -99,8 +99,6 @@ export class Grammar extends FormalLanguage {
             };
         }
         this.derivations.push(derivation);
-
-        this.treeLayout();
     }
 
 
@@ -207,7 +205,7 @@ export class Grammar extends FormalLanguage {
             if (this.derivations.length == 0) {
                 this.addDerivation(step.symbol, step.production);
             } else {
-                this.addDerivation(step.symbol, step.production, this.productions[0].lhs);
+                this.addDerivation(step.symbol, step.production);
             }
         }
     }

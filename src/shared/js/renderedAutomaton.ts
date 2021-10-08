@@ -16,7 +16,7 @@ import { Automaton } from './automaton';
 
 export class AutomatonRendering extends LanguageRendering {
     constructor(canvas: fabric.Canvas, user: string) {
-        super(user, canvas);
+        super(canvas, user);
         this.states = [];
         this.transitions = [];
         this.automaton = new Automaton(user);
@@ -30,7 +30,11 @@ export class AutomatonRendering extends LanguageRendering {
     addState(x: number, y: number, label?: string) {
         let newState = this.automaton.addState(label);
         if (newState) {
-            let newStateRender = new AutomatonStateRendering(newState, this.canvas);
+            let newStateRender = new AutomatonStateRendering(newState, this.canvas,
+                {
+                    left: x,
+                    top: y
+                });
             this.states.push(newStateRender);
             return newStateRender;
         } else {

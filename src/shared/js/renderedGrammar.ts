@@ -50,10 +50,11 @@ export class GrammarRendering extends LanguageRendering {
 
 
     addProduction(prod: Production) {
-        this.language.addProduction(prod);
         let pos = this.language.productions.indexOf(prod);
+        this.language.addProduction(prod);
         if (pos < 0) {
             this.derivations = [];
+            this.language.derivations = [];
             this.addDerivation(-1, -1, new ParseTreeNode(this.language.startingSymbol, this.canvas, {}));
         }
     }

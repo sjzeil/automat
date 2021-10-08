@@ -8,16 +8,17 @@ import { AutomatonTransition } from '../../shared/js/transitions';
 import { StateEditor } from './stateEditor';
 import { fabric } from 'fabric';
 import { AutomatonEditor } from './automatonEditor';
+import { TransitionRendering} from '../../shared/js/renderedTransitions';
 
 
 
 interface TransitionEditorProps {
     parent: AutomatonEditor;
-    selected: AutomatonTransition;
+    selected: TransitionRendering;
 }
 
 interface TransitionEditorState {
-    selected: AutomatonTransition;
+    selected: TransitionRendering;
     workingLabel: string;
     label: string;
     selectedOption: number;

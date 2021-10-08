@@ -9,6 +9,7 @@ import { AutomatonRendering } from './renderedAutomaton';
 import { LanguageRendering } from './renderedLanguage';
 import { GrammarRendering } from './renderedGrammar';
 import { BadLanguageRendering } from './renderedBadLanguage';
+import { RegularExpressionRendering } from './renderedRegularExpression';
 
 
 /**

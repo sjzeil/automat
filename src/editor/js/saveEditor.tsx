@@ -3,13 +3,14 @@ import { FormalLanguage } from '../../shared/js/formalLanguage';
 import { FormalLanguageEditor, MouseLoc } from './formalLanguageEditor';
 import { fabric } from 'fabric';
 import LZUTF8 from 'lzutf8';
+import { LanguageRendering } from '../../shared/js/renderedLanguage';
 
 
 
 
 interface SaveEditorProps {
     parent: FormalLanguageEditor;
-    language: FormalLanguage;
+    language: LanguageRendering;
 }
 
 interface SaveEditorState {
@@ -84,8 +85,8 @@ export
         const queryString = window.location.search;
         let urlParams = new URLSearchParams(queryString);
         urlParams.delete('lang');
-        if (this.parent.language != null) {
-            let json = this.parent.language.toJSon();
+        if (this.parent.rendering != null) {
+            let json = this.parent.rendering.toJSon();
             let encoded = LZUTF8.compress(json, {outputEncoding: "Base64"});
             console.log("json length: " + json.length + "  encoded length: " + encoded.length);
             urlParams.append('lang', encoded);
