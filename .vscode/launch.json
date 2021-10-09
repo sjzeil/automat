@@ -10,6 +10,17 @@
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:8080/editor.html",
             "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "Launch grader",
+            "program": "${workspaceFolder}/build/dist/grader.bundle.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node",
+            "cwd": "${workspaceFolder}/build/test",
+            "args": ["--user=Instructor", "--problem=selfAssessProblem", "--lang=eyJzcGVjaWZpY2F0aW9uIjoiYXV0b21hdG9uIiwiY3JlYXRlZEJ5IjoiKipzdHVkZW50MSIsInN0YXRlcyI6W3sibGFiZWwiOiIwIiwibGVmdCI6MTMwLCJ0b3AiOjk1LCJpbml0aWFsIjpmYWxzZSwiZmluyQ59LMpAxFfGQDM5NsdAMTk02UF0cnVlfV0sInRyYW5zaeQAveYAkGZyb23nAI90b8hYx2QwXG4xIn1dfQ%3D%3D"],
         }
     ]
 }
