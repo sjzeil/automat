@@ -190,13 +190,19 @@ export
   }
 
   gradeReport() {
-    let newURL = this.props.docURL;
-    if (newURL.indexOf("action=editor") >= 0) {
-      newURL.replace("action=editor", "action=grading");
-    } else {
-      newURL += "&action=grading";
+    let trimmedURL = this.props.docURL.split('?')[0];
+    const queryString = window.location.search;
+    let urlParams = new URLSearchParams(queryString);
+    urlParams.delete('lang');
+    if (this.rendering != null) {
+      let json = this.rendering.toJSon();
+      let encoded = LZUTF8.compress(json, { outputEncoding: "Base64" });
+      urlParams.append('lang', encoded);
+      urlParams.delete('action');
+      urlParams.append('action', 'grading');
+      let newURL = trimmedURL + '?' + urlParams.toString();
+      window.location.href = newURL;
     }
-    window.location.href = newURL;
   }
 
   loadEncodedLang(encoded: string) {
