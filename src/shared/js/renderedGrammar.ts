@@ -264,6 +264,7 @@ export class GrammarRendering extends LanguageRendering {
         super.fromJSon(jsonObj);
         this.language.fromJSon(jsonObj);
         this.derivations = [];
+        this.language.derivations = [];
         for (let step of jsonObj.derivation) {
             if (this.derivations.length == 0) {
                 this.addDerivation(step.symbol, step.production, new ParseTreeNode(this.language.startingSymbol, this.canvas, {}));

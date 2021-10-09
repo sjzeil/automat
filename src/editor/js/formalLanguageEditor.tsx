@@ -201,7 +201,6 @@ export
 
   loadEncodedLang(encoded: string) {
     const queryString = encoded.split('?')[1];
-    debugger;
     this.rendering = new LanguageRendering(this.props.canvas, this.props.user);
     if (queryString) {
       let urlParams = new URLSearchParams(queryString);

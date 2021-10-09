@@ -19,7 +19,7 @@ export class AutomatonRendering extends LanguageRendering {
         super(canvas, user);
         this.states = [];
         this.transitions = [];
-        this.automaton = new Automaton(user);
+        this.language = this.automaton = new Automaton(user);
     }
 
     states: AutomatonStateRendering[];
@@ -159,6 +159,10 @@ export class AutomatonRendering extends LanguageRendering {
         let state;
         for (state of jsonObj.states) {
             let newState = this.addState(state.left, state.top, state.label);
+            if (newState) {
+                newState.final = state.final;
+                newState.initial = state.initial;
+            }
         }
         let transition;
         for (transition of jsonObj.transitions) {

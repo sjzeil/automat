@@ -7,7 +7,6 @@
 
 import {FormalLanguage} from '../../shared/js/formalLanguage';
 import {LanguageFactory} from '../../shared/js/languageFactory';
-import "../../editor/css/editor.css";
  
 
 
@@ -24,6 +23,7 @@ let factory = new LanguageFactory(null, user);
 let language = factory.load(lang);
 
 console.log ('specification: ' + language.specification);
-
+console.dir (language, {depth: 2});
 
 console.log ("</pre>");
+process.exit(0);
