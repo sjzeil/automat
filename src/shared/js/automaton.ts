@@ -158,12 +158,10 @@ export class Automaton extends FormalLanguage {
         }
 
         let object = {
-            specification: this.specification,
-            createdBy: this.createdBy,
             states: stateList,
             transitions: transitionList,
         };
-        return JSON.stringify(object);
+        return super.toJSon() + JSON.stringify(object);
     }
 
     fromJSon(jsonObj: any) {

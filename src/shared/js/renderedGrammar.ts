@@ -250,19 +250,15 @@ export class GrammarRendering extends LanguageRendering {
             derivationList.push(stepObj);
         }
 
-        let object = {
-            specification: this.language.specification,
-            createdBy: this.language.createdBy,
-            productions: productionList,
-            derivation: derivationList,
-        };
+        let langJSON = this.language.toJSon();
+        let object = JSON.parse(langJSON);
+        object.derivation = derivationList;
         return JSON.stringify(object);
     }
 
     fromJSon(jsonObj: any) {
         this.clear();
         super.fromJSon(jsonObj);
-        this.language.fromJSon(jsonObj);
         this.derivations = [];
         this.language.derivations = [];
         for (let step of jsonObj.derivation) {

@@ -12,12 +12,14 @@ class FormalLanguage {
     constructor(user: string) {
         this.specification = "unspecified";
         this.createdBy = user;
-        this.unlocked = true;
+        this.unlock = "";
+        this.problemID = "";
     }
 
     specification: string;
     createdBy: string;
-    unlocked: boolean;
+    problemID: string;
+    unlock: string;
 
     clear() {
 
@@ -25,11 +27,15 @@ class FormalLanguage {
 
     toJSon() {
         return '"specification": "' + this.specification + '"\n' +
-               '"createdBy": "' + this.createdBy + '"\n' 
+               '"createdBy": "' + this.createdBy + '"\n' +
+               '"problemID": "' + this.problemID + '"\n' +
+               '"unlock": "' + this.unlock + '"\n'
     }
 
     fromJSon(jsonObj: any) {
         this.createdBy = jsonObj.createdBy;
+        this.problemID = jsonObj.problemID;
+        this.unlock = jsonObj.problemID;
     }
 
 

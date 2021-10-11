@@ -34,13 +34,7 @@ export class RegularExpressionRendering extends LanguageRendering {
     }
 
     toJSon() {
-
-        let object = {
-            specification: this.language.specification,
-            createdBy: this.language.createdBy,
-            regexp: this.language.regexp,
-        };
-        return JSON.stringify(object);
+        return this.language.toJSon();
     }
 
     fromJSon(jsonObj: any) {

@@ -26,7 +26,6 @@ class LanguageRendering {
     }
 
     fromJSon(jsonObj: any) {
-        this.language.createdBy = jsonObj.createdBy;
         this.language.fromJSon(jsonObj);
     }
 

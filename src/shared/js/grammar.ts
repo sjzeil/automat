@@ -185,12 +185,10 @@ export class Grammar extends FormalLanguage {
         }
 
         let object = {
-            specification: this.specification,
-            createdBy: this.createdBy,
             productions: productionList,
             derivation: derivationList,
         };
-        return JSON.stringify(object);
+        return super.toJSon() + JSON.stringify(object);
     }
 
     fromJSon(jsonObj: any) {

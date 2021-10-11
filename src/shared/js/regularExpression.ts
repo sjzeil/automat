@@ -23,11 +23,9 @@ export class RegularExpression extends FormalLanguage {
     toJSon() {
 
         let object = {
-            specification: this.specification,
-            createdBy: this.createdBy,
             regexp: this.regexp,
         };
-        return JSON.stringify(object);
+        return super.toJSon() + JSON.stringify(object);
     }
 
     fromJSon(jsonObj: any) {

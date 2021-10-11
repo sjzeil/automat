@@ -132,30 +132,16 @@ export class AutomatonRendering extends LanguageRendering {
             };
             stateList.push(stateObj);
         }
-        let transitionList = [];
-        let transition;
-        for (transition of this.transitions) {
-            let transObj = {
-                from: transition.from.label,
-                to: transition.to.label,
-                label: transition.label,
-            };
-            transitionList.push(transObj);
-        }
 
-        let object = {
-            specification: this.automaton.specification,
-            createdBy: this.automaton.createdBy,
-            states: stateList,
-            transitions: transitionList,
-        };
+        let langJSON = this.language.toJSon();
+        let object = JSON.parse(langJSON);
+        object.states = stateList;
         return JSON.stringify(object);
     }
 
     fromJSon(jsonObj: any) {
         this.clear();
-        this.automaton.createdBy = jsonObj.createdBy;
-        this.automaton.specification = jsonObj.specification;
+        super.fromJSon(jsonObj);
         let state;
         for (state of jsonObj.states) {
             let newState = this.addState(state.left, state.top, state.label);
