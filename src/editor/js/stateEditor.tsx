@@ -40,7 +40,6 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
         this.labelChanged = this.labelChanged.bind(this);
         this.initialChanged = this.initialChanged.bind(this);
         this.finalChanged = this.finalChanged.bind(this);
-        this.apply = this.apply.bind(this);
         this.fill = this.fill.bind(this);
         this.deleteState = this.deleteState.bind(this);
     }
@@ -53,20 +52,10 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
     componentDidUpdate() {
         console.log("StateEditor updated");
         let selectedElement = this.props.parent.props.parent.state.editing;
-        console.dir(selectedElement);
-        console.dir(this.props.selected.rendering);
-
+        
         if (selectedElement == null) {
             this.props.parent.setState({
                 status: "new",
-            });
-        } else if (this.props.selected.label != this.state.label) {
-            let state = this.props.selected;
-            this.setState({
-                workingLabel: state.label,
-                label: state.label,
-                initial: state.initial,
-                final: state.final,
             });
         }
     }
@@ -80,18 +69,29 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
     }
 
     labelChanged(newLabel: string) {
-        this.setState({
-            workingLabel: newLabel,
-        });
+        let state = this.props.selected;
+            state.label = newLabel;
+            this.setState({
+                label: newLabel,
+                workingLabel: newLabel,
+            });
     }
 
     initialChanged(checked: boolean) {
+        let state = this.props.selected;
+        if (state.initial == this.state.initial) {
+            state.initial = !this.state.initial;
+        }
         this.setState({
             initial: checked,
         });
     }
 
     finalChanged(checked: boolean) {
+        let state = this.props.selected;
+        if (state.final == this.state.final) {
+            state.final = !this.state.final;
+        }
         this.setState({
             final: checked,
         });
@@ -134,8 +134,6 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
                     </tbody>
                 </table>
                 <div>
-                    <input type="button" value="Apply" onClick={this.apply} />
-                    <input type="button" value="Cancel" onClick={this.fill} />
                     <input type="button" value="Delete" onClick={this.deleteState} />
                 </div>
             </div>
@@ -144,21 +142,6 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
 
 
 
-    apply() {
-        let state = this.props.selected;
-        if (state.label != this.state.workingLabel) {
-            state.label = this.state.workingLabel;
-            this.setState({
-                label: this.state.workingLabel,
-            });
-        }
-        if (state.initial != this.state.initial) {
-            state.initial = this.state.initial;
-        }
-        if (state.final != this.state.final) {
-            state.final = this.state.final;
-        }
-    }
 
     fill() {
         let state = this.props.selected;
