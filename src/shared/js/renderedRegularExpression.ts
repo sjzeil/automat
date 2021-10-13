@@ -13,9 +13,9 @@ import { LanguageRendering } from './renderedLanguage';
  */
 
 export class RegularExpressionRendering extends LanguageRendering {
-    constructor(canvas: fabric.Canvas, user: string) {
-        super(canvas, user);
-        this.language = new RegularExpression(user);
+    constructor(canvas: fabric.Canvas, user: string, problem: string) {
+        super(canvas, user, problem);
+        this.language = new RegularExpression(user, problem);
         this.rendering = new fabric.Text("", { left: 10, top: 10, fontSize: 16, fontWeight: 'bold' });
         canvas.add(this.rendering);
     }
