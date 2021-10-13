@@ -1,3 +1,4 @@
+import LZUTF8 from 'lzutf8';
 
 /**
  * FormalLanguage
@@ -25,11 +26,11 @@ class FormalLanguage {
 
     }
 
-    toJSon() {
-        return '"specification": "' + this.specification + '"\n' +
-               '"createdBy": "' + this.createdBy + '"\n' +
-               '"problemID": "' + this.problemID + '"\n' +
-               '"unlock": "' + this.unlock + '"\n'
+    saveJSon(jsonObj: any) {
+        jsonObj.specification = this.specification;
+        jsonObj.createdBy = this.createdBy;
+        jsonObj.problemID = this.problemID;
+        jsonObj.unlock = this.unlock;
     }
 
     fromJSon(jsonObj: any) {
@@ -38,6 +39,16 @@ class FormalLanguage {
         this.unlock = jsonObj.problemID;
     }
 
+    encodeLanguage() {
+          let jsonObj = {};
+          this.saveJSon(jsonObj);
+          let json = JSON.stringify(jsonObj);
+          let encoded = LZUTF8.compress(json, { outputEncoding: "Base64" });
+          console.log("json length: " + json.length + "  encoded length: " + encoded.length);
+          return encoded;
+      }
+    
+    
 
 }
 

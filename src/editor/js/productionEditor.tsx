@@ -289,7 +289,8 @@ export class ProductionEditor extends React.Component<ProductionEditorProps, Pro
         {
             language.productions.push(this.parseProd(productionsText[i]));
         }
-        language.resetDerivations();
+        this.props.parent.rendering.resetDerivations();
+        this.props.parent.rendering.treeLayout();
     }
 
 

@@ -52,11 +52,12 @@ export class GrammarRendering extends LanguageRendering {
     addProduction(prod: Production) {
         let pos = this.language.productions.indexOf(prod);
         this.language.addProduction(prod);
-        if (pos < 0) {
+        //if (pos < 0) {
             this.derivations = [];
             this.language.derivations = [];
             this.addDerivation(-1, -1, new ParseTreeNode(this.language.startingSymbol, this.canvas, {}));
-        }
+        //}
+        this.treeLayout();
     }
 
     removeProduction(prod: Production) {
@@ -82,7 +83,7 @@ export class GrammarRendering extends LanguageRendering {
                 expandedSymbol: symbolNum,
                 selectedProduction: productionNum,
                 expansion: leftPart
-                    + this.language.productions[productionNum].rhs
+                    + ((productionNum >= 0) ?this.language.productions[productionNum].rhs: "")
                     + rightPart,
                 tree: leaf,
                 leftmost: prior.leftmost && leftmost,
@@ -190,6 +191,7 @@ export class GrammarRendering extends LanguageRendering {
         this.canvas.add(this.derivation);
         this.root = null;
         this.derivations = [];
+        this.language.derivations = [];
         this.language.startingSymbol = (this.language.productions.length > 0) ? this.language.productions[0].lhs : 'S';
         this.addDerivation(-1, -1, new ParseTreeNode(this.language.startingSymbol, this.canvas, {}));
         this.treeLayout();
@@ -236,24 +238,8 @@ export class GrammarRendering extends LanguageRendering {
     }
 
 
-    toJSon() {
-        let productionList = [];
-        for (let production of this.language.productions) {
-            productionList.push(production);
-        }
-        let derivationList = [];
-        for (let step of this.derivations) {
-            let stepObj = {
-                symbol: step.expandedSymbol,
-                production: step.selectedProduction,
-            };
-            derivationList.push(stepObj);
-        }
-
-        let langJSON = this.language.toJSon();
-        let object = JSON.parse(langJSON);
-        object.derivation = derivationList;
-        return JSON.stringify(object);
+    saveJSon(jsonObj: any) {
+        this.language.saveJSon(jsonObj);
     }
 
     fromJSon(jsonObj: any) {

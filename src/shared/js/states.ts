@@ -13,6 +13,8 @@ export
         this.initial = false;
         this.final = false;
         this.annotation = "";
+        this.x = 100;
+        this.y = 100;
     }
 
 	label: string;
@@ -20,6 +22,8 @@ export
 	initial: boolean;
 	final: boolean;
 	annotation: string;
+    x: number;
+    y: number;
 
     
 }

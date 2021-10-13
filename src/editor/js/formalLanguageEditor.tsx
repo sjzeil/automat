@@ -12,7 +12,6 @@ import { BadLanguageEditor } from './badLanguageEditor';
 import { FormalLanguage } from '../../shared/js/formalLanguage';
 import { LanguageRendering } from '../../shared/js/renderedLanguage';
 import { RenderedLanguageFactory } from '../../shared/js/renderedLanguageFactory';
-import LZUTF8 from 'lzutf8';
 import { RegularExpression } from '../../shared/js/regularExpression';
 import { BadLanguage } from '../../shared/js/badLanguage';
 import { AutomatonRendering } from '../../shared/js/renderedAutomaton';
@@ -132,16 +131,11 @@ export
       props.creatorName.innerHTML = this.rendering.language.createdBy;
     }
 
-    this.blocked = false;
-    if (this.rendering.language.createdBy != '' && this.props.user != 'Instructor' && this.rendering.language.createdBy != this.props.user) {
-      this.blocked = !this.rendering.language.unlocked;
-    }
-
+    
   }
 
   rendering: LanguageRendering;
-  blocked: boolean;
-
+  
 
   componentDidMount() {
     console.log("FormalLanguageEditor mounted");
@@ -195,8 +189,7 @@ export
     let urlParams = new URLSearchParams(queryString);
     urlParams.delete('lang');
     if (this.rendering != null) {
-      let json = this.rendering.toJSon();
-      let encoded = LZUTF8.compress(json, { outputEncoding: "Base64" });
+      let encoded = this.rendering.encodeLanguage();
       urlParams.append('lang', encoded);
       urlParams.delete('action');
       urlParams.append('action', 'grading');
@@ -227,7 +220,13 @@ export
     }
   }
 
-
+  encodeLanguage() {
+    if (this.rendering != null) {
+      return this.rendering.encodeLanguage();
+    } else {
+      return "";
+    }
+  }
 
   render() {
     console.log("FormalLanguageEditor rendering");

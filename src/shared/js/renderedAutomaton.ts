@@ -118,33 +118,24 @@ export class AutomatonRendering extends LanguageRendering {
         return null;
     }
 
-    toJSon() {
-        let stateList = [];
+    saveJSon(jsonObj: any) {
         let state;
         for (state of this.states) {
             let rendering = state._rendering as Rendering;
-            let stateObj = {
-                label: state.label,
-                left: rendering.left,
-                top: rendering.top,
-                initial: state.initial,
-                final: state.final,
-            };
-            stateList.push(stateObj);
+            let langState = state._state;
+            langState.x = rendering.left as number;
+            langState.y = rendering.top as number;
         }
-
-        let langJSON = this.language.toJSon();
-        let object = JSON.parse(langJSON);
-        object.states = stateList;
-        return JSON.stringify(object);
+        this.language.saveJSon(jsonObj);
     }
 
     fromJSon(jsonObj: any) {
         this.clear();
         super.fromJSon(jsonObj);
+        this.language = this.automaton = new Automaton(this.language.createdBy);
         let state;
         for (state of jsonObj.states) {
-            let newState = this.addState(state.left, state.top, state.label);
+            let newState = this.addState(state.x, state.y, state.label);
             if (newState) {
                 newState.final = state.final;
                 newState.initial = state.initial;

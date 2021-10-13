@@ -76,18 +76,11 @@ export class Grammar extends FormalLanguage {
                 expandedSymbol: symbolNum,
                 selectedProduction: productionNum,
                 expansion: leftPart
-                    + this.productions[productionNum].rhs
+                    + ((productionNum >= 0) ? this.productions[productionNum].rhs : "")
                     + rightPart,
                 leftmost: prior.leftmost && leftmost,
                 rightmost: prior.rightmost && rightmost,
             };
-            if (this.productions[productionNum].rhs.length > 0) {
-                let i;
-                for (i = 0; i < this.productions[productionNum].rhs.length; ++i) {
-                    let symbol = this.productions[productionNum].rhs.substring(i, i + 1);
-                }
-            }
-
 
         } else {
             derivation = {
@@ -170,11 +163,13 @@ export class Grammar extends FormalLanguage {
     }
 
 
-    toJSon() {
+    saveJSon(jsonObj: any) {
+        super.saveJSon(jsonObj);
         let productionList = [];
         for (let production of this.productions) {
             productionList.push(production);
         }
+        jsonObj.productions = productionList;
         let derivationList = [];
         for (let step of this.derivations) {
             let stepObj = {
@@ -183,12 +178,7 @@ export class Grammar extends FormalLanguage {
             };
             derivationList.push(stepObj);
         }
-
-        let object = {
-            productions: productionList,
-            derivation: derivationList,
-        };
-        return super.toJSon() + JSON.stringify(object);
+        jsonObj.derivation = derivationList;
     }
 
     fromJSon(jsonObj: any) {

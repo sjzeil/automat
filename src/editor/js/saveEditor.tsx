@@ -86,9 +86,7 @@ export
         let urlParams = new URLSearchParams(queryString);
         urlParams.delete('lang');
         if (this.parent.rendering != null) {
-            let json = this.parent.rendering.toJSon();
-            let encoded = LZUTF8.compress(json, {outputEncoding: "Base64"});
-            console.log("json length: " + json.length + "  encoded length: " + encoded.length);
+            let encoded = this.parent.encodeLanguage();
             urlParams.append('lang', encoded);
             let newURL = trimmedURL + '?' + urlParams.toString();
             return newURL;

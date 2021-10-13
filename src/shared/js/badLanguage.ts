@@ -17,13 +17,10 @@ export class BadLanguage extends FormalLanguage {
 
     message: string;
 
-    toJSon() {
+    saveJSon(jsonObj: any) {
 
-        let object = {
-            specification: this.specification,
-            message: this.message,
-        };
-        return JSON.stringify(object);
+        jsonObj.message = this.message;
+        super.saveJSon(jsonObj);
     }
 
     fromJSon(jsonObj: any) {

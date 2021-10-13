@@ -29,8 +29,8 @@ export class BadLanguageRendering extends LanguageRendering {
         return this.language.message;
     }
 
-    toJSon() {
-        return this.language.toJSon();
+    saveJSon(jsonObj: any) {
+        this.language.saveJSon(jsonObj);
     }
 
     fromJSon(jsonObj: any) {

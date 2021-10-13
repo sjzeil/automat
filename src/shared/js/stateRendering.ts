@@ -176,6 +176,8 @@ export
 			left: left,
 			top: top
         });
+		this._state.x = left as number;
+		this._state.y = top as number;
         this.setRendering(rendering, false);
     }
 

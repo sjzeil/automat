@@ -20,12 +20,9 @@ export class RegularExpression extends FormalLanguage {
     regexp: string;
 
 
-    toJSon() {
-
-        let object = {
-            regexp: this.regexp,
-        };
-        return super.toJSon() + JSON.stringify(object);
+    saveJSon(jsonObj: any) {
+        super.saveJSon(jsonObj);
+        jsonObj.regexp = this.regexp;
     }
 
     fromJSon(jsonObj: any) {

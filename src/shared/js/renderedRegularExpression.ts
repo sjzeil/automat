@@ -33,8 +33,8 @@ export class RegularExpressionRendering extends LanguageRendering {
         return result;
     }
 
-    toJSon() {
-        return this.language.toJSon();
+    saveJSon(jsonObj: any) {
+        this.language.saveJSon(jsonObj);
     }
 
     fromJSon(jsonObj: any) {

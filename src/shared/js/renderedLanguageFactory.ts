@@ -33,6 +33,7 @@ class RenderedLanguageFactory {
 
     load(encodedLanguage: string) {
         let decoded = LZUTF8.decompress(encodedLanguage, { inputEncoding: "Base64" });
+        console.log('RLF.load: ' + decoded);
         let langObject = JSON.parse(decoded);
         return this._loadLanguageFromJSon(langObject);
     }

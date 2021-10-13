@@ -135,7 +135,8 @@ export class Automaton extends FormalLanguage {
         return null;
     }
 
-    toJSon() {
+    saveJSon(jsonObj: any) {
+        super.saveJSon(jsonObj);
         let stateList = [];
         let state;
         for (state of this.states) {
@@ -143,6 +144,8 @@ export class Automaton extends FormalLanguage {
                 label: state.label,
                 initial: state.initial,
                 final: state.final,
+                x: state.x,
+                y: state.y,
             };
             stateList.push(stateObj);
         }
@@ -157,11 +160,8 @@ export class Automaton extends FormalLanguage {
             transitionList.push(transObj);
         }
 
-        let object = {
-            states: stateList,
-            transitions: transitionList,
-        };
-        return super.toJSon() + JSON.stringify(object);
+        jsonObj.states = stateList;
+        jsonObj.transitions = transitionList;
     }
 
     fromJSon(jsonObj: any) {
