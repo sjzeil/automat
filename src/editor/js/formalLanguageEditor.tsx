@@ -64,7 +64,7 @@ export
       clicked: null,
     }
 
-    this.rendering = new LanguageRendering(props.canvas, props.user);
+    this.rendering = new LanguageRendering(props.canvas, props.user, props.problemID);
 
     let thisFLE = this;
 
@@ -200,7 +200,7 @@ export
 
   loadEncodedLang(encoded: string) {
     const queryString = encoded.split('?')[1];
-    this.rendering = new LanguageRendering(this.props.canvas, this.props.user);
+    this.rendering = new LanguageRendering(this.props.canvas, this.props.user, this.props.problemID);
     if (queryString) {
       let urlParams = new URLSearchParams(queryString);
       if (urlParams.has('lang')) {
@@ -266,7 +266,7 @@ export
   newFA() {
     console.log("in newFA");
     this.props.canvas.clear();
-    this.rendering = new AutomatonRendering(this.props.canvas, this.props.user);
+    this.rendering = new AutomatonRendering(this.props.canvas, this.props.user, this.props.problemID);
     this.setState({
       status: "automaton",
       editing: null,
@@ -294,7 +294,7 @@ export
   newCFG() {
     console.log("in newCFG");
     this.props.canvas.clear();
-    this.rendering = new GrammarRendering(this.props.canvas, this.props.user);
+    this.rendering = new GrammarRendering(this.props.canvas, this.props.user, this.props.problemID);
     this.setState({
       status: "grammar",
       editing: null,
@@ -308,7 +308,7 @@ export
   newRE() {
     console.log("in newRE");
     this.props.canvas.clear();
-    this.rendering = new RegularExpressionRendering(this.props.canvas, this.props.user);
+    this.rendering = new RegularExpressionRendering(this.props.canvas, this.props.user, this.props.problemID);
     this.setState({
       status: "regexp",
       editing: null,

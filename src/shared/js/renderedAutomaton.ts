@@ -15,11 +15,11 @@ import { Automaton } from './automaton';
  */
 
 export class AutomatonRendering extends LanguageRendering {
-    constructor(canvas: fabric.Canvas, user: string) {
-        super(canvas, user);
+    constructor(canvas: fabric.Canvas, user: string, problem: string) {
+        super(canvas, user, problem);
         this.states = [];
         this.transitions = [];
-        this.language = this.automaton = new Automaton(user);
+        this.language = this.automaton = new Automaton(user, problem);
     }
 
     states: AutomatonStateRendering[];
@@ -132,7 +132,7 @@ export class AutomatonRendering extends LanguageRendering {
     fromJSon(jsonObj: any) {
         this.clear();
         super.fromJSon(jsonObj);
-        this.language = this.automaton = new Automaton(this.language.createdBy);
+        this.language = this.automaton = new Automaton(this.language.createdBy, jsonObj.problemID);
         let state;
         for (state of jsonObj.states) {
             let newState = this.addState(state.x, state.y, state.label);

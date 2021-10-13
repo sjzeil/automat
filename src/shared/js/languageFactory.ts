@@ -51,15 +51,15 @@ class LanguageFactory {
       _loadLanguageFromJSon(jsonObj: any): FormalLanguage {
         if (this._loadPermitted(jsonObj)) {
           if (jsonObj.specification == "automaton") {
-            let lang = new Automaton(this.user);
+            let lang = new Automaton(this.user, jsonObj.problemID);
             lang.fromJSon(jsonObj);
             return lang;
           } else if (jsonObj.specification == "grammar") {
-            let lang = new Grammar(this.user);
+            let lang = new Grammar(this.user, jsonObj.problemID);
             lang.fromJSon(jsonObj);
             return lang;
           } else if (jsonObj.specification == "regexp") {
-            let lang = new RegularExpression(this.user);
+            let lang = new RegularExpression(this.user, jsonObj.problemID);
             lang.fromJSon(jsonObj);
             return lang;
           } else {

@@ -51,7 +51,10 @@ export
         this.clicked = this.clicked.bind(this);
         this.selected = this.selected.bind(this);
         this.cancelAdd = this.cancelAdd.bind(this);
-        this.automaton = new AutomatonRendering(this.parent.props.canvas, this.parent.props.user);
+        this.automaton = new AutomatonRendering(
+            this.parent.props.canvas, 
+            this.parent.props.user,
+            this.parent.props.problemID);
     }
 
     parent: FormalLanguageEditor;

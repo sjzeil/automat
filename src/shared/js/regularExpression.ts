@@ -11,8 +11,8 @@ import { fabric } from 'fabric';
  */
 
 export class RegularExpression extends FormalLanguage {
-    constructor(user: string) {
-        super(user);
+    constructor(user: string, problem: string) {
+        super(user, problem);
         this.regexp = "";
         this.specification = "regexp";
     }

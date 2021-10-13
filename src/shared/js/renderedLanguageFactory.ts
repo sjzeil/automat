@@ -57,15 +57,15 @@ class RenderedLanguageFactory {
       _loadLanguageFromJSon(jsonObj: any): LanguageRendering {
         if (this._loadPermitted(jsonObj)) {
           if (jsonObj.specification == "automaton") {
-            let lang = new AutomatonRendering(this._canvas, this.user);
+            let lang = new AutomatonRendering(this._canvas, this.user, jsonObj.problemID);
             lang.fromJSon(jsonObj);
             return lang;
           } else if (jsonObj.specification == "grammar") {
-            let lang = new GrammarRendering(this._canvas, this.user);
+            let lang = new GrammarRendering(this._canvas, this.user, jsonObj.problemID);
             lang.fromJSon(jsonObj);
             return lang;
           } else if (jsonObj.specification == "regexp") {
-            let lang = new RegularExpressionRendering(this._canvas, this.user);
+            let lang = new RegularExpressionRendering(this._canvas, this.user, jsonObj.problemID);
             lang.fromJSon(jsonObj);
             return lang;
           } else {

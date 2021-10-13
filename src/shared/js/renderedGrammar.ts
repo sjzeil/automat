@@ -27,10 +27,10 @@ export interface Derivation {
  */
 
 export class GrammarRendering extends LanguageRendering {
-    constructor(canvas: fabric.Canvas, user: string) {
-        super(canvas, user);
+    constructor(canvas: fabric.Canvas, user: string, problem: string) {
+        super(canvas, user, problem);
         this.derivations = [];
-        this.language = new Grammar(user);
+        this.language = new Grammar(user, problem);
         this.root = null;
         this.summary = new fabric.Text('hello', { left: 10, top: 2, fontSize: 16 });
         this.derivation = new fabric.Text('goodbye', { left: 100, top: 2, fontSize: 16 });

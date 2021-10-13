@@ -9,8 +9,8 @@ import { AutomatonTransition } from "./transitions";
  */
 
 export class Automaton extends FormalLanguage {
-    constructor(createdBy: string) {
-        super(createdBy);
+    constructor(createdBy: string, problem: string) {
+        super(createdBy, problem);
         this.states = [];
         this.transitions = [];
         this.specification = "automaton";

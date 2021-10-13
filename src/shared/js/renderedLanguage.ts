@@ -10,9 +10,9 @@ import LZUTF8 from 'lzutf8';
  */
 export
 class LanguageRendering {
-    constructor(canvas: fabric.Canvas, user: string) {
+    constructor(canvas: fabric.Canvas, user: string, problem: string) {
         this.canvas = canvas;
-        this.language = new FormalLanguage(user);
+        this.language = new FormalLanguage(user, problem);
     }
 
     language: FormalLanguage;

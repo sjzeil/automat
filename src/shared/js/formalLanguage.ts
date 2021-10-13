@@ -10,11 +10,11 @@ import LZUTF8 from 'lzutf8';
  */
 export
 class FormalLanguage {
-    constructor(user: string) {
+    constructor(user: string, problem: string) {
         this.specification = "unspecified";
         this.createdBy = user;
         this.unlock = "";
-        this.problemID = "";
+        this.problemID = problem;
     }
 
     specification: string;

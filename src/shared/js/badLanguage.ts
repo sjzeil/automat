@@ -10,7 +10,7 @@ import { FormalLanguage } from './formalLanguage';
 
 export class BadLanguage extends FormalLanguage {
     constructor(user: string, message: string) {
-        super(user);
+        super(user, "");
         this.message = message;
         this.specification = "badLang";
     }

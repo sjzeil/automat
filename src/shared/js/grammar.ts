@@ -21,8 +21,8 @@ export interface Derivation {
  */
 
 export class Grammar extends FormalLanguage {
-    constructor(user: string) {
-        super(user);
+    constructor(user: string, problem: string) {
+        super(user, problem);
         this.productions = [];
         this.derivations = [];
         this.startingSymbol = "";
