@@ -154,7 +154,18 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
     }
 
     deleteState() {
-
+        let state = this.props.selected;
+        let automaton = this.props.parent.automaton;
+        debugger;
+        automaton.removeState(state);
+        this.props.parent.setState ({
+            status: "new",
+        });
+        this.props.parent.parent.setState({
+            editing: null,
+            clicked: null,
+            status: "automaton",
+        });
     }
 
 }
