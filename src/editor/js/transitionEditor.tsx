@@ -9,6 +9,7 @@ import { StateEditor } from './stateEditor';
 import { fabric } from 'fabric';
 import { AutomatonEditor } from './automatonEditor';
 import { TransitionRendering} from '../../shared/js/renderedTransitions';
+import { AutomatonRendering } from '../../shared/js/renderedAutomaton';
 
 
 
@@ -239,7 +240,8 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
                     label: this.state.workingLabel,
                 });
             } else {
-                this.props.parent.automaton.removeTransition(this.state.selected);
+                let automaton = this.props.parent.parent.rendering as AutomatonRendering;
+                automaton.removeTransition(this.state.selected);
                 this.props.parent.setState({
                     status: "new",
                 });

@@ -7,6 +7,7 @@ import { AutomatonState } from '../../shared/js/states';
 import { AutomatonStateRendering } from '../../shared/js/stateRendering';
 import { AutomatonTransition } from '../../shared/js/transitions';
 import { fabric } from 'fabric';
+import { AutomatonRendering } from '../../shared/js/renderedAutomaton';
 
 
 interface StateEditorProps {
@@ -155,7 +156,7 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
 
     deleteState() {
         let state = this.props.selected;
-        let automaton = this.props.parent.automaton;
+        let automaton = this.props.parent.parent.rendering as AutomatonRendering;
         debugger;
         automaton.removeState(state);
         this.props.parent.setState ({
