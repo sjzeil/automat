@@ -56,7 +56,7 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
         this.upTransitionOption = this.upTransitionOption.bind(this);
         this.downTransitionOption = this.downTransitionOption.bind(this);
         this.removeTransitionOption = this.removeTransitionOption.bind(this);
-        this.apply = this.apply.bind(this);
+        this.delete = this.delete.bind(this);
         this.fill = this.fill.bind(this);
     }
 
@@ -152,7 +152,7 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
                     </tbody>
                 </table>
                 <div>
-                    <input type="button" value="Apply" onClick={this.apply} />
+                    <input type="button" value="Delete" onClick={this.delete} />
                     <input type="button" value="Cancel" onClick={this.fill} />
                 </div>
             </div>
@@ -176,77 +176,82 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
     }
 
     addTransitionOption() {
-        let transitionsText = this.state.workingLabel.split("\n");
-        this.setState({
-            workingLabel: this.state.workingLabel + "\n" + this.state.partialLabel,
-            selectedOption: transitionsText.length,
+        let transition = this.props.selected;
+        let transitionsText = this.state.label.split("\n");
+        transition.label = this.state.label + "\n" + this.state.partialLabel;
+        this.setState ({
+            label: transition.label,
+            workingLabel: transition.label,
         });
     }
 
     replaceTransitionOption() {
-        let transitionsText = this.state.workingLabel.split("\n");
+        let transition = this.props.selected;
+        let transitionsText = this.state.label.split("\n");
         if (this.state.selectedOption >= 0 && this.state.selectedOption <= transitionsText.length) {
             transitionsText[this.state.selectedOption] = this.state.partialLabel;
+            transition.label = transitionsText.join("\n");
             this.setState ({
-                workingLabel: transitionsText.join("\n"),
-            })
+                label: transition.label,
+                workingLabel: transition.label,
+            });
         }
     }
 
     removeTransitionOption() {
-        let transitionsText = this.state.workingLabel.split("\n");
-        if (transitionsText.length > 0 && this.state.selectedOption >= 0 && this.state.selectedOption < transitionsText.length) {
+        let transition = this.props.selected;
+        let transitionsText = this.state.label.split("\n");
+        if (transitionsText.length > 1 && this.state.selectedOption >= 0 && this.state.selectedOption < transitionsText.length) {
             transitionsText.splice(this.state.selectedOption, 1);
-            this.setState({
-                workingLabel: transitionsText.join("\n"),
-                selectedOption: 0,
+            transition.label = transitionsText.join("\n");
+            this.setState ({
+                label: transition.label,
+                workingLabel: transition.label,
             });
         }
     }
 
     downTransitionOption() {
-        let transitionsText = this.state.workingLabel.split("\n");
+        let transition = this.props.selected;
+        let transitionsText = this.state.label.split("\n");
         if (transitionsText.length > 1 && this.state.selectedOption < transitionsText.length - 1) {
             let temp = transitionsText[this.state.selectedOption];
             transitionsText[this.state.selectedOption] = transitionsText[this.state.selectedOption+1];
             transitionsText[this.state.selectedOption+1] = temp;
-            this.setState({
-                workingLabel: transitionsText.join("\n"),
-                selectedOption: this.state.selectedOption + 1,
+            transition.label = transitionsText.join("\n");
+            this.setState ({
+                label: transition.label,
+                workingLabel: transition.label,
             });
         }
     }
 
     upTransitionOption() {
-        let transitionsText = this.state.workingLabel.split("\n");
+        let transition = this.props.selected;
+        let transitionsText = this.state.label.split("\n");
         if (transitionsText.length > 1 && this.state.selectedOption > 0) {
             let temp = transitionsText[this.state.selectedOption];
             transitionsText[this.state.selectedOption] = transitionsText[this.state.selectedOption-1];
             transitionsText[this.state.selectedOption-1] = temp;
-            this.setState({
-                workingLabel: transitionsText.join("\n"),
-                selectedOption: this.state.selectedOption - 1,
+            transition.label = transitionsText.join("\n");
+            this.setState ({
+                label: transition.label,
+                workingLabel: transition.label,
             });
         }
 
     }
 
-    apply() {
+    delete() {
         let transition = this.props.selected;
-        if (transition.label != this.state.workingLabel) {
-            if (this.state.workingLabel != "") {
-                transition.label = this.state.workingLabel;
-                this.setState ({
-                    label: this.state.workingLabel,
-                });
-            } else {
-                let automaton = this.props.parent.parent.rendering as AutomatonRendering;
-                automaton.removeTransition(this.state.selected);
-                this.props.parent.setState({
-                    status: "new",
-                });
-            }
-        }
+        let automaton = this.props.parent.parent.rendering as AutomatonRendering;
+        automaton.removeTransition(transition);
+        this.props.parent.setState({
+            status: "new",
+        });
+        this.props.parent.parent.setState({
+            editing: null,
+        });
     }
 
     fill() {
