@@ -6,6 +6,11 @@
   <body>
     <h1>@title@</h1>
     
+    <div class='reportBody'>
+      <pre>
+       @reportBody@
+      </pre>
+    </div>
     <div>
       <div class="studentSummary">
       <h2>Student's Submission</h2>
@@ -24,9 +29,6 @@
           </iframe>
         </details>
       </div>
-    </div>
-    <div class='reportBody'>
-       @reportBody@
     </div>
     <script>
         document.problem = "@problem@";

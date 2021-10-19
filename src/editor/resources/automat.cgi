@@ -48,6 +48,7 @@ if (!defined($problem)) {
 
 print $query->header();
 loadProperties();
+loadLanguageMetadata();
 
 # Special properties for grade reports
 my $studentSummaryURL = $page_url;
@@ -60,6 +61,8 @@ $instructorSummaryURL .= '&lang=' . $properties{'solution'};
 $properties{"instructorSummaryURL"} = $instructorSummaryURL;
 
 identifyInstructors();
+
+
 my $htmlText = readFileIntoString($action . ".template");
 
 
@@ -133,6 +136,22 @@ sub loadProperties
 			open INIOUT, ">>$problemINI" || die "Could not append to $problemINI";
 			print INIOUT "lock=" . $properties{"lock"} . "\n";
 			close INIOUT;
+		}
+	}
+}
+
+
+sub loadLanguageMetadata {
+	my $lang = $query{"lang"};
+	if (defined($lang)) {
+	    my $metadata = `$nodePath metadata.bundle.js --user=$username --lang=$lang`;
+		my @fieldAssignments = split(/\n/, $metadata);
+		foreach my $fieldAssignment (@fieldAssignments) {
+			my @parts = split(/=/, $fieldAssignment) {
+				if (scalar(@parts) == 2) {
+					$properties{$parts[0]} = $parts[1];
+				}
+			}
 		}
 	}
 }

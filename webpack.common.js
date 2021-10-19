@@ -5,6 +5,7 @@ module.exports = {
     entry: {
         editor: './src/editor/js/index.jsx',
         grader: './src/grader/js/grader.ts',
+        metadata: './src/grader/js/metadata.ts',
     },
     output: {
         filename: '[name].bundle.js',
