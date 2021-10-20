@@ -23,9 +23,11 @@ my $username = $ENV{"REMOTE_USER"};
 if (!defined($username)) {
 	$username="Anonymous";
 }
+my $debugging = 0;
 my $testName = $query->param("test");
 if (defined($testName)) {
 	$username = "**$testName";
+	$debugging = 1;
 }
 
 
@@ -71,6 +73,13 @@ if ($action eq "grading") {
 	$studentSummaryURL =~ /lang=([^&]*)/;
 	my $lang = $1;
 	my $reportOut = `$nodePath grader.bundle.js --user=$username --lang=$lang`;
+	if ($debugging) {
+		$reportOut .= "\n<h2>Debugging</h2><pre>\n";
+		foreach my $propertyKey (keys %properties) {
+			$reportOut .= "$propertyKey=" . $properties{$propertyKey} . "\n";
+		}
+		$reportOut .= "</pre>\n";
+	}
 	$properties{'reportBody'} = $reportOut;
 }
 
@@ -142,14 +151,22 @@ sub loadProperties
 
 
 sub loadLanguageMetadata {
-	my $lang = $query{"lang"};
+	$studentSummaryURL =~ /lang=([^&]*)/;
+	my $lang = $1;
 	if (defined($lang)) {
-	    my $metadata = `$nodePath metadata.bundle.js --user=$username --lang=$lang`;
+	    my $command = "$nodePath metadata.bundle.js --user=$username --lang=$lang";
+		print "command: $command\n";
+		my $metadata = `$command`;
+		print "metadata raw $metadata<br/>\n";
 		my @fieldAssignments = split(/\n/, $metadata);
 		foreach my $fieldAssignment (@fieldAssignments) {
-			my @parts = split(/=/, $fieldAssignment) {
-				if (scalar(@parts) == 2) {
-					$properties{$parts[0]} = $parts[1];
+			if (substr($fieldAssignment, 0, 1) ne '#') {
+				my $pos = index($fieldAssignment, '=');
+				if ($pos > 0) {
+					my $key = substr($fieldAssignment, 0, $pos);
+					my $value = substr($fieldAssignment, $pos+1);
+					$properties{$key} = $value;
+					print "metadata $key=$value<br/>\n";
 				}
 			}
 		}

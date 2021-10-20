@@ -20,7 +20,18 @@
             ],
             "type": "pwa-node",
             "cwd": "${workspaceFolder}/build/test",
-            "args": ["--user=Instructor", "--problem=selfAssessProblem", "--lang=eyJzcGVjaWZpY2F0aW9uIjoiYXV0b21hdG9uIiwiY3JlYXRlZEJ5IjoiKipzdHVkZW50MSIsInN0YXRlcyI6W3sibGFiZWwiOiIwIiwibGVmdCI6MTMwLCJ0b3AiOjk1LCJpbml0aWFsIjpmYWxzZSwiZmluyQ59LMpAxFfGQDM5NsdAMTk02UF0cnVlfV0sInRyYW5zaeQAveYAkGZyb23nAI90b8hYx2QwXG4xIn1dfQ%3D%3D"],
+            "args": ["--user=Instructor", "--problem=selfAssessProblem", "--lang=eyJzcGVjaWZpY2F0aW9uIjoiYXV0b21hdG9uIiwiY3JlYXRlZEJ5IjoiSW5zdHJ1Y3RvciIsInByb2JsZW1JRCI6InRlc3RQxhAiLCJ1bmxvY2siOiIiLCJzdGF0ZXMiOlt7ImxhYmVsIjoiMCIsImluaXRpYWwiOnRydWUsImZpbsQNZmFsc2UsIngiOjI2MCwieSI6MTkyfV0sInRyYW5zaeQAnsZLZnJvbcdKdG%2FHCcpffV19"],
+        },
+        {
+            "name": "Launch metadata",
+            "program": "${workspaceFolder}/build/dist/metadata.bundle.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node",
+            "cwd": "${workspaceFolder}/build/test",
+            "args": ["--user=Instructor", "--problem=selfAssessProblem", "--lang=eyJzcGVjaWZpY2F0aW9uIjoiYXV0b21hdG9uIiwiY3JlYXRlZEJ5IjoiSW5zdHJ1Y3RvciIsInByb2JsZW1JRCI6InRlc3RQxhAiLCJ1bmxvY2siOiIiLCJzdGF0ZXMiOlt7ImxhYmVsIjoiMCIsImluaXRpYWwiOnRydWUsImZpbsQNZmFsc2UsIngiOjI2MCwieSI6MTkyfV0sInRyYW5zaeQAnsZLZnJvbcdKdG%2FHCcpffV19"],
         }
     ]
 }

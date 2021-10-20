@@ -107,6 +107,7 @@ export class AutomatonRendering extends LanguageRendering {
         let trRenderer = transition.getRendering() as Rendering;
         this.canvas?.remove(trRenderer);
         this.transitions.splice(this.transitions.indexOf(transition), 1);
+        this.automaton.removeTransition(transition._transition);
     }
 
     findTransition(fromState: AutomatonStateRendering, toState: AutomatonStateRendering) {

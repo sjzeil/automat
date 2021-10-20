@@ -36,7 +36,8 @@ class LanguageRendering {
         this.saveJSon(jsonObj);
         let json = JSON.stringify(jsonObj);
         let encoded = LZUTF8.compress(json, { outputEncoding: "Base64" });
-        console.log("json length: " + json.length + "  encoded length: " + encoded.length);
+        console.log("encoding json: " + json);
+        console.log("encoding encoded: " + encoded);
         return encoded;
     }
 

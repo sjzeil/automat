@@ -36,7 +36,7 @@ class FormalLanguage {
     fromJSon(jsonObj: any) {
         this.createdBy = jsonObj.createdBy;
         this.problemID = jsonObj.problemID;
-        this.unlock = jsonObj.problemID;
+        this.unlock = jsonObj.unlock;
     }
 
     encodeLanguage() {

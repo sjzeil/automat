@@ -28,6 +28,9 @@ class LanguageFactory {
 
     load(encodedLanguage: string) {
         let decoded = LZUTF8.decompress(encodedLanguage, { inputEncoding: "Base64" });
+        console.log("#load encoded: " + encodedLanguage);
+        console.log("#load json: " + decoded);
+
         let langObject = JSON.parse(decoded);
         return this._loadLanguageFromJSon(langObject);
     }

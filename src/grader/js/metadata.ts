@@ -16,16 +16,12 @@ const user = args['user']
 const lang = args['lang']
 const problem = args['problem']
 
-console.log('user:' + user);
-console.log('problem:' + problem);
-console.log('lang:' + lang);
-
 let factory = new LanguageFactory(null, user);
-let language = factory.load(lang);
+let language = factory.load(decodeURIComponent(lang));
 
-console.log ('specification:' + language.specification);
-console.log ('createdBy:' + language.createdBy);
-console.log ('problemID:' + language.problemID);
-console.log ('unlock:' + language.unlock);
+console.log ('specification=' + language.specification);
+console.log ('createdBy=' + language.createdBy);
+console.log ('problemID=' + language.problemID);
+console.log ('unlock=' + language.unlock);
 
 process.exit(0);

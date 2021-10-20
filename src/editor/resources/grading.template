@@ -7,9 +7,7 @@
     <h1>@title@</h1>
     
     <div class='reportBody'>
-      <pre>
        @reportBody@
-      </pre>
     </div>
     <div>
       <div class="studentSummary">
