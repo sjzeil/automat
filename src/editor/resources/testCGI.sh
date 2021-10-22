@@ -1,0 +1,3 @@
+#!/bin/sh
+perl automat.cgi test=instr1 action=grading problem=selfAssessProblem \
+  lang="eyJzcGVjaWZpY2F0aW9uIjoiYXV0b21hdG9uIiwiY3JlYXRlZEJ5IjoiSW5zdHJ1Y3RvciIsInByb2JsZW1JRCI6InRlc3RQxhAiLCJ1bmxvY2siOiIiLCJzdGF0ZXMiOlt7ImxhYmVsIjoiMCIsImluaXRpYWwiOnRydWUsImZpbsQNZmFsc2UsIngiOjI2MCwieSI6MTkyfV0sInRyYW5zaeQAnsZLZnJvbcdKdG%2FHCcpffV19"

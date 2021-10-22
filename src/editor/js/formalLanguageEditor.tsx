@@ -153,11 +153,9 @@ export
     let gradeButton = () => {
       let gButton = (<span></span>);
       if (this.props.problemID != "") {
-        if ((this.props.user === "Instructor") || (this.props.lock == "")) {
-          gButton = (<input type="button" value="Grade Report"
-            onClick={this.gradeReport}
-            disabled={this.state.status == "new"} />);
-        }
+        gButton = (<input type="button" value="Grade Report"
+          onClick={this.gradeReport}
+          disabled={this.state.status == "new"} />);
       }
       return gButton;
     };

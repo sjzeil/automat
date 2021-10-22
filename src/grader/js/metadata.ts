@@ -17,7 +17,7 @@ const lang = args['lang']
 const problem = args['problem']
 
 let factory = new LanguageFactory(null, user);
-let language = factory.load(decodeURIComponent(lang));
+let language = factory.load(lang);
 
 console.log ('specification=' + language.specification);
 console.log ('createdBy=' + language.createdBy);

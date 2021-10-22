@@ -28,8 +28,6 @@ class LanguageFactory {
 
     load(encodedLanguage: string) {
         let decoded = LZUTF8.decompress(encodedLanguage, { inputEncoding: "Base64" });
-        console.log("#load encoded: " + encodedLanguage);
-        console.log("#load json: " + decoded);
 
         let langObject = JSON.parse(decoded);
         return this._loadLanguageFromJSon(langObject);
@@ -51,31 +49,25 @@ class LanguageFactory {
         return false;
       }
     
-      _loadLanguageFromJSon(jsonObj: any): FormalLanguage {
-        if (this._loadPermitted(jsonObj)) {
-          if (jsonObj.specification == "automaton") {
-            let lang = new Automaton(this.user, jsonObj.problemID);
-            lang.fromJSon(jsonObj);
-            return lang;
-          } else if (jsonObj.specification == "grammar") {
-            let lang = new Grammar(this.user, jsonObj.problemID);
-            lang.fromJSon(jsonObj);
-            return lang;
-          } else if (jsonObj.specification == "regexp") {
-            let lang = new RegularExpression(this.user, jsonObj.problemID);
-            lang.fromJSon(jsonObj);
-            return lang;
-          } else {
-            let lang = new BadLanguage(this.user,
-              "Unknown language specification: " + jsonObj.specification);
-            return lang;
-          }
-        } else {
-          let lang = new BadLanguage(this.user,
-          this.user + " cannot view languages created by " + jsonObj.createdBy);
-          return lang
-        }
-      }   
+  _loadLanguageFromJSon(jsonObj: any): FormalLanguage {
+    if (jsonObj.specification == "automaton") {
+      let lang = new Automaton(this.user, jsonObj.problemID);
+      lang.fromJSon(jsonObj);
+      return lang;
+    } else if (jsonObj.specification == "grammar") {
+      let lang = new Grammar(this.user, jsonObj.problemID);
+      lang.fromJSon(jsonObj);
+      return lang;
+    } else if (jsonObj.specification == "regexp") {
+      let lang = new RegularExpression(this.user, jsonObj.problemID);
+      lang.fromJSon(jsonObj);
+      return lang;
+    } else {
+      let lang = new BadLanguage(this.user,
+        "Unknown language specification: " + jsonObj.specification);
+      return lang;
+    }
+  }
 
 }
 

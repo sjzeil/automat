@@ -20,7 +20,7 @@ console.log('user is ' + user);
 console.log('lang is ' + lang);
 
 let factory = new LanguageFactory(null, user);
-let language = factory.load(decodeURIComponent(lang));
+let language = factory.load(lang);
 
 console.log ('specification: ' + language.specification);
 console.dir (language, {depth: 2});

@@ -20,7 +20,8 @@
             ],
             "type": "pwa-node",
             "cwd": "${workspaceFolder}/build/test",
-            "args": ["--user=Instructor", "--problem=selfAssessProblem", "--lang=eyJzcGVjaWZpY2F0aW9uIjoiYXV0b21hdG9uIiwiY3JlYXRlZEJ5IjoiSW5zdHJ1Y3RvciIsInByb2JsZW1JRCI6InRlc3RQxhAiLCJ1bmxvY2siOiIiLCJzdGF0ZXMiOlt7ImxhYmVsIjoiMCIsImluaXRpYWwiOnRydWUsImZpbsQNZmFsc2UsIngiOjI2MCwieSI6MTkyfV0sInRyYW5zaeQAnsZLZnJvbcdKdG%2FHCcpffV19"],
+            "args": ["--user=Instructor", "--problem=selfAssessProblem", 
+                "--lang=eyJzcGVjaWZpY2F0aW9uIjoiYXV0b21hdG9uIiwiY3JlYXRlZEJ5IjoiSW5zdHJ1Y3RvciIsInByb2JsZW1JRCI6InRlc3RQxhAiLCJ1bmxvY2siOiIiLCJzdGF0ZXMiOlt7ImxhYmVsIjoiMCIsImluaXRpYWwiOnRydWUsImZpbsQNZmFsc2UsIngiOjI2MCwieSI6MTkyfV0sInRyYW5zaeQAnsZLZnJvbcdKdG/HCcpffV19"],
         },
         {
             "name": "Launch metadata",
@@ -31,7 +32,8 @@
             ],
             "type": "pwa-node",
             "cwd": "${workspaceFolder}/build/test",
-            "args": ["--user=Instructor", "--problem=selfAssessProblem", "--lang=eyJzcGVjaWZpY2F0aW9uIjoiYXV0b21hdG9uIiwiY3JlYXRlZEJ5IjoiSW5zdHJ1Y3RvciIsInByb2JsZW1JRCI6InRlc3RQxhAiLCJ1bmxvY2siOiIiLCJzdGF0ZXMiOlt7ImxhYmVsIjoiMCIsImluaXRpYWwiOnRydWUsImZpbsQNZmFsc2UsIngiOjI2MCwieSI6MTkyfV0sInRyYW5zaeQAnsZLZnJvbcdKdG%2FHCcpffV19"],
+            "args": ["--user=Instructor", "--problem=selfAssessProblem", 
+                "--lang=eyJzcGVjaWZpY2F0aW9uIjoiYXV0b21hdG9uIiwiY3JlYXRlZEJ5IjoiSW5zdHJ1Y3RvciIsInByb2JsZW1JRCI6InRlc3RQxhAiLCJ1bmxvY2siOiIiLCJzdGF0ZXMiOlt7ImxhYmVsIjoiMCIsImluaXRpYWwiOnRydWUsImZpbsQNZmFsc2UsIngiOjI2MCwieSI6MTkyfV0sInRyYW5zaeQAnsZLZnJvbcdKdG/HCcpffV19"],
         }
     ]
 }
