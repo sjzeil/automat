@@ -32,8 +32,12 @@
             ],
             "type": "pwa-node",
             "cwd": "${workspaceFolder}/build/test",
-            "args": ["--user=Instructor", "--problem=selfAssessProblem", 
-                "--lang=eyJzcGVjaWZpY2F0aW9uIjoiYXV0b21hdG9uIiwiY3JlYXRlZEJ5IjoiSW5zdHJ1Y3RvciIsInByb2JsZW1JRCI6InRlc3RQxhAiLCJ1bmxvY2siOiIiLCJzdGF0ZXMiOlt7ImxhYmVsIjoiMCIsImluaXRpYWwiOnRydWUsImZpbsQNZmFsc2UsIngiOjI2MCwieSI6MTkyfV0sInRyYW5zaeQAnsZLZnJvbcdKdG/HCcpffV19"],
+            "args": ["--user=**student1", "--problem=selfAssessProblem", 
+                "--lang=eyJzcGVjaWZpY2F0aW9uIjoiYXV0b21hdG9uIiwiY3JlYXRlZEJ5IjoiSW5zdHJ1Y3RvciIsInByb2JsZW1JRCI6InRlc3RQxhAiLCJ1bmxvY2siOiIiLCJzdGF0ZXMiOlt7ImxhYmVsIjoiMCIsImluaXRpYWwiOnRydWUsImZpbsQNZmFsc2UsIngiOjI2MCwieSI6MTkyfV0sInRyYW5zaeQAnsZLZnJvbcdKdG/HCcpffV19",
+                "--thisURL=https://www.cs.odu.edu/~zeil/automatTest/automat.cgi?test=instr1&problem=testProblem&lang=eyJzcGVjaWZpY2F0aW9uIjoiZ3JhbW1hciIsImNyZWF0ZWRCeSI6Iioqc3R1ZGVudDEiLCJwcm9ibGVtSUQiOiJ0ZXN0UMYQIiwidW5sb2NrIjoixiZkdWPEVnMiOlt7ImxocyI6IlMiLCJyxQoifV0sImRlcml2x3tbeyJzeW1ib2wiOi0xzEDEEH1dfQ%3D%3D&action=grading",
+                "--userKey=e3a404a4bb81395caf135a1ba51adf6ec2cc56d119ec428c03c5ff5bb9ee47d1"
+            ],
+
         }
     ]
 }

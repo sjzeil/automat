@@ -6,6 +6,7 @@ use CGI qw/:standard *table/;
 use CGI::Carp qw(fatalsToBrowser);
 use List::Util 'any';
 use URI::Escape;
+use Digest::SHA qw(sha256_hex);
 
 use strict;
 
@@ -28,7 +29,7 @@ my $debugging = 0;
 my $testName = $query->param("test");
 if (defined($testName)) {
 	$username = "**$testName";
-	$debugging = 1;
+	$debugging = 0;
 }
 
 
@@ -89,13 +90,26 @@ if ($authenticationMsg eq "") {  # authentication succeeded
 
 	if ($action eq "grading") {
 		# Run the grade report
-		my $reportOut = `$nodePath grader.bundle.js --user=$username --lang=$language`;
+		my $solution = $properties{"solution"};
+		my $ukey = userUnlockKey();
+		my $graderCommand = "$nodePath grader.bundle.js --user=$username --lang=$language --solution='$solution'"
+			.  " --problem=" . $properties{"problem"} 
+			. " --unlockKey='" . creatorUnlockKey() . "'"
+			. " --base='" . $properties{"base"} . "'"
+			. " --lock=" . $properties{"lock"}
+			. " --thisURL='$page_url'"
+			. " --unlockedURL='" . $properties{"unlockedURL"} . "'"
+			;
+		#print "<p>graderCommand=$graderCommand</p>\n";
+		my $reportOut = `$graderCommand`;
 		if ($debugging) {
 			$reportOut .= "\n<h2>Debugging</h2><pre>\n";
 			foreach my $propertyKey (keys %properties) {
 				$reportOut .= "$propertyKey=" . $properties{$propertyKey} . "\n";
 			}
-			$reportOut .= "unlockKey=" . unlockKey() . "\n";
+			$reportOut .= "page_url=$page_url\n";
+			$reportOut .= "creatorUnlockKey=" . creatorUnlockKey() . "\n";
+			$reportOut .= "userUnlockKey=" . userUnlockKey() . "\n";
 			$reportOut .= "</pre>\n";
 		}
 		$properties{'reportBody'} = $reportOut;
@@ -116,7 +130,7 @@ sub OKToLoad
 	if ($properties{"lock"} eq "0") {
 		return "";
 	}
-	if ($properties{"unlock"} == unlockKey()) {
+	if ($properties{"unlock"} eq userUnlockKey()) {
 		return "";
 	}
 	if ($action eq "editor" && !defined($language)) {
@@ -131,14 +145,19 @@ sub OKToLoad
 		}
 		return $properties{"user"} . " cannot view automata created by " . $properties{"createdBy"};
 	} else {
-		return "The instructor has not released this grade report for viewing."
+		return "The instructor has not released this grade report for viewing.";
 	}
 }
 
-sub unlockKey() {
-	my $salt = substr($properties{"lock"} . "xz", 0, 2);
-	my $key = $properties{"problemID"} . $properties{"user"} . $properties{"lock"};
-	my $unlock = crypt($key, $salt);
+sub creatorUnlockKey {
+	my $key = $properties{"problem"} . $properties{"createdBy"} . $properties{"lock"};
+	my $unlock = sha256_hex($key);
+	return $unlock;
+}
+
+sub userUnlockKey {
+	my $key = $properties{"problem"} . $properties{"user"} . $properties{"lock"};
+	my $unlock = sha256_hex($key);
 	return $unlock;
 }
 
@@ -209,8 +228,10 @@ sub loadProperties
 sub loadLanguageMetadata {
 	my $lang = $language;
 	if (defined($lang)) {
+		my $userKey = creatorUnlockKey();
+		my $solution = uri_unescape($properties{"solution"});
 	    my $command = "$nodePath metadata.bundle.js --user=$username --lang=$lang";
-		#print "command: $command\n";
+		#print "metadata command: $command\n";
 		my $metadata = `$command`;
 		#print "metadata raw $metadata<br/>\n";
 		my @fieldAssignments = split(/\n/, $metadata);

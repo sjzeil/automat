@@ -30,14 +30,14 @@ body
 
 
 
-div.studentSummary {
+div.studentGrSummary {
 	width: 650px;
     display: inline-block;
     vertical-align: top;
     background-color: #FFFFCC;
 }
 
-div.instructorSummary {
+div.instructorGrSummary {
 	width: 650px;
     display: inline-block;
     vertical-align: top;
@@ -91,6 +91,11 @@ div.reportBody {
     color: red;
 }
 
+.warnings {
+    color: orange;
+}
+
 div.suppressed {
     display: none;
 }
+

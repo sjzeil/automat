@@ -192,7 +192,7 @@ export
       urlParams.delete('action');
       urlParams.append('action', 'grading');
       let newURL = trimmedURL + '?' + urlParams.toString();
-      window.location.href = newURL;
+      window.open (newURL, '_blank');
     }
   }
 

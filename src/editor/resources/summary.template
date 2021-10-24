@@ -13,6 +13,7 @@
     </div>
 
     <script>
+        document.languageURL = document.URL;
         document.problem = "@problem@";
         document.username = "@user@";
         document.lock = "@lock@";
