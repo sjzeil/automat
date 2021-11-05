@@ -5,5 +5,8 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'gradle-demo'  
+rootProject.name = 'automat'  
 
+include 'automatWeb'
+include 'grader'
+include 'formalLangLib'

@@ -1,0 +1,65 @@
+buildscript {
+	repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.github.fracpete:rsync4j-all:3.1.2-15"
+    }
+}
+
+plugins {
+    id "com.github.node-gradle.node" version "3.1.0"
+}
+
+defaultTasks 'clean', 'build'
+
+node {
+    version="16.1.0"
+}
+
+
+task buildReactApp(type: NpxTask, dependsOn: 'npmInstall') {
+    command = 'webpack'
+    args = [
+            '--config', './webpack.dev.js'
+    ]
+}
+
+task buildReactAppProduction(type: NpxTask, dependsOn: 'npmInstall') {
+    command = 'webpack'
+    args = [
+            '--config', './webpack.prod.js'
+    ]
+}
+
+
+
+task build {
+	 description = 'Build the development bundle'
+	 group = build
+	 dependsOn = ['buildReactApp', ':formalLangLib:build']
+}
+
+task production	 {
+	 description = 'Build the production bundle'
+	 group = build
+	 dependsOn = ['buildReactAppProduction', 'copyResources']
+}
+
+task cleanTests (type: Delete) {
+	delete './build/test'
+	followSymlinks = false
+}
+
+task clean (type: Delete, dependsOn: 'cleanTests') {
+	delete './build/dist'
+	followSymlinks = false
+}
+
+task cleaner (type: Delete, dependsOn: 'clean') {
+	delete 'node_modules'
+	followSymlinks = false
+}
+

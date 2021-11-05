@@ -5,5 +5,6 @@
         "evented",
         "renderable",
         "unmounting"
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
