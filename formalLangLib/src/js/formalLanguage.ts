@@ -1,3 +1,4 @@
+import LZUTF8 from "lzutf8";
 
 export
 class SampleResults {
@@ -80,6 +81,10 @@ class FormalLanguage {
           return true;
     }
 
+    producesOutput() {
+        return true;
+  }
+
     equivalentTo(other: FormalLanguage) {
         return false;
     }
@@ -89,13 +94,14 @@ class FormalLanguage {
         for (let i = 0; i < samples.length; ++i) {
             let testResult = this.test(samples[i]);
             if (testResult.passed) {
-                if (i < expected.length && testResult.output != null) {
+                if (this.producesOutput() && i <= expected.length ) {
                     if (expected[i] === testResult.output) {
                         results.acceptedPassed.push(samples[i]);
                     } else {
                         results.acceptedFailed.push(samples[i])
                         results.expected.push(expected[i]);
-                        results.actual.push(testResult.output);
+                        let actualOut = testResult.output as string;
+                        results.actual.push(actualOut);
                     }
                 } else {
                     results.acceptedPassed.push(samples[i]);

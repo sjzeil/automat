@@ -19,6 +19,6 @@
         "jsx": "react"
     },
     "include": [
-        "../../../../formalLangLib/src/js"
+        "../formalLangLib/src/js"
     ]
 }

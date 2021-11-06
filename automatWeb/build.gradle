@@ -58,7 +58,7 @@ task copyGraderBundles (type: Copy, dependsOn: ':grader:build') {
 task setupTest {
 	description "set up test environment in build/test"
 	group = "test"
-	dependsOn =['copyTestResources', 'copyDistForTest']
+	dependsOn =['copyTestResources', 'copyDistForTest', 'copyGraderBundles']
 	doLast {
 		String testDirectory = project.projectDir.getAbsolutePath() + '/build/test'
 		new ProcessBuilder('perl',  'automat.cgi',  'action=editor',  'problem=testProblem', 'test=instr1') .
@@ -79,8 +79,8 @@ import com.github.fracpete.processoutput4j.output.ConsoleOutputProcessOutput;
 
 task deployForTest (dependsOn: 'setupTest') {
 	doLast {
-        def sourceDir = "build/test/";
-        def destURL = "zeil@linux.cs.odu.edu:/home/zeil/secure_html/automatTest/";
+        String sourceDir = project.projectDir.getAbsolutePath() + '/build/test'
+		def destURL = "zeil@linux.cs.odu.edu:/home/zeil/secure_html/automatTest/";
         RSync rsync = new RSync()
                 .source(sourceDir)
                 .destination(destURL)

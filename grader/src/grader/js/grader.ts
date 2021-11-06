@@ -6,7 +6,7 @@
 
 
 import { ExternalsPlugin } from 'webpack';
-import {FormalLanguage} from '../../../../formalLangLib/src/js/formalLanguage';
+import {FormalLanguage, SampleResults, TestResult} from '../../../../formalLangLib/src/js/formalLanguage';
 import {LanguageFactory} from '../../../../formalLangLib/src/js/languageFactory';
 import fs from 'fs';
  
@@ -51,13 +51,67 @@ function info(message:string) {
 }
 
 function readStrings(path:string): string[] {
+    warning("attempting to read from " + path);
         const data = fs.readFileSync(path, 'utf8');
-        return data.split("\n");
+        if (data !== undefined ) {
+            return data.split("\n");
+        } else {
+            return [];
+        }
 }
+
+function li(contents: string): string {
+    return '<li>' + contents + '</li>\n';
+}
+
+function printExamples (strings: string[]): string {
+    let output = '\n<ul>\n';
+    for (let i = 0; i < 4; ++i) {
+        if (i < strings.length) {
+            output += li('"' + strings[i] + '"');
+        }
+    }
+    if (strings.length >= 10) {
+        output += li('"' + strings[Math.round(strings.length / 2)] + '"');
+    }
+    if (strings.length >= 5) {
+        output += li('"' + strings[strings.length  - 1] + '"');
+    }
+    output += '</ul>\n';
+    return output;
+}
+
+
+function printOutputExample (results: SampleResults, i: number): string {
+    let output = li('Input: "' + results.acceptedFailed[i] 
+        + '"  Expected: "' + results.expected[i] 
+        + '"  Observed: "' + results.actual[i]
+        + '"' 
+        );
+    return output;
+}
+
+function printOutputExamples (results: SampleResults): string {
+    let output = '\n<ul>\n';
+    for (let i = 0; i < 4; ++i) {
+        if (i < results.acceptedFailed.length) {
+            output += '<li>' + results.acceptedFailed[i] + '</li>\n';
+        }
+    }
+    if (results.acceptedFailed.length >= 10) {
+        output += '<li>' + results.acceptedFailed[Math.round(results.acceptedFailed.length / 2)] + '</li>\n';
+    }
+    if (results.acceptedFailed.length >= 5) {
+        output += '<li>' + results.acceptedFailed[results.acceptedFailed.length  - 1] + '</li>\n';
+    }
+    output += '</ul>\n';
+    return output;
+}
+
 
 /////// Begin main routine  ///////////
 
-
+error("not a problem");
 if (problem === "") {
     error("Cannot issue a grading report - no problem has been specified.");
     process.exit(1);
@@ -69,7 +123,7 @@ if (lang === "") {
 
 
 
-let factory = new LanguageFactory(null, user);
+let factory = new LanguageFactory(user);
 let language = factory.load(lang);
 if (problem !== language.problemID) {
     warning("This language was created for problem " + language.problemID 
@@ -94,6 +148,7 @@ if (user === "Instructor") {
     info (`Release this report to students by giving them <a target='blank' href='${unlockedURL}'>this URL</a>.`);
 }
 
+warning("solution=" + solution);
 let solutionParts = solution.split('?');
 let solutionParams = new URLSearchParams(solutionParts[1]);
 let solutionLang = solutionParams.get('lang');
@@ -114,13 +169,87 @@ if (language.canBeCheckedForEquivalence()) {
     }
 }
 
-// Try to read the list of strings that should be accepted.
-let accepted = [] as String[];
+warning("Current directory is" + process.cwd());
+// Try to read the list of strings that should be accept.
+let accept = [] as string[];
 try {
-    accepted = readStrings("${baseDir}/accepted.txt");
+    accept = readStrings(`${baseDir}/accept.dat`);
 } catch(err){
-    error("Could not read accepted strings from ${baseDir}/accepted.txt<br/>\n{$err}");
+    error(`Could not read accept strings from ${baseDir}/accept.dat<br/>\n{$err}`);
 }
-warning("read " + accepted.length + " accepted strings");
+warning("read " + accept.length + " accept strings");
+
+
+// Try to read the list of strings that should be rejected.
+let reject = [] as string[];
+try {
+    reject = readStrings(`${baseDir}/reject.dat`);
+} catch(err){
+    error(`Could not read reject strings from ${baseDir}/reject.dat<br/>\n{$err}`);
+}
+warning("read " + reject.length + " reject strings");
+
+let expected = [] as string[];
+if (language.producesOutput()) {
+    try {
+        expected = readStrings(`${baseDir}/expected.dat`);
+    } catch(err){
+        error(`Could not read expected strings from ${baseDir}/expected.dat<br/>\n{$err}`);
+    }
+    warning("read " + expected.length + " expected strings");
+    if (expected.length != accept.length) {
+        error("accept.dat and expected.dat must be the same length.");
+    }
+}
+
+let acceptResults = language.testOnSamples(accept, expected);
+let rejectResults = language.testOnSamples(reject, []);
+
+let acceptAccuracy = 100.0;
+if (accept.length > 0) {
+    acceptAccuracy = 100.0 * acceptResults.acceptedPassed.length / accept.length;
+    if (language.producesOutput()) {
+        console.log(
+            div('results', 'Accepted and produced correct output for '
+            + acceptResults.acceptedPassed.length + ' out of ' + accept.length + ' strings')
+        );
+    } else {
+        console.log(
+            div('results', 'Correctly accepted ' + acceptResults.acceptedPassed.length
+            + ' out of ' + accept.length + ' strings')
+        );
+    }
+}
+
+
+
+let rejectAccuracy = 100.0;
+if (reject.length > 0) {
+    rejectAccuracy = 100.0 * rejectResults.rejected.length / reject.length;
+    console.log(div('results', 'Correctly rejected ' 
+        + rejectResults.rejected.length + ' out of ' + reject.length + ' strings'));
+}
+
+if (acceptResults.rejected.length > 0) {
+    console.log(div('results', 'Some examples of strings that your language should have accepted but rejected instead are:'
+       + printExamples(acceptResults.rejected)));
+}
+if (acceptResults.acceptedFailed.length > 0) {
+    console.log(div('results', 'Some examples of strings on which your automaton produced incorrect outputs are:' 
+       + printOutputExamples(acceptResults)));
+}
+if (rejectResults.acceptedPassed.length > 0) {
+    console.log(div('results', 'Some examples of strings that your language should have rejected but accecpted instead are:'
+       + printExamples(rejectResults.acceptedPassed)));
+}
+
+let accuracy = Math.round((rejectAccuracy < acceptAccuracy) ? rejectAccuracy : acceptAccuracy);
+
+if (accept.length > 0 || reject.length > 0) {
+    console.log(div('results', 'Overall accuracy: ' + accuracy + '%'));
+} else {
+    warning('No test data was found for this problem.');
+}
+
 
 process.exit(0);
