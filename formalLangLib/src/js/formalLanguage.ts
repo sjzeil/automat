@@ -1,3 +1,4 @@
+import LZUTF8 from 'lzutf8';
 
 export
 class SampleResults {

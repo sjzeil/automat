@@ -30,7 +30,7 @@ function div(className: string, message: string): string {
 }
 
 function span(className: string, message: string): string {
-    return `<span class='${className}'>${message}</div>\n`;
+    return `<span class='${className}'>${message}</span>\n`;
 }
 
 function error(message:string) {
@@ -114,12 +114,13 @@ if (language.canBeCheckedForEquivalence()) {
     }
 }
 
+warning("baseDir is " + baseDir);
 // Try to read the list of strings that should be accepted.
 let accepted = [] as String[];
 try {
-    accepted = readStrings("${baseDir}/accepted.txt");
+    accepted = readStrings(`${baseDir}/${problem}/accept.dat`);
 } catch(err){
-    error("Could not read accepted strings from ${baseDir}/accepted.txt<br/>\n{$err}");
+    error(`Could not read accepted strings from ${baseDir}/${problem}/accept.dat<br/>\n{$err}`);
 }
 warning("read " + accepted.length + " accepted strings");
 
