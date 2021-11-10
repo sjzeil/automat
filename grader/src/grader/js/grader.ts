@@ -30,7 +30,7 @@ function div(className: string, message: string): string {
 }
 
 function span(className: string, message: string): string {
-    return `<span class='${className}'>${message}</div>\n`;
+    return `<span class='${className}'>${message}</span>\n`;
 }
 
 function error(message:string) {
@@ -169,13 +169,13 @@ if (language.canBeCheckedForEquivalence()) {
     }
 }
 
-warning("Current directory is" + process.cwd());
-// Try to read the list of strings that should be accept.
-let accept = [] as string[];
+warning("baseDir is " + baseDir);
+// Try to read the list of strings that should be accepted.
+let accept = [] as String[];
 try {
-    accept = readStrings(`${baseDir}/accept.dat`);
+    accept = readStrings(`${baseDir}/${problem}/accept.dat`);
 } catch(err){
-    error(`Could not read accept strings from ${baseDir}/accept.dat<br/>\n{$err}`);
+    error(`Could not read accepted strings from ${baseDir}/${problem}/accept.dat<br/>\n{$err}`);
 }
 warning("read " + accept.length + " accept strings");
 
@@ -183,18 +183,18 @@ warning("read " + accept.length + " accept strings");
 // Try to read the list of strings that should be rejected.
 let reject = [] as string[];
 try {
-    reject = readStrings(`${baseDir}/reject.dat`);
+    reject = readStrings(`${baseDir}/${problem}/reject.dat`);
 } catch(err){
-    error(`Could not read reject strings from ${baseDir}/reject.dat<br/>\n{$err}`);
+    error(`Could not read reject strings from ${baseDir}/${problem}/reject.dat<br/>\n{$err}`);
 }
 warning("read " + reject.length + " reject strings");
 
 let expected = [] as string[];
 if (language.producesOutput()) {
     try {
-        expected = readStrings(`${baseDir}/expected.dat`);
+        expected = readStrings(`${baseDir}/${problem}/expected.dat`);
     } catch(err){
-        error(`Could not read expected strings from ${baseDir}/expected.dat<br/>\n{$err}`);
+        error(`Could not read expected strings from ${baseDir}/${problem}/expected.dat<br/>\n{$err}`);
     }
     warning("read " + expected.length + " expected strings");
     if (expected.length != accept.length) {

@@ -25,7 +25,7 @@ my $username = $ENV{"REMOTE_USER"};
 if (!defined($username)) {
 	$username="Anonymous";
 }
-my $debugging = 0;
+my $debugging = 1;
 my $testName = $query->param("test");
 if (defined($testName)) {
 	$username = "**$testName";
@@ -100,7 +100,6 @@ if ($authenticationMsg eq "") {  # authentication succeeded
 			. " --thisURL='$page_url'"
 			. " --unlockedURL='" . $properties{"unlockedURL"} . "'"
 			;
-		#print "<p>graderCommand=$graderCommand</p>\n";
 		my $reportOut = `$graderCommand`;
 		if ($debugging) {
 			$reportOut .= "\n<h2>Debugging</h2><pre>\n";
