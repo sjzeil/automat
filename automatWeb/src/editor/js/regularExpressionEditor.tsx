@@ -19,6 +19,8 @@ interface RegularExpressionEditorState {
     status: string;
     partialInput: string;
     error: string;
+    testInput: string;
+    testResult: string;
 }
 
 
@@ -37,10 +39,14 @@ export
             status: "new",
             partialInput: "",
             error: "",
+            testInput: "",
+            testResult: "",
         };
         this.parent = props.parent;
         this.startTest = this.startTest.bind(this);
         this.inputChanged = this.inputChanged.bind(this);
+        this.testInputChanged = this.testInputChanged.bind(this);
+        this.runTest = this.runTest.bind(this);
         this.rendering = this.props.language as RegularExpressionRendering;
     }
 
@@ -64,6 +70,25 @@ export
         this.rendering.language.regexp = newRE;
         this.setState({
             partialInput: newRE,
+        });
+    }
+
+    testInputChanged(newInput: string) {
+        this.setState({
+            testInput: newInput,
+        });
+    }
+
+    runTest() {
+        let result = this.rendering.language.test(this.state.testInput);
+        let announcement = this.state.testInput + " was ";
+        if (result.passed) {
+            announcement = announcement + "accepted."
+        } else {
+            announcement = announcement + "rejected."
+        }
+        this.setState ({
+            testResult: announcement,
         });
     }
 
@@ -92,8 +117,26 @@ export
                         Enter a regular expression. Permitted characters are alphanumerics, '_', parentheses,
                         and the operators '*' and '+'. Type '@' to enter an &#x03B5;.
                     </div>
+                    <div className="testing">
+                        <h3>Testing</h3>
+                        <div>
+                            Input text:
+                            <input type="text" id="regexp_text_in" name="regexp_text_in" 
+                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>): 
+                                        void => this.testInputChanged(ev.target.value)}
+                                    value={this.state.testInput}
+                                    className="regexpIn"
+                                    maxLength={100}
+                                    />
+                        </div>
+                        <div>
+                            <input type="button" value="Test" onClick={this.runTest}/>
+                            <span> </span>
+                            <span className="testResult">{this.state.testResult}</span>
+                        </div>
+                    </div>
                     <div className="errors">
-                        {this.state.error}
+                        {this.rendering.language.validate().errors}
                     </div>
                 </div>
             </React.Fragment>

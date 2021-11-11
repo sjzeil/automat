@@ -28,7 +28,16 @@ class TestResult {
     output: string | null;
 }
 
+export 
+class ValidationResult {
+    constructor(warnings: string, errors: string) {
+        this.warnings = warnings;
+        this.errors = errors;
+    }
 
+    warnings: string;
+    errors: string;
+}
 
 /**
  * FormalLanguage
@@ -83,7 +92,7 @@ class FormalLanguage {
 
     producesOutput() {
         return true;
-  }
+    }
 
     equivalentTo(other: FormalLanguage) {
         return false;
@@ -115,6 +124,10 @@ class FormalLanguage {
 
     test (sample: string): TestResult {
         return new TestResult(sample.length % 2 == 0, "");
+    }
+
+    validate(): ValidationResult {
+        return new ValidationResult("", "");
     }
 
 }

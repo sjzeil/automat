@@ -1,4 +1,6 @@
 import { FormalLanguage } from './formalLanguage';
+import { TestResult } from './formalLanguage';
+import { ValidationResult } from './formalLanguage';
 
 
 
@@ -26,6 +28,42 @@ export class RegularExpression extends FormalLanguage {
     fromJSon(jsonObj: any) {
         super.fromJSon(jsonObj);
         this.regexp = jsonObj.regexp;
+    }
+
+    canBeCheckedForEquivalence() {
+        return false;
+    }
+
+    producesOutput() {
+        return false;
+    }
+
+    equivalentTo(other: FormalLanguage) {
+        return false;
+    }
+
+    test(sample: string): TestResult {
+        let regexpForm = this.regexp.replaceAll('+', '|');
+        regexpForm = regexpForm.replaceAll('@', '={0}');
+        let re = new RegExp('^' + regexpForm + '$');
+        let result = re.test(sample);
+        return new TestResult(result, "");
+    }
+
+    validate(): ValidationResult {
+        let re = new RegExp('^[A-Za-z0-9_()*+@]*$');
+        let result = re.test(this.regexp);
+        let errors = "";
+        if (!result) {
+            errors = "Invalid character in regular expression."
+        } else {
+            try {
+                let re2 = new RegExp(this.regexp);
+            } catch (err) {
+                errors = "Syntax error in regular expression."
+            }
+        }
+        return new ValidationResult("", errors);
     }
 
 }
