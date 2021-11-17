@@ -21,5 +21,10 @@
     "include": [
         "src/editor/js",
         "src/js"
+    ],
+    "exclude": [
+        "./src/test",
+        "./node_modules/",
+        "./build/"
     ]
 }

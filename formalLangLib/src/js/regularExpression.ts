@@ -43,8 +43,8 @@ export class RegularExpression extends FormalLanguage {
     }
 
     test(sample: string): TestResult {
-        let regexpForm = this.regexp.replaceAll('+', '|');
-        regexpForm = regexpForm.replaceAll('@', '={0}');
+        let regexpForm = this.regexp.replace(/[+]/g, '|');
+        regexpForm = regexpForm.replace(/@/g, '@{0}');
         let re = new RegExp('^' + regexpForm + '$');
         let result = re.test(sample);
         return new TestResult(result, "");

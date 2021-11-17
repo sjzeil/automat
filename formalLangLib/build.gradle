@@ -34,11 +34,15 @@ task buildReactAppProduction(type: NpxTask, dependsOn: 'npmInstall') {
     ]
 }
 
+task test (type: NpmTask) { 
+    args = ['test']
+}
+
 
 task build {
 	 description = 'Build the development bundle'
 	 group = build
-	 dependsOn = ['buildReactApp']
+	 dependsOn = ['buildReactApp', 'test']
 }
 
 task production	 {
