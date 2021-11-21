@@ -35,6 +35,9 @@ task buildReactAppProduction(type: NpxTask, dependsOn: 'npmInstall') {
 }
 
 task test (type: NpmTask) { 
+    inputs.files(fileTree('src/'))
+        .withPropertyName('sourceFiles')
+        .withPathSensitivity(PathSensitivity.RELATIVE)
     args = ['test']
 }
 

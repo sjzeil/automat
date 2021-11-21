@@ -1,4 +1,6 @@
 import { FormalLanguage } from './formalLanguage';
+import { TestResult } from './formalLanguage';
+import { ValidationResult } from './formalLanguage';
 
 
 export interface Production {
@@ -196,5 +198,38 @@ export class Grammar extends FormalLanguage {
             }
         }
     }
+
+    canBeCheckedForEquivalence() {
+        return false;
+    }
+
+    producesOutput() {
+        return false;
+    }
+
+    equivalentTo(other: FormalLanguage) {
+        return false;
+    }
+
+    test(sample: string): TestResult {
+        return new TestResult(false, "");
+    }
+
+    validate(): ValidationResult {
+        let errors = '';
+        let re = new RegExp('^[A-Za-z0-9_()*+@]*$');
+        this.productions.forEach((prod: Production) => {
+            let productionString = prod.lhs + ' ' + Grammar.ProducesChar + ' ' + prod.rhs;
+            if (prod.lhs.length != 1) {
+                errors += productionString + ": Left-hand-side must have exactly one symbol.<br/>\n"
+            } else if (prod.lhs < 'A' || prod.lhs > 'Z') {
+                errors += productionString + ": Left-hand-side must be a non-terminal (upper-case letter).<br/>\n"
+            } else if (!re.test(prod.rhs)) {
+                errors += productionString + ": Illegal chacter on right-hand-side of the production.<br/>\n"
+            }
+        });
+        return new ValidationResult("", errors);
+    }
+
 
 }
