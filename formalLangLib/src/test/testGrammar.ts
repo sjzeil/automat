@@ -21,7 +21,7 @@ describe('Grammar', function () {
             expect(gr.producesOutput()).to.be.false;
         });
     });
-    context('validation', function () {
+    context('valid grammar', function () {
         let gr = new Grammar('Instructor', '');
         let productions = [
             'S=SA',
@@ -69,6 +69,73 @@ describe('Grammar', function () {
             expect(gr.validate().errors).is.not.equal("");
         });
     });
-    context('matching', function () {
+    context('split', function () {
+        let gr = new Grammar('Instructor', '');
+        let result = gr.splitAtFirstNonTermal('abQcd');
+        it ('should be ab', function() {
+            expect(result.left).to.equal('ab');
+        });
+        it ('should be Q', function() {
+            expect(result.middle).to.equal('Q');
+        });
+        it ('should be cd', function() {
+            expect(result.right).to.equal('cd');
+        });
+    });
+    context('split2', function () {
+        let gr = new Grammar('Instructor', '');
+        let result = gr.splitAtFirstNonTermal('Qcd');
+        it ('should be empty', function() {
+            expect(result.left).to.equal('');
+        });
+        it ('should be Q', function() {
+            expect(result.middle).to.equal('Q');
+        });
+        it ('should be cd', function() {
+            expect(result.right).to.equal('cd');
+        });
+    });
+    context('split3', function () {
+        let gr = new Grammar('Instructor', '');
+        let result = gr.splitAtFirstNonTermal('abQ');
+        it ('should be ab', function() {
+            expect(result.left).to.equal('ab');
+        });
+        it ('should be Q', function() {
+            expect(result.middle).to.equal('Q');
+        });
+        it ('should be empty', function() {
+            expect(result.right).to.equal('');
+        });
+    });
+    context('mightDerive', function () {
+        let gr = new Grammar('Instructor', '');
+        it ('AAB might derive ab', function() {
+            expect(gr.mightDerive('AAB', 'ab')).to.be.true;
+        });
+        it ('ABb might derive ab', function() {
+            expect(gr.mightDerive('ABb', 'ab')).to.be.true;
+        });
+        it ('AbBaA connot derive ab', function() {
+            expect(gr.mightDerive('AbBaA', 'ab')).to.be.false;
+        });
+});
+
+    context('parsing', function () {
+        let gr = new Grammar('Instructor', '');
+        let productions = [
+            'S=AB',
+            'A=aA',
+            'A=c',
+            'B=bB',
+            'B=b'
+        ];
+        addProductions(gr, productions);
+        it('should accept aacbb', function() {
+            expect(gr.test('aacbb').passed).to.be.true;
+        });
+        it('should reject bbaac', function() {
+            expect(gr.test('bbaac').passed).to.be.false;
+        });
     });
 });

@@ -1,6 +1,7 @@
 import { FormalLanguage } from './formalLanguage';
 import { TestResult } from './formalLanguage';
 import { ValidationResult } from './formalLanguage';
+import { Queue } from './queue';
 
 
 export interface Production {
@@ -22,6 +23,8 @@ export interface Derivation {
  */
 
 export class Grammar extends FormalLanguage {
+    static ParseLimit: number = 10000;
+
     constructor(user: string, problem: string) {
         super(user, problem);
         this.productions = [];
@@ -212,7 +215,77 @@ export class Grammar extends FormalLanguage {
     }
 
     test(sample: string): TestResult {
+        let counter = 0;
+        let q = new Queue<string>();
+        let examined = new Set();
+
+        let initalStr = this.startingSymbol;
+        q.push(initalStr);
+        examined.add(initalStr);
+
+        while (counter < Grammar.ParseLimit && !q.isEmpty()) {
+            ++counter;
+            let derivation = q.front() as string;
+            q.pop();
+            let derivationParts = this.splitAtFirstNonTermal(derivation);
+            for (const prod of this.productions) {
+                if (prod.lhs == derivationParts.middle) {
+                    let newDeriv = derivationParts.left + prod.rhs + derivationParts.right;
+                    if (newDeriv == sample) {
+                        return new TestResult(true, '');
+                    } else if ((!examined.has(newDeriv)) && this.mightDerive(newDeriv, sample)) {
+                        q.push(newDeriv);
+                        examined.add(newDeriv);
+                    }
+                }
+            }
+        }
         return new TestResult(false, "");
+    }
+
+    mightDerive(newDeriv: string, sample: string) {
+        let lastWasNonTerm = false;
+        let reStr = '^';
+        for (let i = 0; i < newDeriv.length; ++i) {
+            let sym = newDeriv.charAt(i);
+            if (this.isANonTerminal(sym)) {
+                if (!lastWasNonTerm) {
+                    reStr += '.*';
+                    lastWasNonTerm = true;
+                }
+            } else {
+                reStr += sym;
+                lastWasNonTerm = false;
+            }
+        }
+        reStr += '$';
+        let re = new RegExp(reStr);
+        return re.test(sample);
+    }
+    
+    splitAtFirstNonTermal(derivation: string) {
+        let k = 0;
+        for (; k < derivation.length; ++k) {
+            if (this.isANonTerminal(derivation.charAt(k))) {
+                return {
+                    left: derivation.substring(0, k),
+                    middle: derivation.charAt(k),
+                    right: derivation.substring(k+1)
+                };
+            }
+        }
+        return {
+            left: derivation,
+            middle: '',
+            right: ''
+        }
+    }
+
+    private isANonTerminal(symbol: string): boolean {
+        if (symbol >= 'A' && symbol <= 'Z') 
+            return true;
+        else
+            return (symbol > '~');
     }
 
     validate(): ValidationResult {
