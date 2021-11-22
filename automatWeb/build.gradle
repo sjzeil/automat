@@ -79,7 +79,7 @@ import com.github.fracpete.processoutput4j.output.ConsoleOutputProcessOutput;
 
 task deployForTest (dependsOn: ['buildReactApp', 'copyResources','setupTest']) {
 	doLast {
-        String sourceDir = project.projectDir.getAbsolutePath() + '/build/test'
+        String sourceDir = project.projectDir.getAbsolutePath() + '/build/test/'
 		def destURL = "zeil@linux.cs.odu.edu:/home/zeil/secure_html/automatTest/";
         RSync rsync = new RSync()
                 .source(sourceDir)

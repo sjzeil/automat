@@ -22,6 +22,8 @@ interface GrammarEditorState {
     selectedProduction: number;
     selectedNode: ParseTreeNode | null;
     error: string;
+    testInput: string;
+    testResult: string;
 }
 
 
@@ -41,11 +43,15 @@ export
             selectedProduction: 0,
             selectedNode: null,
             error: "",
+            testInput: '',
+            testResult: ''
         };
         this.parent = props.parent;
         this.addDerivationStep = this.addDerivationStep.bind(this);
         this.retractDerivationStep = this.retractDerivationStep.bind(this);
         this.startTest = this.startTest.bind(this);
+        this.runTest = this.runTest.bind(this);
+        this.testInputChanged = this.testInputChanged.bind(this);
         this.rendering = this.props.language as GrammarRendering;
         if (this.rendering.language.productions.length == 0) {
             this.rendering.addProduction({ lhs: "S", rhs: "" });
@@ -134,6 +140,24 @@ export
                     <div className="errors">
                         {this.state.error}
                     </div>
+                    <div className="testing">
+                        <h2>Testing</h2>
+                        <div>
+                            Input text:
+                            <input type="text" id="regexp_text_in" name="regexp_text_in" 
+                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>): 
+                                        void => this.testInputChanged(ev.target.value)}
+                                    value={this.state.testInput}
+                                    className="regexpIn"
+                                    maxLength={100}
+                                    />
+                        </div>
+                        <div>
+                            <input type="button" value="Test" onClick={this.runTest}/>
+                            <span> </span>
+                            <span className="testResult">{this.state.testResult}</span>
+                        </div>
+                    </div>
                 </div>
             </React.Fragment>
         );
@@ -219,6 +243,24 @@ export
     }
 
 
+    testInputChanged(newInput: string) {
+        this.setState({
+            testInput: newInput,
+        });
+    }
+
+    runTest() {
+        let result = this.rendering.language.test(this.state.testInput);
+        let announcement = this.state.testInput + " was ";
+        if (result.passed) {
+            announcement = announcement + "accepted."
+        } else {
+            announcement = announcement + "rejected."
+        }
+        this.setState ({
+            testResult: announcement,
+        });
+    }
 
 
 
