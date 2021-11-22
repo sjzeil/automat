@@ -25,7 +25,7 @@ export class Queue<T> {
         if (this.last == null) {
             this.first = this.last = new QNode<T>(data);
         } else {
-            this.last.next = new QNode<T>(data);
+            this.last = this.last.next = new QNode<T>(data);
         }
     }
 

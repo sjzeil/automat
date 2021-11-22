@@ -138,4 +138,104 @@ describe('Grammar', function () {
             expect(gr.test('bbaac').passed).to.be.false;
         });
     });
+
+    context('removeImmediateLeftRecursion', function () {
+        let gr = new Grammar('Instructor', '');
+        let productions = [
+            'S=AB',
+            'A=Aa',
+            'A=c',
+            'A=a',
+            'B=Bb',
+            'B='
+        ];
+        addProductions(gr, productions);
+        let gr2 = gr.clone();
+        gr2.removeDirectLeftRecursion();
+        let inputs = ['', 'a', 'b', 'c', 'aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca', 'cb', 'cc',
+            'aaa', 'aab', 'aac', 'aba', 'abb', 'abc', 'aca', 'acb', 'acc', 
+            'baa', 'bab', 'bac', 'bba', 'bbb', 'bbc', 'bca', 'bcb', 'bcc', 
+            'caa', 'cab', 'cac', 'cba', 'cbb', 'cbc', 'cca', 'ccb', 'ccc'
+        ];
+        //console.log("removed imm lr: " + gr2.productionSummary());
+        for (let input of inputs) {
+            it('parsing should match on ' + input, function() {
+                expect(gr2.parse(input).passed).to.equal(gr.parse(input).passed);
+            });
+        }
+    });
+
+
+    context('removeLeftRecursion', function () {
+        let gr = new Grammar('Instructor', '');
+        let productions = [
+            'S=AB',
+            'A=C',
+            'C=AC',
+            'C=c',
+            'C=a',
+            'B=Bb',
+            'B='
+        ];
+        addProductions(gr, productions);
+        let gr2 = gr.clone();
+        gr2.removeLeftRecursion();
+        let accept = ['a', 'c', 'aa', 'ab', 'ac', 'ca', 'cb', 'cc',
+            'aaa', 'aab', 'aac', 'abb', 'aca', 'acb', 'acc', 
+            'caa', 'cab', 'cac', 'cbb', 'cca', 'ccb', 'ccc'
+        ];
+        let reject = ['', 'b', 'ba', 'bb', 'bc',
+            'aba', 'abc',
+            'baa', 'bab', 'bac', 'bba', 'bbb', 'bbc', 'bca', 'bcb', 'bcc', 
+            'cba'
+        ];
+        //console.log("removed lr: " + gr2.productionSummary());
+        for (let input of accept) {
+            it('parsing should accept ' + input, function() {
+                expect(gr2.parse(input).passed).to.be.true;
+            });
+        }
+        for (let input of reject) {
+            it('parsing should reject ' + input, function() {
+                expect(gr2.parse(input).passed).to.be.false;
+            });
+        }
+    });
+
+
+    context('parsing2', function () {
+        let gr = new Grammar('Instructor', '');
+        let productions = [
+            'S=AB',
+            'A=C',
+            'C=AC',
+            'C=c',
+            'C=a',
+            'B=Bb',
+            'B='
+        ];
+        addProductions(gr, productions);
+        let accept = ['a', 'c', 'aa', 'ab', 'ac', 'ca', 'cb', 'cc',
+            'aaa', 'aab', 'aac', 'abb', 'aca', 'acb', 'acc', 
+            'caa', 'cab', 'cac', 'cbb', 'cca', 'ccb', 'ccc'
+        ];
+        let reject = ['', 'b', 'ba', 'bb', 'bc',
+            'aba', 'abc',
+            'baa', 'bab', 'bac', 'bba', 'bbb', 'bbc', 'bca', 'bcb', 'bcc', 
+            'cba'
+        ];
+        //console.log("removed lr: " + gr2.productionSummary());
+        for (let input of accept) {
+            it('parsing should accept ' + input, function() {
+                expect(gr.test(input).passed).to.be.true;
+            });
+        }
+        for (let input of reject) {
+            it('parsing should reject ' + input, function() {
+                expect(gr.test(input).passed).to.be.false;
+            });
+        }
+    });
+
+
 });

@@ -31,26 +31,42 @@ export class Grammar extends FormalLanguage {
         this.derivations = [];
         this.startingSymbol = "";
         this.specification = "grammar";
+        this.parsable = null;
+        this.nextAvailableNonTerminal = 0x3B1;  // alpha
     }
 
     productions: Production[];
     derivations: Derivation[];
     startingSymbol: string;
+    nextAvailableNonTerminal: number;
+    parsable: Grammar | null;
 
     static ProducesChar = "\u2192";
     static DerivesChar = "\u21D2";
     static Epsilon = "\u03B5";
 
+    clone(): Grammar {
+        let gr = new Grammar(this.createdBy, this.problemID);
+        gr.startingSymbol = this.startingSymbol;
+        for (let production of this.productions) {
+            gr.addProduction(production);
+        }
+        return gr;
+    }
 
     addProduction(prod: Production) {
         let pos = this.productions.indexOf(prod);
         if (pos < 0) {
-            this.productions.push(prod);
+            this.productions.push({
+                lhs: prod.lhs,
+                rhs: prod.rhs
+            });
             if (this.productions.length == 1 && this.productions[0].lhs.length == 1) {
                 this.startingSymbol = this.productions[0].lhs;
             }
             this.derivations = [];
             this.addDerivation(-1, -1);
+            this.parsable = null;
         }
     }
 
@@ -60,12 +76,14 @@ export class Grammar extends FormalLanguage {
             this.productions.splice(prPos, 1);
             this.derivations = [];
         }
+        this.parsable = null;
     }
 
     clear() {
         this.productions = [];
         this.derivations = [];
         this.startingSymbol = "";
+        this.parsable = null;
     }
 
     addDerivation(symbolNum: number, productionNum: number) {
@@ -106,6 +124,110 @@ export class Grammar extends FormalLanguage {
         }
     }
 
+
+    removeLeftRecursion() {
+        let nonTerminals = this.collectNonTerminals();
+        let self = this;
+        for (let nonTerminal of nonTerminals) {
+            let changed = true;
+            while (changed) {
+                changed = false;
+                for (let p = 0; p < self.productions.length; ++p) {
+                    let production = self.productions[p];
+                    if (production.lhs == nonTerminal) {
+                        if (production.rhs.length > 0 && self.isANonTerminal(production.rhs.charAt(0))) {
+                            if (production.rhs.charAt(0) < nonTerminal) {
+                                changed = true;
+                                let nonTerminal2 = production.rhs.charAt(0);
+                                let beta = production.rhs.substring(1);
+                                let newProductions = [];
+                                self.removeProduction(production);
+                                for (let prod2 of self.productions) {
+                                    if (prod2.lhs == nonTerminal2) {
+                                        self.addProduction({
+                                            lhs: nonTerminal,
+                                            rhs: prod2.rhs + beta
+                                        });
+                                    }
+                                }
+                                p = self.productions.length;
+                            }
+                        }
+                    }
+                }
+            }
+            self.removeDirectLeftRecursionOn(nonTerminal);
+        }
+    }
+
+    collectNonTerminals(): string[] {
+        let result = new Set<string>();
+        for (let production of this.productions) {
+            result.add(production.lhs);
+        }
+        return Array.from(result).sort();
+    }
+
+
+
+    removeDirectLeftRecursion() {
+        this.removeReflexiveProductions()
+        let changed = true;
+        while (changed) {
+            changed = false;
+            let k = this.findDirectLeftRecursion();
+            if (k >= 0) {
+                changed = true;
+                this.removeDirectLeftRecursionOn(this.productions[k].lhs);
+            }
+        }
+    }
+    removeDirectLeftRecursionOn(nonTerminal: string) {
+        let newProductions = [];
+        let recursiveProductions = [];
+        let nonrecursiveProductions = [];
+        for (let production of this.productions) {
+            if (production.lhs != nonTerminal) {
+                newProductions.push(production);
+            } else if (production.rhs.charAt(0) == nonTerminal) {
+                recursiveProductions.push(production);
+            } else {
+                nonrecursiveProductions.push(production);
+            }
+        }
+        let newNonTerminal = this.generateNewNonTerminal();
+        for (let prod of nonrecursiveProductions) {
+            newProductions.push({
+                lhs: nonTerminal,
+                rhs: prod.rhs + newNonTerminal
+            });
+        }
+        for (let prod of recursiveProductions) {
+            newProductions.push({
+                lhs: newNonTerminal,
+                rhs: prod.rhs.substring(1) + newNonTerminal
+            });
+        }
+        newProductions.push({
+            lhs: newNonTerminal,
+            rhs: ''
+        });
+        this.productions = newProductions;
+    }
+
+    generateNewNonTerminal(): string {
+        let result = String.fromCodePoint(this.nextAvailableNonTerminal);
+        ++this.nextAvailableNonTerminal;
+        return result;
+    }
+
+    findDirectLeftRecursion(): number {
+        for (let k = 0; k < this.productions.length; ++k) {
+            if (this.productions[k].rhs.charAt(0) == this.productions[k].lhs)
+                return k;
+        }
+        return -1;
+    }
 
     productionSummary() {
         let result = "";
@@ -215,6 +337,15 @@ export class Grammar extends FormalLanguage {
     }
 
     test(sample: string): TestResult {
+        if (this.parsable == null) {
+            this.parsable = this.clone();
+            this.parsable.removeLeftRecursion();
+        }
+        return this.parsable.parse(sample);
+    }
+
+    parse(sample: string): TestResult {
+       //console.log('parsing: ' + sample);
         let counter = 0;
         let q = new Queue<string>();
         let examined = new Set();
@@ -227,19 +358,23 @@ export class Grammar extends FormalLanguage {
             ++counter;
             let derivation = q.front() as string;
             q.pop();
+            // console.log('Examining ' + derivation);
             let derivationParts = this.splitAtFirstNonTermal(derivation);
             for (const prod of this.productions) {
                 if (prod.lhs == derivationParts.middle) {
                     let newDeriv = derivationParts.left + prod.rhs + derivationParts.right;
                     if (newDeriv == sample) {
+                        // console.log("accepted")
                         return new TestResult(true, '');
                     } else if ((!examined.has(newDeriv)) && this.mightDerive(newDeriv, sample)) {
+                        // console.log(' pushing ' + newDeriv);
                         q.push(newDeriv);
                         examined.add(newDeriv);
                     }
                 }
             }
         }
+        // console.log('rejected');
         return new TestResult(false, "");
     }
 
@@ -262,7 +397,7 @@ export class Grammar extends FormalLanguage {
         let re = new RegExp(reStr);
         return re.test(sample);
     }
-    
+
     splitAtFirstNonTermal(derivation: string) {
         let k = 0;
         for (; k < derivation.length; ++k) {
@@ -270,7 +405,7 @@ export class Grammar extends FormalLanguage {
                 return {
                     left: derivation.substring(0, k),
                     middle: derivation.charAt(k),
-                    right: derivation.substring(k+1)
+                    right: derivation.substring(k + 1)
                 };
             }
         }
@@ -282,7 +417,7 @@ export class Grammar extends FormalLanguage {
     }
 
     private isANonTerminal(symbol: string): boolean {
-        if (symbol >= 'A' && symbol <= 'Z') 
+        if (symbol >= 'A' && symbol <= 'Z')
             return true;
         else
             return (symbol > '~');
@@ -304,5 +439,15 @@ export class Grammar extends FormalLanguage {
         return new ValidationResult("", errors);
     }
 
+    removeReflexiveProductions() {
+        let newProductions = [];
+        for (let production of this.productions) {
+            if (production.lhs != production.rhs) {
+                newProductions.push(production);
+            }
+        }
+        this.productions = newProductions;
+    }
 
 }
+
