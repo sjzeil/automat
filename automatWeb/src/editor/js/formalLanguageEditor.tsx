@@ -7,6 +7,7 @@ import { GrammarEditor } from './grammarEditor';
 import { SaveEditor } from './saveEditor';
 import { Grammar } from '../../../../formalLangLib/src/js/grammar';
 import { Automaton } from '../../../../formalLangLib/src/js/automaton';
+import { FAEngine } from '../../../../formalLangLib/src/js/FAEngine';
 import { RegularExpressionEditor } from './regularExpressionEditor';
 import { BadLanguageEditor } from './badLanguageEditor';
 import { FormalLanguage } from '../../../../formalLangLib/src/js/formalLanguage';
@@ -264,7 +265,8 @@ export
   newFA() {
     console.log("in newFA");
     this.props.canvas.clear();
-    this.rendering = new AutomatonRendering(this.props.canvas, this.props.user, this.props.problemID);
+    let engine = new FAEngine();
+    this.rendering = new AutomatonRendering(this.props.canvas, this.props.user, this.props.problemID, engine);
     this.setState({
       status: "automaton",
       editing: null,

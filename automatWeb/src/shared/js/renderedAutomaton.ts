@@ -7,6 +7,8 @@ import { TransitionRendering } from './renderedTransitions'
 import { Rendering, RenderedElement } from './renderedElement';
 import { LanguageRendering } from './renderedLanguage';
 import { Automaton } from '../../../../formalLangLib/src/js/automaton';
+import { AutomatonEngine } from '../../../../formalLangLib/src/js/automatonEngine';
+import { EngineFactory } from '../../../../formalLangLib/src/js/engineFactory';
 
 
 /**
@@ -15,11 +17,11 @@ import { Automaton } from '../../../../formalLangLib/src/js/automaton';
  */
 
 export class AutomatonRendering extends LanguageRendering {
-    constructor(canvas: fabric.Canvas, user: string, problem: string) {
+    constructor(canvas: fabric.Canvas, user: string, problem: string, engine: AutomatonEngine) {
         super(canvas, user, problem);
         this.states = [];
         this.transitions = [];
-        this.language = this.automaton = new Automaton(user, problem);
+        this.language = this.automaton = new Automaton(user, problem, engine);
     }
 
     states: AutomatonStateRendering[];
@@ -133,7 +135,8 @@ export class AutomatonRendering extends LanguageRendering {
     fromJSon(jsonObj: any) {
         this.clear();
         super.fromJSon(jsonObj);
-        this.language = this.automaton = new Automaton(this.language.createdBy, jsonObj.problemID);
+        let engine = EngineFactory.newEngine(jsonObj.specification);
+        this.language = this.automaton = new Automaton(this.language.createdBy, jsonObj.problemID, engine);
         let state;
         for (state of jsonObj.states) {
             let newState = this.addState(state.x, state.y, state.label);
