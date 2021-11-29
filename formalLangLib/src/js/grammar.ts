@@ -1,6 +1,7 @@
 import { FormalLanguage } from './formalLanguage';
 import { TestResult } from './formalLanguage';
 import { ValidationResult } from './formalLanguage';
+import { LanguageFactory } from './languageFactory';
 import { Queue } from './queue';
 
 
@@ -30,7 +31,7 @@ export class Grammar extends FormalLanguage {
         this.productions = [];
         this.derivations = [];
         this.startingSymbol = "";
-        this.specification = "grammar";
+        this.specification = LanguageFactory.CFGspec;
         this.parsable = null;
         this.nextAvailableNonTerminal = 0x3B1;  // alpha
     }

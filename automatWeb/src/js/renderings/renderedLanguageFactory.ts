@@ -2,6 +2,7 @@ import { fabric } from 'fabric';
 import { Grammar } from '../../../../formalLangLib/src/js/grammar';
 import { Automaton } from '../../../../formalLangLib/src/js/automaton';
 import { FormalLanguage } from '../../../../formalLangLib/src/js/formalLanguage';
+import { LanguageFactory } from '../../../../formalLangLib/src/js/languageFactory';
 import LZUTF8 from 'lzutf8';
 import { RegularExpression } from '../../../../formalLangLib/src/js/regularExpression';
 import { BadLanguage } from '../../../../formalLangLib/src/js/badLanguage';
@@ -10,6 +11,7 @@ import { LanguageRendering } from './renderedLanguage';
 import { GrammarRendering } from './renderedGrammar';
 import { BadLanguageRendering } from './renderedBadLanguage';
 import { RegularExpressionRendering } from './renderedRegularExpression';
+import { FAEngine } from '../../../../formalLangLib/src/js/FAEngine';
 
 
 /**
@@ -55,15 +57,15 @@ export
   }
 
   _loadLanguageFromJSon(jsonObj: any): LanguageRendering {
-    if (jsonObj.specification == "automaton") {
-      let lang = new AutomatonRendering(this._canvas, this.user, jsonObj.problemID);
+    if (jsonObj.specification == LanguageFactory.FAspec) {
+      let lang = new AutomatonRendering(this._canvas, this.user, jsonObj.problemID, new FAEngine());
       lang.fromJSon(jsonObj);
       return lang;
-    } else if (jsonObj.specification == "grammar") {
+    } else if (jsonObj.specification == LanguageFactory.CFGspec) {
       let lang = new GrammarRendering(this._canvas, this.user, jsonObj.problemID);
       lang.fromJSon(jsonObj);
       return lang;
-    } else if (jsonObj.specification == "regexp") {
+    } else if (jsonObj.specification == LanguageFactory.REspec) {
       let lang = new RegularExpressionRendering(this._canvas, this.user, jsonObj.problemID);
       lang.fromJSon(jsonObj);
       return lang;

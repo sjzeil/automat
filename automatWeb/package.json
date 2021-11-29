@@ -1,7 +1,7 @@
 {
   "name": "automat",
   "exports": {
-    "./src/editor/js/index.jsx": "build/dist/editor.bundle.js"
+    "./src/js/index.jsx": "./build/dist/editor.bundle.js"
   },
   "version": "1.0.0",
   "description": "A formal language editor",

@@ -19,8 +19,7 @@
         "jsx": "react"
     },
     "include": [
-        "src/editor/js",
-        "../../../../formalLangLib/src/js",
-        "src/shared/js"
+        "./src/js",
+        "../../../../formalLangLib/src/js"
     ]
 }

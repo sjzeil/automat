@@ -5,7 +5,7 @@ const webpack = require('webpack')
 module.exports = {
     //target: 'node',
     entry: {
-        editor: './src/editor/js/index.jsx',
+        editor: './src/js/index.jsx',
     },
     output: {
         filename: '[name].bundle.js',

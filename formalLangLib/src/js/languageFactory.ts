@@ -4,6 +4,7 @@ import { FormalLanguage } from './formalLanguage';
 import LZUTF8 from 'lzutf8';
 import { RegularExpression } from './regularExpression';
 import { BadLanguage } from './badLanguage';
+import { FAEngine } from './FAEngine';
 
 
 /**
@@ -47,15 +48,15 @@ class LanguageFactory {
       }
     
   _loadLanguageFromJSon(jsonObj: any): FormalLanguage {
-    if (jsonObj.specification == "automaton") {
-      let lang = new Automaton(this.user, jsonObj.problemID);
+    if (jsonObj.specification == LanguageFactory.FAspec) {
+      let lang = new Automaton(this.user, jsonObj.problemID, new FAEngine());
       lang.fromJSon(jsonObj);
       return lang;
-    } else if (jsonObj.specification == "grammar") {
+    } else if (jsonObj.specification == LanguageFactory.CFGspec) {
       let lang = new Grammar(this.user, jsonObj.problemID);
       lang.fromJSon(jsonObj);
       return lang;
-    } else if (jsonObj.specification == "regexp") {
+    } else if (jsonObj.specification == LanguageFactory.REspec) {
       let lang = new RegularExpression(this.user, jsonObj.problemID);
       lang.fromJSon(jsonObj);
       return lang;
@@ -65,6 +66,13 @@ class LanguageFactory {
       return lang;
     }
   }
+
+  static CFGspec = 'grammar';
+  static REspec = 'regexp';
+  static FAspec = 'automatonFA';
+  static PDAspec = 'automatonPDA';
+  static TMspec = 'automatonTM';
+  static BadLanguageSpec = 'badLanguage';
 
 }
 
