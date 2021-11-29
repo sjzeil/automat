@@ -118,7 +118,6 @@ export
 
         } else if (this.state.status == "state") {
             console.log("updated Automaton editor in state mode");
-            debugger;
             let selectedItem = this.props.parent.state.editing;
             if (selectedItem != null && selectedItem.type == "Transition") {
                 this.setState({

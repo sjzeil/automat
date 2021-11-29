@@ -62,7 +62,6 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
             let selectedElement0 = selectedElement as any;
             let selectedRender = selectedElement0.renderingOf as AutomatonStateRendering;
             if (this.state.selected != selectedRender) {
-                debugger;
                 this.setState({
                     selected: selectedRender,
                     workingLabel: selectedRender.label,
@@ -173,7 +172,6 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
     deleteState() {
         let state = this.props.selected;
         let automaton = this.props.parent.parent.rendering as AutomatonRendering;
-        debugger;
         automaton.removeState(state);
         this.props.parent.setState({
             status: "new",

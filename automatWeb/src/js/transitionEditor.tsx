@@ -79,7 +79,6 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
             let selectedElement0 = selectedElement as any;
             let selectedRender = selectedElement0.renderingOf as TransitionRendering;
             if (this.state.selected != selectedRender) {
-                debugger;
                 this.setState({
                     selected: selectedRender,
                     workingLabel: selectedRender.label,
@@ -88,16 +87,6 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
                     partialLabel: '',
                 });
             }
-        
-        /*
-        if (this.props.selected.label != this.state.label) {
-            let transition = this.props.selected;
-            this.setState({
-                workingLabel: transition.label,
-                label: transition.label,
-                selectedOption: 0,
-                partialLabel: "",
-            });*/
         }
     }
 
