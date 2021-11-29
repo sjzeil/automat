@@ -1,9 +1,9 @@
 import React from 'react';
-import { FormalLanguage } from '../../../../formalLangLib/src/js/formalLanguage';
+import { FormalLanguage } from '../../../formalLangLib/src/js/formalLanguage';
 import { FormalLanguageEditor, MouseLoc } from './formalLanguageEditor';
 import { fabric } from 'fabric';
 import LZUTF8 from 'lzutf8';
-import { LanguageRendering } from '../../shared/js/renderedLanguage';
+import { LanguageRendering } from './renderings/renderedLanguage';
 
 
 

@@ -5,20 +5,20 @@ import { NewLanguageEditor } from './newLanguageEditor';
 import { AutomatonEditor } from './automatonEditor';
 import { GrammarEditor } from './grammarEditor';
 import { SaveEditor } from './saveEditor';
-import { Grammar } from '../../../../formalLangLib/src/js/grammar';
-import { Automaton } from '../../../../formalLangLib/src/js/automaton';
-import { FAEngine } from '../../../../formalLangLib/src/js/FAEngine';
+import { Grammar } from '../../../formalLangLib/src/js/grammar';
+import { Automaton } from '../../../formalLangLib/src/js/automaton';
+import { FAEngine } from '../../../formalLangLib/src/js/FAEngine';
 import { RegularExpressionEditor } from './regularExpressionEditor';
 import { BadLanguageEditor } from './badLanguageEditor';
-import { FormalLanguage } from '../../../../formalLangLib/src/js/formalLanguage';
-import { LanguageRendering } from '../../shared/js/renderedLanguage';
-import { RenderedLanguageFactory } from '../../shared/js/renderedLanguageFactory';
-import { RegularExpression } from '../../../../formalLangLib/src/js/regularExpression';
-import { BadLanguage } from '../../../../formalLangLib/src/js/badLanguage';
-import { AutomatonRendering } from '../../shared/js/renderedAutomaton';
-import { BadLanguageRendering } from '../../shared/js/renderedBadLanguage';
-import { GrammarRendering } from '../../shared/js/renderedGrammar';
-import { RegularExpressionRendering } from '../../shared/js/renderedRegularExpression';
+import { FormalLanguage } from '../../../formalLangLib/src/js/formalLanguage';
+import { LanguageRendering } from './renderings/renderedLanguage';
+import { RenderedLanguageFactory } from './renderings/renderedLanguageFactory';
+import { RegularExpression } from '../../../formalLangLib/src/js/regularExpression';
+import { BadLanguage } from '../../../formalLangLib/src/js/badLanguage';
+import { AutomatonRendering } from './renderings/renderedAutomaton';
+import { BadLanguageRendering } from './renderings/renderedBadLanguage';
+import { GrammarRendering } from './renderings/renderedGrammar';
+import { RegularExpressionRendering } from './renderings/renderedRegularExpression';
 
 
 export class MouseLoc {

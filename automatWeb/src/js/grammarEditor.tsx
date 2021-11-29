@@ -1,13 +1,13 @@
 import React from 'react';
-import { FormalLanguage } from '../../../../formalLangLib/src/js/formalLanguage';
+import { FormalLanguage } from '../../../formalLangLib/src/js/formalLanguage';
 import { FormalLanguageEditor, MouseLoc } from './formalLanguageEditor';
-import { Rendering } from '../../shared/js/renderedElement';
-import { Grammar } from '../../../../formalLangLib/src/js/grammar';
+import { Rendering } from './renderings/renderedElement';
+import { Grammar } from '../../../formalLangLib/src/js/grammar';
 import { ProductionEditor } from './productionEditor'
 import { fabric } from 'fabric';
-import { ParseTreeNode } from '../../shared/js/parseTreeNodes'
-import { LanguageRendering } from '../../shared/js/renderedLanguage';
-import { GrammarRendering } from '../../shared/js/renderedGrammar';
+import { ParseTreeNode } from './renderings/parseTreeNodes'
+import { LanguageRendering } from './renderings/renderedLanguage';
+import { GrammarRendering } from './renderings/renderedGrammar';
 
 
 

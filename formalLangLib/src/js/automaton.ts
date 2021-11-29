@@ -1,3 +1,4 @@
+import { AutomatonEngine } from './automatonEngine';
 import { FormalLanguage } from './formalLanguage';
 import { AutomatonState } from "./states";
 import { AutomatonTransition } from "./transitions";
@@ -9,15 +10,17 @@ import { AutomatonTransition } from "./transitions";
  */
 
 export class Automaton extends FormalLanguage {
-    constructor(createdBy: string, problem: string) {
+    constructor(createdBy: string, problem: string, engine: AutomatonEngine) {
         super(createdBy, problem);
         this.states = [];
         this.transitions = [];
-        this.specification = "automaton";
+        this.specification = engine.specification;
+        this.engine = engine;
     }
 
     states: AutomatonState[];
     transitions: AutomatonTransition[];
+    engine: AutomatonEngine;
 
     /**
      * Add a state to the automaton. Label must be unique.

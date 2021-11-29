@@ -1,10 +1,10 @@
 import React from 'react';
-import { FormalLanguage } from '../../../../formalLangLib/src/js/formalLanguage';
+import { FormalLanguage } from '../../../formalLangLib/src/js/formalLanguage';
 import { FormalLanguageEditor, MouseLoc } from './formalLanguageEditor';
-import { RegularExpression } from '../../../../formalLangLib/src/js/regularExpression';
+import { RegularExpression } from '../../../formalLangLib/src/js/regularExpression';
 import { fabric } from 'fabric';
-import { LanguageRendering } from '../../shared/js/renderedLanguage';
-import { RegularExpressionRendering } from '../../shared/js/renderedRegularExpression';
+import { LanguageRendering } from './renderings/renderedLanguage';
+import { RegularExpressionRendering } from './renderings/renderedRegularExpression';
 
 
 

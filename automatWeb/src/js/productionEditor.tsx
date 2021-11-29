@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { FormalLanguage } from '../../../../formalLangLib/src/js/formalLanguage';
+import { FormalLanguage } from '../../../formalLangLib/src/js/formalLanguage';
 import { FormalLanguageEditor, MouseLoc } from './formalLanguageEditor';
 import { GrammarEditor } from './grammarEditor';
-import { Grammar, Production } from '../../../../formalLangLib/src/js/grammar';
+import { Grammar, Production } from '../../../formalLangLib/src/js/grammar';
 import { fabric } from 'fabric';
 
 

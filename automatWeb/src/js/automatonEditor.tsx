@@ -1,16 +1,16 @@
 import React from 'react';
-import { FormalLanguage } from '../../../../formalLangLib/src/js/formalLanguage';
+import { FormalLanguage } from '../../../formalLangLib/src/js/formalLanguage';
 import { FormalLanguageEditor, MouseLoc } from './formalLanguageEditor';
-import { Automaton } from '../../../../formalLangLib/src/js/automaton';
-import { AutomatonState } from '../../../../formalLangLib/src/js/states';
-import { AutomatonTransition } from '../../../../formalLangLib/src/js/transitions';
+import { Automaton } from '../../../formalLangLib/src/js/automaton';
+import { AutomatonState } from '../../../formalLangLib/src/js/states';
+import { AutomatonTransition } from '../../../formalLangLib/src/js/transitions';
 import { StateEditor } from './stateEditor';
 import { TransitionEditor } from './transitionEditor';
 import { fabric } from 'fabric';
-import { LanguageRendering } from '../../shared/js/renderedLanguage';
-import { AutomatonRendering } from '../../shared/js/renderedAutomaton';
-import { AutomatonStateRendering } from '../../shared/js/stateRendering';
-import { TransitionRendering } from '../../shared/js/renderedTransitions';
+import { LanguageRendering } from './renderings/renderedLanguage';
+import { AutomatonRendering } from './renderings/renderedAutomaton';
+import { AutomatonStateRendering } from './renderings/stateRendering';
+import { TransitionRendering } from './renderings/renderedTransitions';
 
 
 

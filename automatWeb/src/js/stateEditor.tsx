@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { FormalLanguage } from '../../../../formalLangLib/src/js/formalLanguage';
+import { FormalLanguage } from '../../../formalLangLib/src/js/formalLanguage';
 import { AutomatonEditor } from './automatonEditor';
-import { Automaton } from '../../../../formalLangLib/src/js/automaton';
-import { AutomatonState } from '../../../../formalLangLib/src/js/states';
-import { AutomatonStateRendering } from '../../shared/js/stateRendering';
-import { AutomatonTransition } from '../../../../formalLangLib/src/js/transitions';
+import { Automaton } from '../../../formalLangLib/src/js/automaton';
+import { AutomatonState } from '../../../formalLangLib/src/js/states';
+import { AutomatonStateRendering } from './renderings/stateRendering';
+import { AutomatonTransition } from '../../../formalLangLib/src/js/transitions';
 import { fabric } from 'fabric';
-import { AutomatonRendering } from '../../shared/js/renderedAutomaton';
+import { AutomatonRendering } from './renderings/renderedAutomaton';
 
 
 interface StateEditorProps {
