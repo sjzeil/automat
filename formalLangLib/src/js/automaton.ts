@@ -1,5 +1,5 @@
 import { AutomatonEngine } from './automatonEngine';
-import { FormalLanguage } from './formalLanguage';
+import { FormalLanguage, ValidationResult } from './formalLanguage';
 import { AutomatonState } from "./states";
 import { AutomatonTransition } from "./transitions";
 
@@ -185,5 +185,27 @@ export class Automaton extends FormalLanguage {
             this.addTransition(transition.from, transition.to, transition.label);
         }
     }
+
+    canBeCheckedForEquivalence() {
+        return this.engine.canBeCheckedForEquivalence();
+    }
+
+    producesOutput() {
+        return this.engine.producesOutput();
+    }
+
+    equivalentTo(other: FormalLanguage) {
+        if (other.specification == this.specification) {
+            let otherAutomaton = other as Automaton;
+            return this.engine.equivalent(this, otherAutomaton);
+        } else {
+            return false;
+        }
+    }
+
+    validate(): ValidationResult {
+        return this.engine.validate(this);
+    }
+
 
 }

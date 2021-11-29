@@ -31,5 +31,8 @@ abstract class AutomatonEngine {
 
     abstract validate(automaton: Automaton): ValidationResult;
 
+    abstract transitionText(): string;
+
+    abstract startingTransition(): string;
 }
 

@@ -209,11 +209,17 @@ Transition.angleOffset = 2.0 * Math.PI * (15.0 / 360.0);
         this._prepareRendering();
     }
 
+
+    _epsilonSub(label: string): string
+    {
+        return label.replace(/@/g, '\u03B5');
+    }
+
     _prepareRendering()
     {
         let rendering = new Transition(this.from, this.to,
             {
-            label: this._transition.label,
+            label: this._epsilonSub(this._transition.label),
             curved: this._curved
         });
         this.setRendering(rendering, true);
@@ -241,6 +247,5 @@ Transition.angleOffset = 2.0 * Math.PI * (15.0 / 360.0);
         }
     }
 
-    
    
 }

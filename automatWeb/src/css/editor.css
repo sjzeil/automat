@@ -83,6 +83,10 @@ div.instructorSummary {
     color: red;
 }
 
+.warnings {
+    color: rgb(3, 95, 26);
+}
+
 div.suppressed {
     display: none;
 }

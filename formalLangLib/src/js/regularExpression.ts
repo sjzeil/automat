@@ -1,6 +1,7 @@
 import { FormalLanguage } from './formalLanguage';
 import { TestResult } from './formalLanguage';
 import { ValidationResult } from './formalLanguage';
+import { LanguageFactory } from './languageFactory';
 
 
 
@@ -14,7 +15,7 @@ export class RegularExpression extends FormalLanguage {
     constructor(user: string, problem: string) {
         super(user, problem);
         this.regexp = "";
-        this.specification = "regexp";
+        this.specification = LanguageFactory.REspec;
     }
 
     regexp: string;

@@ -53,11 +53,25 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
     componentDidUpdate() {
         console.log("StateEditor updated");
         let selectedElement = this.props.parent.props.parent.state.editing;
-        
+
         if (selectedElement == null) {
             this.props.parent.setState({
                 status: "new",
             });
+        } else {
+            let selectedElement0 = selectedElement as any;
+            let selectedRender = selectedElement0.renderingOf as AutomatonStateRendering;
+            if (this.state.selected != selectedRender) {
+                debugger;
+                this.setState({
+                    selected: selectedRender,
+                    workingLabel: selectedRender.label,
+                    label: selectedRender.label,
+                    initial: selectedRender.initial,
+                    final: selectedRender.final,
+                });
+            }
+
         }
     }
 
@@ -71,11 +85,11 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
 
     labelChanged(newLabel: string) {
         let state = this.props.selected;
-            state.label = newLabel;
-            this.setState({
-                label: newLabel,
-                workingLabel: newLabel,
-            });
+        state.label = newLabel;
+        this.setState({
+            label: newLabel,
+            workingLabel: newLabel,
+        });
     }
 
     initialChanged(checked: boolean) {
@@ -86,6 +100,7 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
         this.setState({
             initial: checked,
         });
+        this.props.parent.clearTest();
     }
 
     finalChanged(checked: boolean) {
@@ -96,6 +111,7 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
         this.setState({
             final: checked,
         });
+        this.props.parent.clearTest();
     }
 
 
@@ -159,7 +175,7 @@ export class StateEditor extends React.Component<StateEditorProps, StateEditorSt
         let automaton = this.props.parent.parent.rendering as AutomatonRendering;
         debugger;
         automaton.removeState(state);
-        this.props.parent.setState ({
+        this.props.parent.setState({
             status: "new",
         });
         this.props.parent.parent.setState({

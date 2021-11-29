@@ -25,6 +25,9 @@ interface AutomatonEditorState {
     status: string;
     selected1: fabric.Object | null;
     selected2: fabric.Object | null;
+    testInput: string;
+    testResult: string;
+    snapshot: string | null;
 }
 
 
@@ -43,6 +46,9 @@ export
             status: "new",
             selected1: null,
             selected2: null,
+            testInput: '',
+            testResult: '',
+            snapshot: null,
         };
         this.parent = props.parent;
         this.addState = this.addState.bind(this);
@@ -51,6 +57,9 @@ export
         this.clicked = this.clicked.bind(this);
         this.selected = this.selected.bind(this);
         this.cancelAdd = this.cancelAdd.bind(this);
+        this.testInputChanged = this.testInputChanged.bind(this);
+        this.stepTest = this.stepTest.bind(this);
+        this.finishTest = this.finishTest.bind(this);
     }
 
     parent: FormalLanguageEditor;
@@ -89,10 +98,11 @@ export
                     selected2: rendering,
                 });
                 let a = this.props.parent.rendering as AutomatonRendering;
+                let automaton = a.language as Automaton;
                 let loc = this.props.parent.state.clicked as MouseLoc;
                 let sourceState = this.state.selected1 as any;
                 let destState = this.props.parent.state.editing as any;
-                let newTransition = a.addTransition(sourceState.label, destState.label, "?");
+                let newTransition = a.addTransition(sourceState.label, destState.label, automaton.engine.startingTransition());
                 if (newTransition) {
                     this.parent.setState({
                         clicked: null,
@@ -108,6 +118,7 @@ export
 
         } else if (this.state.status == "state") {
             console.log("updated Automaton editor in state mode");
+            debugger;
             let selectedItem = this.props.parent.state.editing;
             if (selectedItem != null && selectedItem.type == "Transition") {
                 this.setState({
@@ -152,7 +163,7 @@ export
      */
     render() {
         console.log("AutomatonEditor rendering");
-
+        
         let mainEditor = this.parent;
         let editorDetail;
         if (this.state.status == "new") {
@@ -187,6 +198,7 @@ export
         } else {
             editorDetail = (<div>bad state {this.state.status}</div>);
         }
+        let validation = this.props.language.language.validate();
         return (
             <div className="editors">
                 <div id="addAutomata" className="editorToolBar">
@@ -197,6 +209,37 @@ export
                         disabled={/*this.automaton.states.length > 0*/true} />
                 </div>
                 {editorDetail}
+                <div className="testing">
+                        <h3>Testing</h3>
+                        <div>
+                            Input text:
+                            <input type="text" id="regexp_text_in" name="regexp_text_in" 
+                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>): 
+                                        void => this.testInputChanged(ev.target.value)}
+                                    value={this.state.testInput}
+                                    className="regexpIn"
+                                    maxLength={100}
+                                    />
+                        </div>
+                        <div>
+                            <input type="button" value="Start" onClick={this.startTest}
+                                disabled={validation.errors != ''}/>
+                            <span> </span>
+                            <input type="button" value="Step" onClick={this.stepTest} 
+                                disabled={this.state.snapshot == null}/>
+                            <span> </span>
+                            <input type="button" value="Finish" onClick={this.finishTest} 
+                                disabled={this.state.snapshot == null}/>
+                            <span> </span>
+                            <span className="testResult">{this.state.testResult}</span>
+                        </div>
+                    </div>
+                    <div className="warnings">
+                        {validation.warnings}
+                    </div>
+                    <div className="errors">
+                        {validation.errors}
+                    </div>
             </div>
         );
     }
@@ -239,7 +282,15 @@ export
     }
 
     startTest() {
+        //TODO
+    }
 
+    stepTest() {
+        //TODO
+    }
+
+    finishTest() {
+        //TODO
     }
 
     selected(item: fabric.Object) {
@@ -291,6 +342,18 @@ export
             );
             console.log("-set state click:");
         }
+    }
+
+    testInputChanged(newInput: string) {
+        this.setState({
+            testInput: newInput,
+        });
+    }
+
+    clearTest() {
+        this.setState ({
+            snapshot: null,
+        });
     }
 
 

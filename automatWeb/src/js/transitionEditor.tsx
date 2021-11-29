@@ -75,14 +75,29 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
             this.props.parent.setState({
                 status: "new",
             });
-        } else if (this.props.selected.label != this.state.label) {
+        } else {
+            let selectedElement0 = selectedElement as any;
+            let selectedRender = selectedElement0.renderingOf as TransitionRendering;
+            if (this.state.selected != selectedRender) {
+                debugger;
+                this.setState({
+                    selected: selectedRender,
+                    workingLabel: selectedRender.label,
+                    label: selectedRender.label,
+                    selectedOption: 0,
+                    partialLabel: '',
+                });
+            }
+        
+        /*
+        if (this.props.selected.label != this.state.label) {
             let transition = this.props.selected;
             this.setState({
                 workingLabel: transition.label,
                 label: transition.label,
                 selectedOption: 0,
                 partialLabel: "",
-            });
+            });*/
         }
     }
 
@@ -115,6 +130,7 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
                 ))
             }
         </React.Fragment>);
+        let automaton = this.props.parent.props.language.language as Automaton;
         return (
             <div id="transitionEditor" className="editors">
                 <div>From {this.state.selected.from.label} to {this.state.selected.to.label}...</div>
@@ -151,6 +167,9 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
                         </tr>
                     </tbody>
                 </table>
+                <div className='explanations'>
+                    {automaton.engine.transitionText()}
+                </div>
                 <div>
                     <input type="button" value="Delete" onClick={this.delete} />
                     <input type="button" value="Cancel" onClick={this.fill} />
@@ -183,6 +202,7 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
             label: transition.label,
             workingLabel: transition.label,
         });
+        this.props.parent.clearTest();
     }
 
     replaceTransitionOption() {
@@ -195,6 +215,7 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
                 label: transition.label,
                 workingLabel: transition.label,
             });
+            this.props.parent.clearTest();
         }
     }
 
@@ -208,6 +229,7 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
                 label: transition.label,
                 workingLabel: transition.label,
             });
+            this.props.parent.clearTest();
         }
     }
 
@@ -252,6 +274,7 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
         this.props.parent.parent.setState({
             editing: null,
         });
+        this.props.parent.clearTest();
     }
 
     fill() {
