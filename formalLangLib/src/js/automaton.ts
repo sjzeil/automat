@@ -1,5 +1,5 @@
 import { AutomatonEngine } from './automatonEngine';
-import { FormalLanguage, ValidationResult } from './formalLanguage';
+import { FormalLanguage, TestResult, ValidationResult } from './formalLanguage';
 import { AutomatonState } from "./states";
 import { AutomatonTransition } from "./transitions";
 
@@ -207,5 +207,12 @@ export class Automaton extends FormalLanguage {
         return this.engine.validate(this);
     }
 
+    test(sample: string): TestResult {
+        let snapshot = this.engine.initialSnapshot(this, sample);
+        while (!this.engine.stopped(snapshot)) {
+            snapshot = this.engine.step(this, snapshot);
+        }
+        return new TestResult(this.engine.accepted(snapshot), "");
+    }
 
 }

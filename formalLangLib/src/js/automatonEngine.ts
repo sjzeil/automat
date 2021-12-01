@@ -1,6 +1,6 @@
 import { Automaton } from './automaton';
+import { Snapshot } from './snapshot';
 import { TestResult, ValidationResult } from './formalLanguage';
-
 
 
 
@@ -36,5 +36,14 @@ abstract class AutomatonEngine {
     abstract transitionText(): string;
 
     abstract startingTransition(): string;
+
+    abstract initialSnapshot(au: Automaton, input: string): Snapshot;
+
+    abstract step(au: Automaton, current: Snapshot): Snapshot;
+
+    abstract stopped(current: Snapshot): boolean;
+
+    abstract accepted(current: Snapshot): boolean;
 }
+
 
