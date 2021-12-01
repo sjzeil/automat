@@ -18,6 +18,8 @@ abstract class AutomatonEngine {
 
     specification: string;
 
+    abstract name(): string;
+
     abstract canBeCheckedForEquivalence(): boolean;
 
     producesOutput() {

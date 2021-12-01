@@ -63,7 +63,7 @@ export
     }
 
     parent: FormalLanguageEditor;
-    
+
     componentDidMount() {
         console.log("AutomatonEditor mounted");
     }
@@ -162,8 +162,10 @@ export
      */
     render() {
         console.log("AutomatonEditor rendering");
-        
+
         let mainEditor = this.parent;
+        let a = this.props.parent.rendering as AutomatonRendering;
+        let automaton = a.language as Automaton;
         let editorDetail;
         if (this.state.status == "new") {
             editorDetail = <span></span>;
@@ -201,44 +203,46 @@ export
         return (
             <div className="editors">
                 <div id="addAutomata" className="editorToolBar">
-                    <input type="button" value="+State" onClick={this.addState} />
-                    <input type="button" value="+Transition" onClick={this.addTransition}
-                        disabled={/*this.automaton.states.length > 0*/false} />
-                    <input type="button" value="Test" onClick={this.startTest}
-                        disabled={/*this.automaton.states.length > 0*/true} />
+                    <h3>{automaton.engine.name()}</h3>
+                    <div>
+                        <input type="button" value="+State" onClick={this.addState} />
+                        <span> </span>
+                        <input type="button" value="+Transition" onClick={this.addTransition}
+                            disabled={/*this.automaton.states.length > 0*/false} />
+                    </div>
                 </div>
                 {editorDetail}
                 <div className="testing">
-                        <h3>Testing</h3>
-                        <div>
-                            Input text:
-                            <input type="text" id="regexp_text_in" name="regexp_text_in" 
-                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>): 
-                                        void => this.testInputChanged(ev.target.value)}
-                                    value={this.state.testInput}
-                                    className="regexpIn"
-                                    maxLength={100}
-                                    />
-                        </div>
-                        <div>
-                            <input type="button" value="Start" onClick={this.startTest}
-                                disabled={validation.errors != ''}/>
-                            <span> </span>
-                            <input type="button" value="Step" onClick={this.stepTest} 
-                                disabled={this.state.snapshot == null}/>
-                            <span> </span>
-                            <input type="button" value="Finish" onClick={this.finishTest} 
-                                disabled={this.state.snapshot == null}/>
-                            <span> </span>
-                            <span className="testResult">{this.state.testResult}</span>
-                        </div>
+                    <h3>Testing</h3>
+                    <div>
+                        Input text:
+                        <input type="text" id="regexp_text_in" name="regexp_text_in"
+                            onChange={(ev: React.ChangeEvent<HTMLInputElement>):
+                                void => this.testInputChanged(ev.target.value)}
+                            value={this.state.testInput}
+                            className="regexpIn"
+                            maxLength={100}
+                        />
                     </div>
-                    <div className="warnings">
-                        {validation.warnings}
+                    <div>
+                        <input type="button" value="Start" onClick={this.startTest}
+                            disabled={validation.errors != ''} />
+                        <span> </span>
+                        <input type="button" value="Step" onClick={this.stepTest}
+                            disabled={this.state.snapshot == null} />
+                        <span> </span>
+                        <input type="button" value="Finish" onClick={this.finishTest}
+                            disabled={this.state.snapshot == null} />
+                        <span> </span>
+                        <span className="testResult">{this.state.testResult}</span>
                     </div>
-                    <div className="errors">
-                        {validation.errors}
-                    </div>
+                </div>
+                <div className="warnings">
+                    {validation.warnings}
+                </div>
+                <div className="errors">
+                    {validation.errors}
+                </div>
             </div>
         );
     }
@@ -350,7 +354,7 @@ export
     }
 
     clearTest() {
-        this.setState ({
+        this.setState({
             snapshot: null,
         });
     }

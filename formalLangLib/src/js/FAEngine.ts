@@ -17,6 +17,10 @@ class FAEngine extends AutomatonEngine {
         super("automatonFA");
     }
 
+    name(): string {
+        return 'Finite Automaton';
+    }
+
     canBeCheckedForEquivalence(): boolean
     {
         return false;  // TODO to change this later

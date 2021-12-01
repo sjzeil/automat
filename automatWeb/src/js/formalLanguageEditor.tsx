@@ -207,8 +207,12 @@ export
         if (lang) {
           let factory = new RenderedLanguageFactory(this.props.canvas, this.props.user);
           this.rendering = factory.load(lang);
+          let status = this.rendering.language.specification;
+          if (status.startsWith('automaton')) {
+            status = 'automaton';
+          }
           this.state = {
-            status: this.rendering.language.specification,
+            status: status,
             oldStatus: "new",
             editing: null,
             clicked: null,
