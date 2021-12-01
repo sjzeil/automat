@@ -2,6 +2,8 @@ import React from 'react';
 import { FormalLanguage } from '../../../formalLangLib/src/js/formalLanguage';
 import { FormalLanguageEditor, MouseLoc } from './formalLanguageEditor';
 import { Automaton } from '../../../formalLangLib/src/js/automaton';
+import { AutomatonEngine } from '../../../formalLangLib/src/js/automatonEngine';
+import { FAEngine } from '../../../formalLangLib/src/js/FAEngine';
 import { AutomatonState } from '../../../formalLangLib/src/js/states';
 import { AutomatonTransition } from '../../../formalLangLib/src/js/transitions';
 import { StateEditor } from './stateEditor';
@@ -11,6 +13,7 @@ import { LanguageRendering } from './renderings/renderedLanguage';
 import { AutomatonRendering } from './renderings/renderedAutomaton';
 import { AutomatonStateRendering } from './renderings/stateRendering';
 import { TransitionRendering } from './renderings/renderedTransitions';
+import { Snapshot } from '../../../formalLangLib/src/js/snapshot';
 
 
 
@@ -27,7 +30,7 @@ interface AutomatonEditorState {
     selected2: fabric.Object | null;
     testInput: string;
     testResult: string;
-    snapshot: string | null;
+    snapshot: Snapshot | null;
 }
 
 
@@ -58,6 +61,7 @@ export
         this.selected = this.selected.bind(this);
         this.cancelAdd = this.cancelAdd.bind(this);
         this.testInputChanged = this.testInputChanged.bind(this);
+        this.startTest = this.startTest.bind(this);
         this.stepTest = this.stepTest.bind(this);
         this.finishTest = this.finishTest.bind(this);
     }
@@ -81,6 +85,7 @@ export
                 });
                 this.setState({
                     status: "state",
+                    snapshot: null,
                 });
             }
         } else if (this.state.status == "addingTransition" && this.props.parent.state.editing != null) {
@@ -122,6 +127,7 @@ export
             if (selectedItem != null && selectedItem.type == "Transition") {
                 this.setState({
                     status: "transition",
+                    snapshot: null,
                 });
             }
         } else if (this.state.status == "transition") {
@@ -130,23 +136,26 @@ export
             if (selectedItem != null && selectedItem.type == "State") {
                 this.setState({
                     status: "state",
+                    snapshot: null,
                 });
             } else if (selectedItem != null && selectedItem.type == "Transition") {
                 if (this.props.selected != this.props.parent.state.editing) {
                     this.props.parent.setState({
-
                     });
                 }
+
             }
         } else if (this.state.status == "new") {
             let selectedItem = this.props.parent.state.editing;
             if (selectedItem != null && selectedItem.type == "State") {
                 this.setState({
                     status: "state",
+                    snapshot: null,
                 });
             } else if (selectedItem != null && selectedItem.type == "Transition") {
                 this.setState({
                     status: "transition",
+                    snapshot: null,
                 });
             }
         }
@@ -200,6 +209,20 @@ export
             editorDetail = (<div>bad state {this.state.status}</div>);
         }
         let validation = this.props.language.language.validate();
+        let processedInput = '';
+        a.clearDecorations();
+        let testResult = (<span></span>);
+        if (this.state.snapshot != null) {
+            processedInput = this.state.snapshot.inputPortrayal();
+            a.decorateStates(this.state.snapshot);
+            if (automaton.engine.stopped(this.state.snapshot)) {
+                if (automaton.engine.accepted(this.state.snapshot)) {
+                    testResult = (<span className='accepted'>Accepted</span>);
+                } else {
+                    testResult = (<span className='rejected'>Rejected</span>);
+                }
+            }
+        }
         return (
             <div className="editors">
                 <div id="addAutomata" className="editorToolBar">
@@ -223,16 +246,20 @@ export
                             className="regexpIn"
                             maxLength={100}
                         />
+                        {testResult}
+                    </div>
+                    <div className="testInput">
+                        {processedInput}
                     </div>
                     <div>
                         <input type="button" value="Start" onClick={this.startTest}
                             disabled={validation.errors != ''} />
                         <span> </span>
                         <input type="button" value="Step" onClick={this.stepTest}
-                            disabled={this.state.snapshot == null} />
+                            disabled={this.state.snapshot == null || automaton.engine.stopped(this.state.snapshot)} />
                         <span> </span>
                         <input type="button" value="Finish" onClick={this.finishTest}
-                            disabled={this.state.snapshot == null} />
+                            disabled={this.state.snapshot == null || automaton.engine.stopped(this.state.snapshot)} />
                         <span> </span>
                         <span className="testResult">{this.state.testResult}</span>
                     </div>
@@ -253,6 +280,7 @@ export
                 status: "addingState",
                 selected1: null,
                 selected2: null,
+                snapshot: null,
             }
         );
         this.parent.setState({
@@ -270,6 +298,7 @@ export
                 status: "addingTransition",
                 selected1: null,
                 selected2: null,
+                snapshot: null,
             }
         );
     }
@@ -285,19 +314,47 @@ export
     }
 
     startTest() {
-        //TODO
+        let faRendered = this.props.language as AutomatonRendering;
+        let fa = faRendered.language as Automaton;
+        let snapshot0 = fa.engine.initialSnapshot(fa, this.state.testInput);
+        this.setState({
+            snapshot: snapshot0,
+            status: 'new'
+        });
+        this.parent.setState ({
+            editing: null,
+        });
     }
 
     stepTest() {
-        //TODO
+        let faRendered = this.props.language as AutomatonRendering;
+        let fa = faRendered.language as Automaton;
+        if (this.state.snapshot != null) {
+            let snapshot0 = fa.engine.step(fa, this.state.snapshot);
+            this.setState({
+                snapshot: snapshot0
+            });
+        }
     }
 
     finishTest() {
+        let faRendered = this.props.language as AutomatonRendering;
+        let fa = faRendered.language as Automaton;
+        if (this.state.snapshot != null) {
+            let snapshot0 = this.state.snapshot;
+            while (!fa.engine.stopped(snapshot0)) {
+                snapshot0 = fa.engine.step(fa, snapshot0);
+            }
+            this.setState({
+                snapshot: snapshot0
+            });
+        }
         //TODO
     }
 
     selected(item: fabric.Object) {
         let itemObj = item as any;
+        debugger;
         if (itemObj.type == "State") {
             if (this.state.status == "addingTransition") {
                 if (this.state.selected1 == null) {
@@ -314,6 +371,7 @@ export
                 this.setState(
                     {
                         status: "state",
+                        snapshot: null,
                     }
                 );
                 this.props.parent.setState({
@@ -324,6 +382,7 @@ export
             this.setState(
                 {
                     status: "transition",
+                    snapshot: null,
                     //editing: itemO.renderingOf,
                 }
             );

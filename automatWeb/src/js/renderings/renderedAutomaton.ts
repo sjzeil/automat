@@ -9,6 +9,7 @@ import { LanguageRendering } from './renderedLanguage';
 import { Automaton } from '../../../../formalLangLib/src/js/automaton';
 import { AutomatonEngine } from '../../../../formalLangLib/src/js/automatonEngine';
 import { EngineFactory } from '../../../../formalLangLib/src/js/engineFactory';
+import { Snapshot } from '../../../../formalLangLib/src/js/snapshot';
 
 
 /**
@@ -150,6 +151,23 @@ export class AutomatonRendering extends LanguageRendering {
             let fromState = this.findState(transition.from);
             let toState = this.findState(transition.to);
             this.addTransition(transition.from, transition.to, transition.label);
+        }
+    }
+
+    clearDecorations() {
+        for (let stateR of this.states) {
+            stateR.selected = false;
+            stateR.annotation = '';
+        }
+    }
+
+    decorateStates(snapshot: Snapshot) {
+        for (let stateR of this.states) {
+            let decoration = snapshot.selectedStates.get(stateR._state);
+            if (typeof decoration !== typeof undefined) {
+                stateR.selected = true;
+                stateR.annotation = decoration as string;
+            }
         }
     }
 

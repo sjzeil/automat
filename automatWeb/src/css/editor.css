@@ -2,8 +2,8 @@ body
 {
   width:      100vw; 
   min-height: 100vh;
-  padding:    0;
-  margin:     10px;
+  padding:    5px;
+  margin:     5px;
 }
 
 .editorCanvas {
@@ -85,6 +85,22 @@ div.instructorSummary {
 
 .warnings {
     color: rgb(3, 95, 26);
+}
+
+span.rejected {
+    color: red;
+}
+
+span.accepted {
+    color: rgb(3, 95, 26);
+}
+
+
+div.testInput {
+    color: rgb(6, 38, 219);
+    padding-left: 2ex;
+    font-style: italic;
+    font-weight: bold;
 }
 
 div.suppressed {
