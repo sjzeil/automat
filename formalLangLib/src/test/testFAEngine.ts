@@ -44,6 +44,30 @@ function sampleNFA(): Automaton {
     return fa;
 }
 
+function notCharFA(): Automaton {
+    let fa = new Automaton('Instructor', '', new FAEngine());
+    fa.addState('0');
+    fa.addState('1');
+    fa.addState('2');
+    fa.states[0].initial = true;
+    fa.states[2].final = true;
+    fa.addTransition('0', '1', '0');
+    fa.addTransition('0', '2', '!0');
+    //fa.addTransition('0', '1', '1');
+    return fa;
+}
+
+function anyCharFA(): Automaton {
+    let fa = new Automaton('Instructor', '', new FAEngine());
+    fa.addState('0');
+    fa.addState('1');
+    fa.states[0].initial = true;
+    fa.states[1].final = true;
+    fa.addTransition('0', '1', '~');
+    fa.addTransition('1', '0', '0');
+    return fa;
+}
+
 
 describe('FAEngine', function () {
     context('validate-empty-fa', function () {
@@ -229,13 +253,48 @@ describe('FAEngine', function () {
     context('FA execution', function () {
         it('nondeterministic FA accepts', function () {
             let fa = sampleNFA();
-            let inputStr = '000';
             expect(fa.test('000').passed).to.be.true;
             expect(fa.test('11').passed).to.be.true;
             expect(fa.test('01').passed).to.be.false;
             expect(fa.test('110').passed).to.be.false;
         });
     });
+
+    context('notChar shortcut', function() {
+        it('not-character shortcut accepted', function() {
+            let fa = notCharFA();
+            let validation = fa.validate();
+            expect(validation.errors).to.equal('');
+            expect(validation.warnings.indexOf('nondeterministic')).to.be.lessThan(0);
+            fa.addTransition('0', '1', '1');
+            validation = fa.validate();
+            expect(validation.warnings.indexOf('nondeterministic')).to.be.greaterThanOrEqual(0);
+        });
+
+        it('not-character shortcut execution', function() {
+            let fa = notCharFA();
+            expect(fa.test('0').passed).to.be.false;
+            expect(fa.test('a').passed).to.be.true;
+        });
+    });
+
+
+    context('anyChar shortcut', function() {
+        it('any-character shortcut accepted', function() {
+            let fa = anyCharFA();
+            let validation = fa.validate();
+            expect(validation.errors).to.equal('');
+            expect(validation.warnings.indexOf('nondeterministic')).to.be.lessThan(0);
+        });
+
+        it('not-character shortcut execution', function() {
+            let fa = anyCharFA();
+            expect(fa.test('0').passed).to.be.true;
+            expect(fa.test('a0a').passed).to.be.true;
+            expect(fa.test('10x0Q').passed).to.be.true;
+        });
+    });
+
 
 
 });

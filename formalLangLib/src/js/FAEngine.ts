@@ -13,7 +13,7 @@ import { TestResult, ValidationResult } from './formalLanguage';
  * 
  */
 export
-class FAEngine extends AutomatonEngine {
+    class FAEngine extends AutomatonEngine {
     constructor() {
         super("automatonFA");
     }
@@ -22,20 +22,17 @@ class FAEngine extends AutomatonEngine {
         return 'Finite Automaton';
     }
 
-    canBeCheckedForEquivalence(): boolean
-    {
+    canBeCheckedForEquivalence(): boolean {
         return false;  // TODO to change this later
     }
 
 
-    equivalent(automaton: Automaton, automaton2: Automaton): boolean
-    {
+    equivalent(automaton: Automaton, automaton2: Automaton): boolean {
         return false;
     }
 
 
-    test (sample: string, automaton: Automaton): TestResult
-    {
+    test(sample: string, automaton: Automaton): TestResult {
         //TODO
         return {
             passed: false,
@@ -43,8 +40,7 @@ class FAEngine extends AutomatonEngine {
         };
     }
 
-    validate(automaton: Automaton): ValidationResult
-    {
+    validate(automaton: Automaton): ValidationResult {
         if (automaton.states.length == 0) {
             return {
                 warnings: '',
@@ -87,27 +83,41 @@ class FAEngine extends AutomatonEngine {
                 }
                 let transitionsInThisArrow = new Set<string>();
                 for (let transition of transitions) {
-                    if (transitionsInThisArrow.has(transition)) {
-                        return {
-                            warnings: '',
-                            errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                            ' has duplicate transitions.'
+                    let transitionTriggers = this.getTriggersFor(transition);
+                    for (let i = 0; i < transitionTriggers.length; ++i) {
+                        let trigger = transitionTriggers.charAt(i);
+
+                        if (transitionsInThisArrow.has(trigger)) {
+                            return {
+                                warnings: '',
+                                errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
+                                    ' has duplicate transitions on ' + trigger + '.'
+                            }
+                        }
+                        transitionsInThisArrow.add(trigger);
+                        if (trigger == '@' || transitionsSeen.has(trigger)) {
+                            isDeterministic = false;
+                        }
+                        if (trigger != '@') {
+                            transitionsSeen.add(transition);
                         }
                     }
-                    transitionsInThisArrow.add(transition);
-                    if (transition == '@' || transitionsSeen.has(transition)) {
-                        isDeterministic = false;
-                    }
-                    if (transition != '@') {
-                        transitionsSeen.add(transition);
-                    }
-                    if (transition.length != 1 || !transition.match(/^[@0-9A-Za-z]$/)) {
-                        return {
-                            warnings: warningStr,
-                            errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                                ' has an invalid transition: ' + transition
-                        };
-    
+                    if (transition.length == 1) {
+                        if (!transition.match(/^[@~0-9A-Za-z]$/)) {
+                            return {
+                                warnings: warningStr,
+                                errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
+                                    ' has an invalid transition: ' + transition
+                            };
+                        }
+                    } else if (transition.length == 2) {
+                        if (!transition.match(/^![0-9A-Za-z]$/)) {
+                            return {
+                                warnings: warningStr,
+                                errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
+                                    ' has an invalid transition: ' + transition
+                            };
+                        }
                     }
                 }
             }
@@ -124,15 +134,33 @@ class FAEngine extends AutomatonEngine {
             errors: errorStr
         };
     }
+    private static charSet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+    private getTriggersFor(transition: string): string {
+        if (transition.length == 1) {
+            if (transition == '~') {
+                return FAEngine.charSet;
+            } else {
+                return transition;
+            }
+        }
+        if (transition.length == 2 && transition.charAt(0) == '!') {
+            let result = FAEngine.charSet.replace(transition.charAt(1), '');
+            return result;
+        }
+        return '';
+    }
 
     startingTransition(): string {
         return '@';
     }
 
-    transitionText(): string 
-    {
+    transitionText(): string {
         return 'Each arrow may represent one or more transitions.\n' +
-         'Each transition must contain a single alphanumeric character, or @ to denote the empty string (\u03B5).' 
+            'Each transition must contain a single alphanumeric character, or @ to denote the empty string (\u03B5).\n' +
+            'Shortcuts are also available: !x means "every character except x", ~ means "any character", and ' +
+            'a,b,c}w means that any of the characters to the left of the "}" can be accepted, but will be stored ' +
+            'in a "variable" named "w".'
     }
 
     initialSnapshot(au: Automaton, input: string): Snapshot {
@@ -172,8 +200,7 @@ class FAEngine extends AutomatonEngine {
     }
 
 
-    step(au: Automaton, current: Snapshot): Snapshot
-    {
+    step(au: Automaton, current: Snapshot): Snapshot {
         let next = new Snapshot(current.input as string);
         next.numCharsProcessed = current.numCharsProcessed + 1;
         let processed = (current.input as string).substr(0, next.numCharsProcessed);
@@ -183,7 +210,18 @@ class FAEngine extends AutomatonEngine {
             if (typeof description === typeof '') {
                 let transitions = arrow.label.split('\n');
                 for (let transition of transitions) {
-                    if (transition == trigger) {
+                    let follow = false;
+                    if (transition.length == 1 && transition == trigger) {
+                        follow = true;
+                    }
+                    if (transition == '~') {
+                        follow = true;
+                    }
+                    if (transition.length == 2 && transition.charAt(0) == '!' &&
+                        transition.charAt(1) != trigger) {
+                        follow = true;
+                    }
+                    if (follow) {
                         next.selectedStates.set(arrow.to, processed);
                     }
                 }
@@ -194,15 +232,15 @@ class FAEngine extends AutomatonEngine {
     }
 
     stopped(current: Snapshot): boolean {
-        return current.selectedStates.size == 0 || 
-            current.input == null || 
+        return current.selectedStates.size == 0 ||
+            current.input == null ||
             current.numCharsProcessed >= current.input.length;
     }
 
     accepted(current: Snapshot): boolean {
         if (current.numCharsProcessed >= (current.input as string).length) {
             let inFinalState = false;
-            current.selectedStates.forEach (function(value, currentState) {
+            current.selectedStates.forEach(function (value, currentState) {
                 inFinalState = inFinalState || currentState.final;
             });
             return inFinalState;
@@ -213,4 +251,5 @@ class FAEngine extends AutomatonEngine {
 
 
 }
+
 
