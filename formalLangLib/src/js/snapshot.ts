@@ -15,11 +15,13 @@ class Snapshot {
         this.input = input;
         this.numCharsProcessed = 0;
         this.selectedStates = new Map();
+        this.variables = {};
     }
 
     input: string | null; // Input to the automaton (null for TMs)
     numCharsProcessed: number; // Portion of input that has been processed already
     selectedStates: Map<AutomatonState, string>;
+    variables: any; // map from alphanumeric characters to alphanumeric characters
 
 
     inputPortrayal(): string {

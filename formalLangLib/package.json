@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register --exit 'src/test/**/*.ts'",
-    "debug": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register  --grep 'notChar' --inspect --exit 'src/test/**/*.ts'",
+    "debug": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register  --grep 'variable' --inspect --exit 'src/test/**/*.ts'",
     "watch": "webpack --watch",
     "start": "webpack serve --open --config webpack.dev.js",
     "server": "node server.js",

@@ -70,53 +70,65 @@ export
         }
 
         let isDeterministic = true;
+        let variableMapping = this.collectVariables(automaton);
         for (let state of automaton.states) {
             let transitionsSeen = new Set<string>();
             for (let arrow of automaton.transitions) {
-                let transitions = arrow.label.split('\n');
-                if (transitions.length == 0) {
-                    return {
-                        warnings: warningStr,
-                        errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                            ' has no transitions.'
+                if (arrow.from == state) {
+                    let transitions = arrow.label.split('\n');
+                    if (transitions.length == 0) {
+                        return {
+                            warnings: warningStr,
+                            errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
+                                ' has no transitions.'
+                        }
                     }
-                }
-                let transitionsInThisArrow = new Set<string>();
-                for (let transition of transitions) {
-                    let transitionTriggers = this.getTriggersFor(transition);
-                    for (let i = 0; i < transitionTriggers.length; ++i) {
-                        let trigger = transitionTriggers.charAt(i);
+                    let transitionsInThisArrow = new Set<string>();
+                    for (let transition of transitions) {
+                        let transitionTriggers = this.getTriggersFor(transition);
+                        transitionTriggers = this.replaceVariablesIn(transitionTriggers, variableMapping);
+                        for (let i = 0; i < transitionTriggers.length; ++i) {
+                            let trigger = transitionTriggers.charAt(i);
 
-                        if (transitionsInThisArrow.has(trigger)) {
-                            return {
-                                warnings: '',
-                                errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                                    ' has duplicate transitions on ' + trigger + '.'
+                            if (transitionsInThisArrow.has(trigger)) {
+                                return {
+                                    warnings: '',
+                                    errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
+                                        ' has duplicate transitions on ' + trigger + '.'
+                                }
+                            }
+                            transitionsInThisArrow.add(trigger);
+                            if (trigger == '@' || transitionsSeen.has(trigger)) {
+                                isDeterministic = false;
+                            }
+                            if (trigger != '@') {
+                                transitionsSeen.add(trigger);
                             }
                         }
-                        transitionsInThisArrow.add(trigger);
-                        if (trigger == '@' || transitionsSeen.has(trigger)) {
-                            isDeterministic = false;
-                        }
-                        if (trigger != '@') {
-                            transitionsSeen.add(transition);
-                        }
-                    }
-                    if (transition.length == 1) {
-                        if (!transition.match(/^[@~0-9A-Za-z]$/)) {
-                            return {
-                                warnings: warningStr,
-                                errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                                    ' has an invalid transition: ' + transition
-                            };
-                        }
-                    } else if (transition.length == 2) {
-                        if (!transition.match(/^![0-9A-Za-z]$/)) {
-                            return {
-                                warnings: warningStr,
-                                errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                                    ' has an invalid transition: ' + transition
-                            };
+                        if (transition.length == 1) {
+                            if (!transition.match(/^[@~0-9A-Za-z]$/)) {
+                                return {
+                                    warnings: warningStr,
+                                    errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
+                                        ' has an invalid transition: ' + transition
+                                };
+                            }
+                        } else if (transition.length == 2) {
+                            if (!transition.match(/^![0-9A-Za-z]$/)) {
+                                return {
+                                    warnings: warningStr,
+                                    errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
+                                        ' has an invalid transition: ' + transition
+                                };
+                            }
+                        } else if (transition.length > 2) {
+                            if (!transition.match(/^[0-9A-Za-z](,[0-9A-Za-z])*(}[A-Za-z])?$/)) {
+                                return {
+                                    warnings: warningStr,
+                                    errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
+                                        ' has an invalid transition: ' + transition
+                                };
+                            }
                         }
                     }
                 }
@@ -134,6 +146,35 @@ export
             errors: errorStr
         };
     }
+    replaceVariablesIn(transition: string, variableMapping: any): string {
+        let storage = '';
+        let result = transition;
+        if (transition.length > 2 && transition.charAt(transition.length-2) == '}') {
+            storage = transition.substr(transition.length-2);
+            result = transition.substr(0, transition.length-2);
+        }
+        for (let property in variableMapping) {
+            let re = new RegExp(property, 'g');
+            result = result.replace(re, variableMapping[property]);
+        }
+        return result + storage;
+    }
+
+    private collectVariables(automaton: Automaton): any {
+        let result = {} as any;
+        for (let arrow of automaton.transitions) {
+            let transitions = arrow.label.split('\n');
+            for (let transition of transitions) {
+                if (transition.match(/^[0-9A-Za-z](,[0-9A-Za-z])*}[A-Za-z]$/)) {
+                    let varName = transition.charAt(transition.length - 1);
+                    let transitionTriggers = this.getTriggersFor(transition);
+                    result[varName] = transitionTriggers;
+                }
+            }
+        }
+        return result;
+    }
+
     private static charSet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
     private getTriggersFor(transition: string): string {
@@ -143,9 +184,20 @@ export
             } else {
                 return transition;
             }
-        }
-        if (transition.length == 2 && transition.charAt(0) == '!') {
+        } else if (transition.length == 2 && transition.charAt(0) == '!') {
             let result = FAEngine.charSet.replace(transition.charAt(1), '');
+            return result;
+        } else if (transition.length > 2) {
+            let k = transition.indexOf('}');
+            if (k >= 0) {
+                transition = transition.substring(0, k);
+            }
+            let result = '';
+            for (let i = 0; i < transition.length; ++i) {
+                if (transition.charAt(i) != ',') {
+                    result += transition.charAt(i);
+                }
+            }
             return result;
         }
         return '';
@@ -202,24 +254,30 @@ export
 
     step(au: Automaton, current: Snapshot): Snapshot {
         let next = new Snapshot(current.input as string);
+        next.variables = current.variables;
         next.numCharsProcessed = current.numCharsProcessed + 1;
         let processed = (current.input as string).substr(0, next.numCharsProcessed);
-        let trigger = current.input?.substr(current.numCharsProcessed, 1);
+        let trigger = current.input?.substr(current.numCharsProcessed, 1) as string;
         for (let arrow of au.transitions) {
             let description = current.selectedStates.get(arrow.from);
             if (typeof description === typeof '') {
                 let transitions = arrow.label.split('\n');
                 for (let transition of transitions) {
+                    transition = this.replaceVariablesIn(transition, current.variables);
                     let follow = false;
-                    if (transition.length == 1 && transition == trigger) {
-                        follow = true;
-                    }
-                    if (transition == '~') {
-                        follow = true;
-                    }
-                    if (transition.length == 2 && transition.charAt(0) == '!' &&
-                        transition.charAt(1) != trigger) {
-                        follow = true;
+                    if (transition.length == 1) {
+                        follow = (transition == trigger) || (transition == '~');
+                    } else if (transition.length == 2 && transition.charAt(0) == '!')  {
+                        let notChar = transition.charAt(1);
+                        follow = (notChar != trigger);
+                    } else if (transition.length > 2) {
+                        let acceptabletriggers = this.getTriggersFor(transition);
+                        if (acceptabletriggers.indexOf(trigger) >= 0) {
+                            follow = true;
+                            if (transition.charAt(transition.length-2) == '}') {
+                                next.variables[transition.charAt(transition.length-1)] = trigger;
+                            }
+                        }
                     }
                     if (follow) {
                         next.selectedStates.set(arrow.to, processed);

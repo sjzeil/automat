@@ -68,6 +68,17 @@ function anyCharFA(): Automaton {
     return fa;
 }
 
+function storedCharFA(): Automaton {
+    let fa = new Automaton('Instructor', '', new FAEngine());
+    fa.addState('0');
+    fa.addState('1');
+    fa.states[0].initial = true;
+    fa.states[1].final = true;
+    fa.addTransition('0', '1', '0,1}z');
+    fa.addTransition('1', '0', 'z');
+    return fa;
+}
+
 
 describe('FAEngine', function () {
     context('validate-empty-fa', function () {
@@ -287,7 +298,7 @@ describe('FAEngine', function () {
             expect(validation.warnings.indexOf('nondeterministic')).to.be.lessThan(0);
         });
 
-        it('not-character shortcut execution', function() {
+        it('any-character shortcut execution', function() {
             let fa = anyCharFA();
             expect(fa.test('0').passed).to.be.true;
             expect(fa.test('a0a').passed).to.be.true;
@@ -295,6 +306,28 @@ describe('FAEngine', function () {
         });
     });
 
+    context('variable shortcut', function() {
+        it('variable shortcut accepted', function() {
+            let fa = storedCharFA();
+            let validation = fa.validate();
+            expect(validation.errors).to.equal('');
+            expect(validation.warnings.indexOf('nondeterministic')).to.be.lessThan(0);
+            fa.addState('2');
+            fa.addTransition('1', '2', '1')
+            validation = fa.validate();
+            expect(validation.errors).to.equal('');
+            expect(validation.warnings.indexOf('nondeterministic')).to.be.greaterThanOrEqual(0);
+        });
+
+        it('variable shortcut execution', function() {
+            let fa = storedCharFA();
+            expect(fa.test('0').passed).to.be.true;
+            expect(fa.test('001').passed).to.be.true;
+            expect(fa.test('011').passed).to.be.false;
+            expect(fa.test('0055x').passed).to.be.false;
+            expect(fa.test('00110').passed).to.be.true;
+        });
+    });
 
 
 });
