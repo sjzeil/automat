@@ -248,8 +248,8 @@ export
                         />
                         {testResult}
                     </div>
-                    <div className="testInput">
-                        {processedInput}
+                    <div className='testInput'
+                       dangerouslySetInnerHTML={{__html: processedInput} }>
                     </div>
                     <div>
                         <input type="button" value="Start" onClick={this.startTest}
@@ -261,7 +261,8 @@ export
                         <input type="button" value="Finish" onClick={this.finishTest}
                             disabled={this.state.snapshot == null || automaton.engine.stopped(this.state.snapshot)} />
                         <span> </span>
-                        <span className="testResult">{this.state.testResult}</span>
+                        <span className="testResult">
+                            {this.state.testResult }</span>
                     </div>
                 </div>
                 <div className="warnings">

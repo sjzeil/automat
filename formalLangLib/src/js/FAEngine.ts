@@ -208,11 +208,12 @@ export
     }
 
     transitionText(): string {
-        return 'Each arrow may represent one or more transitions.\n' +
-            'Each transition must contain a single alphanumeric character, or @ to denote the empty string (\u03B5).\n' +
-            'Shortcuts are also available: !x means "every character except x", ~ means "any character", and ' +
-            'a,b,c}w means that any of the characters to the left of the "}" can be accepted, but will be stored ' +
-            'in a "variable" named "w".'
+        return 'Each arrow may represent one or more transitions.<br/>' +
+            '<ul><li>Each transition must contain a single alphanumeric character, or @ to denote the empty string (\u03B5).</li>' +
+            '<li>Shortcuts are also available:' +
+            ' <ul><li>!x means "every character except x",</li> <li>~ means "any character", and </li>' +
+            '<li>a,b,c}w means that any of the characters to the left of the "}" can be accepted, but will be stored ' +
+            'in a "variable" named "w".</li></ul></ul>'
     }
 
     initialSnapshot(au: Automaton, input: string): Snapshot {

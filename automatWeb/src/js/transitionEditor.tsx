@@ -156,8 +156,8 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
                         </tr>
                     </tbody>
                 </table>
-                <div className='explanations'>
-                    {automaton.engine.transitionText()}
+                <div className='explanations'
+                  dangerouslySetInnerHTML={{ __html: automaton.engine.transitionText() }}>
                 </div>
                 <div>
                     <input type="button" value="Delete" onClick={this.delete} />
