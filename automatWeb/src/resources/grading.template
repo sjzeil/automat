@@ -25,17 +25,18 @@
               <div id="editorContainer" class="summaryCanvas">
                 <canvas id="editorView" height=600 width=600> </canvas>
               <div>(Hold Alt key to drag diagram horizontally or vertically.)</div>
-          </div>
-          
-          <script>
+            </div>
+            <div class="graderNotes">@graderNotes@</div>
+
+            <script>
               document.languageURL = "@solution@";
               document.problem = "@problem@";
               document.username = "Instructor";
               document.lock = "0";
-          </script>
-          <div id="react-entry-point" class="suppressed"></div>
-          <div id="creatorName"class="suppressed">Instructor</div>
-          <script src="./editor.bundle.js"> </script>
+            </script>
+            <div id="react-entry-point" class="suppressed"></div>
+            <div id="creatorName"class="suppressed">Instructor</div>
+            <script src="./editor.bundle.js"> </script>
         </details>
       </div>
     </div>

@@ -42,7 +42,7 @@ function warning(message:string) {
 }
 
 function dbg(message:string) {
-    console.log(div("warnings", message));
+    //console.log(div("warnings", message));
 }
 
 
@@ -51,10 +51,15 @@ function info(message:string) {
 }
 
 function readStrings(path:string): string[] {
-    warning("attempting to read from " + path);
+    dbg("attempting to read from " + path);
         const data = fs.readFileSync(path, 'utf8');
         if (data !== undefined ) {
-            return data.split("\n");
+            let strippedData = data.replace(/\n$/,'');
+            let lines = strippedData.split("\n");
+            if (lines[lines.length-1] == '') {
+                lines.pop();
+            }
+            return lines;
         } else {
             return [];
         }
@@ -111,7 +116,6 @@ function printOutputExamples (results: SampleResults): string {
 
 /////// Begin main routine  ///////////
 
-error("not a problem");
 if (problem === "") {
     error("Cannot issue a grading report - no problem has been specified.");
     process.exit(1);
@@ -148,7 +152,7 @@ if (user === "Instructor") {
     info (`Release this report to students by giving them <a target='blank' href='${unlockedURL}'>this URL</a>.`);
 }
 
-warning("solution=" + solution);
+dbg("solution=" + solution);
 let solutionParts = solution.split('?');
 let solutionParams = new URLSearchParams(solutionParts[1]);
 let solutionLang = solutionParams.get('lang');
@@ -169,7 +173,7 @@ if (language.canBeCheckedForEquivalence()) {
     }
 }
 
-warning("baseDir is " + baseDir);
+dbg("baseDir is " + baseDir);
 // Try to read the list of strings that should be accepted.
 let accept = [] as String[];
 try {
@@ -177,7 +181,7 @@ try {
 } catch(err){
     error(`Could not read accepted strings from ${baseDir}/${problem}/accept.dat<br/>\n{$err}`);
 }
-warning("read " + accept.length + " accept strings");
+dbg("read " + accept.length + " accept strings");
 
 
 // Try to read the list of strings that should be rejected.
@@ -187,7 +191,7 @@ try {
 } catch(err){
     error(`Could not read reject strings from ${baseDir}/${problem}/reject.dat<br/>\n{$err}`);
 }
-warning("read " + reject.length + " reject strings");
+dbg("read " + reject.length + " reject strings");
 
 let expected = [] as string[];
 if (language.producesOutput()) {
@@ -196,7 +200,7 @@ if (language.producesOutput()) {
     } catch(err){
         error(`Could not read expected strings from ${baseDir}/${problem}/expected.dat<br/>\n{$err}`);
     }
-    warning("read " + expected.length + " expected strings");
+    dbg("read " + expected.length + " expected strings");
     if (expected.length != accept.length) {
         error("accept.dat and expected.dat must be the same length.");
     }

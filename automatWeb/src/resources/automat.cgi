@@ -14,6 +14,7 @@ my $nodePath="/home/zeil/.nvm/versions/node/v14.17.6/bin/node";
 if (!-x $nodePath) {
 	$nodePath = "/usr/bin/node";
 }
+my $pandoc = "/home/zeil/bin/pandoc";
 
 my @actions=("editor", "grading", "summary");
 
@@ -25,7 +26,7 @@ my $username = $ENV{"REMOTE_USER"};
 if (!defined($username)) {
 	$username="Anonymous";
 }
-my $debugging = 1;
+my $debugging = 0;
 my $testName = $query->param("test");
 if (defined($testName)) {
 	$username = "**$testName";
@@ -76,6 +77,13 @@ $instructorSummaryURL =~ s/lang=[^&]*//;
 $instructorSummaryURL .= '&lang=' . $properties{'solution'};
 $properties{"instructorSummaryURL"} = $instructorSummaryURL;
 
+my $graderNotes = '';
+my $notesFile = $properties{"base"} . "/" . $properties{"problem"} . "/notes.md";
+if ($action == "grading" && -r $notesFile) {
+	$graderNotes = `$pandoc --ascii --mathjax < $notesFile`;
+}
+$properties{"graderNotes"} = $graderNotes;
+
 identifyInstructors();
 
 my $htmlText = "";
@@ -109,9 +117,12 @@ if ($authenticationMsg eq "") {  # authentication succeeded
 			$reportOut .= "page_url=$page_url\n";
 			$reportOut .= "creatorUnlockKey=" . creatorUnlockKey() . "\n";
 			$reportOut .= "userUnlockKey=" . userUnlockKey() . "\n";
+			#$reportOut .= "graderCommand=" . $graderCommand . "\n";
+			
 			$reportOut .= "</pre>\n";
 		}
 		$properties{'reportBody'} = $reportOut;
+
 	}
 
 	performSubstutitions();
@@ -192,6 +203,15 @@ sub loadProperties
 			close INI1;
 		}
 		my $problemINI = $properties{"base"} . "/$problem/$problem.ini";
+		if (!-r $problemINI) {
+			$problemINI = $properties{"base"} . "/$problem/automat.ini";
+		}
+		if (!-r $problemINI) {
+			my @iniFiles = glob($properties{"base"} . "/$problem/*.ini");
+			if (scalar(@iniFiles) > 0) {
+				$problemINI = $iniFiles[0];
+			}
+		}
 		if (-r $problemINI) {
 			open INI2, "<$problemINI" || die "Could not open $problemINI";
 			my $line;

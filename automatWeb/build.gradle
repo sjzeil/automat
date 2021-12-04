@@ -34,8 +34,8 @@ task buildReactAppProduction(type: NpxTask, dependsOn: ['npmInstall', ':formalLa
     ]
 }
 
-task copyResources (type: Copy) {
-	from 'src/editor/resources'
+task assembleDistribution (type: Copy, dependsOn: 'buildReactApp') {
+	from 'src/resources'
 	into './build/dist'
 }
 
@@ -44,7 +44,9 @@ task copyDistForTest (type: Copy, dependsOn: ['buildReactApp', 'copyResources'])
 	into './build/test'
 }
 
-task copyTestResources (type: Copy) {
+task assembleTest (type: Copy, dependsOn: 'assembleDistribution') {
+	from '../grader/build/dist'
+	from './build/dist'
 	from 'test/resources'
 	into './build/test'
 }
@@ -58,7 +60,7 @@ task copyGraderBundles (type: Copy, dependsOn: ':grader:build') {
 task setupTest {
 	description "set up test environment in build/test"
 	group = "test"
-	dependsOn =['copyTestResources', 'copyDistForTest', 'copyGraderBundles']
+	dependsOn =['assembleTest', 'assembleDistribution']
 	doLast {
 		String testDirectory = project.projectDir.getAbsolutePath() + '/build/test'
 		new ProcessBuilder('perl',  'automat.cgi',  'action=editor',  'problem=testProblem', 'test=instr1') .
@@ -77,7 +79,7 @@ task setupTest {
 import com.github.fracpete.rsync4j.RSync;
 import com.github.fracpete.processoutput4j.output.ConsoleOutputProcessOutput;
 
-task deployForTest (dependsOn: ['buildReactApp', 'copyResources','setupTest']) {
+task deployForTest (dependsOn: ['setupTest']) {
 	doLast {
         String sourceDir = project.projectDir.getAbsolutePath() + '/build/test/'
 		def destURL = "zeil@linux.cs.odu.edu:/home/zeil/secure_html/automatTest/";
@@ -98,14 +100,9 @@ task deployForTest (dependsOn: ['buildReactApp', 'copyResources','setupTest']) {
 task build {
 	 description = 'Build the development bundle'
 	 group = build
-	 dependsOn = ['buildReactApp', 'copyResources', 'deployForTest']
+	 dependsOn = ['buildReactApp', 'assembleDistribution', 'deployForTest']
 }
 
-task production	 {
-	 description = 'Build the production bundle'
-	 group = build
-	 dependsOn = ['buildReactAppProduction', 'copyResources']
-}
 
 task cleanTests (type: Delete) {
 	delete './build/test'
