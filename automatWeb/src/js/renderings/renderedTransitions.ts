@@ -44,10 +44,10 @@ var Transition = fabric.util.createClass(fabric.Text, {
     },
 
     render: function (ctx: CanvasRenderingContext2D) {
-        let x0 = this.from.rendering.left + this.from.rendering.circle.radius;
+        let x0 = this.from.rendering.left + this.from.rendering.width / 2;
         let y0 = this.from.rendering.top + this.from.rendering.circle.radius;
 
-        let x1 = this.to.rendering.left + this.to.rendering.circle.radius;
+        let x1 = this.to.rendering.left + this.to.rendering.width / 2;
         let y1 = this.to.rendering.top + this.to.rendering.circle.radius;
 
         let dx = x1 - x0;
@@ -62,8 +62,8 @@ var Transition = fabric.util.createClass(fabric.Text, {
         let yc = (y0 + y1) / 2;
 
         let exitAngle = angle - ((this.curved) ? Transition.angleOffset : 0);
-        let fromXc = this.from.rendering.left + this.from.rendering.circle.radius;
-        let fromYc = this.from.rendering.top + this.from.rendering.circle.radius;
+        let fromXc = x0;
+        let fromYc = y0;
         let exitX = fromXc + this.from.rendering.circle.radius * Math.cos(exitAngle);
         let exitY = fromYc + this.from.rendering.circle.radius * Math.sin(exitAngle);
 
@@ -72,8 +72,8 @@ var Transition = fabric.util.createClass(fabric.Text, {
 
         if (this.from != this.to) {
             let entryAngle = angle + Math.PI + ((this.curved) ? Transition.angleOffset : 0);
-            let toXc = this.to.rendering.left + this.to.rendering.circle.radius;
-            let toYc = this.to.rendering.top + this.to.rendering.circle.radius;
+            let toXc = x1;
+            let toYc = y1;
             let entryX = toXc + this.to.rendering.circle.radius * Math.cos(entryAngle);
             let entryY = toYc + this.to.rendering.circle.radius * Math.sin(entryAngle);
 
@@ -127,8 +127,8 @@ var Transition = fabric.util.createClass(fabric.Text, {
             // transition from a node to itself
 
             let entryAngle = exitAngle + 2.0 * Transition.angleOffset;
-            let toXc = this.to.rendering.left + this.to.rendering.circle.radius;
-            let toYc = this.to.rendering.top + this.to.rendering.circle.radius;
+            let toXc = x0;
+            let toYc = y0;
             let entryX = toXc + this.to.rendering.circle.radius * Math.cos(entryAngle);
             let entryY = toYc + this.to.rendering.circle.radius * Math.sin(entryAngle);
 

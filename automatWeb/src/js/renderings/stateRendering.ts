@@ -86,16 +86,18 @@ var State = fabric.util.createClass(fabric.Group, {
 		if (this.initial) {
 			ctx.beginPath();
 			var y = this.top + this.circle.height/2;
-			ctx.moveTo(this.left, y);
-			ctx.lineTo (this.left - State.initMarkerSize/2, y - State.initMarkerSize/2);
-			ctx.lineTo (this.left - State.initMarkerSize/2, y + State.initMarkerSize/2);
-			ctx.lineTo(this.left, y);
+			var xc = this.left + this.width / 2;
+			var xPerim = xc - this.circle.radius;
+			ctx.moveTo(xPerim, y);
+			ctx.lineTo (xPerim - State.initMarkerSize/2, y - State.initMarkerSize/2);
+			ctx.lineTo (xPerim - State.initMarkerSize/2, y + State.initMarkerSize/2);
+			ctx.lineTo(xPerim, y);
 			ctx.strokeStyle='black';
 			ctx.stroke();			
 		}
 		if (this.final) {
-			var radius = this.width / 2;
-			var x = this.left + radius;
+			var radius = this.circle.radius;
+			var x = this.left + this.width / 2;
 			var y = this.top + radius;
 			ctx.beginPath();
 			ctx.arc(x, y, radius-State.rimOffSet, 0, 2*Math.PI);

@@ -355,7 +355,6 @@ export
 
     selected(item: fabric.Object) {
         let itemObj = item as any;
-        debugger;
         if (itemObj.type == "State") {
             if (this.state.status == "addingTransition") {
                 if (this.state.selected1 == null) {
@@ -398,7 +397,6 @@ export
             this.setState(
                 {
                     status: "state",
-                    //editing: newState,
                     selected1: null,
                     selected2: null,
                 }
