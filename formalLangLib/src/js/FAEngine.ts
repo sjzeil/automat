@@ -33,11 +33,11 @@ export
 
 
     test(sample: string, automaton: Automaton): TestResult {
-        //TODO
-        return {
-            passed: false,
-            output: ''
-        };
+        let snapshot = this.initialSnapshot(automaton, sample);
+        while (!this.stopped(snapshot)) {
+            snapshot = this.step(automaton, snapshot);
+        }
+        return new TestResult(this.accepted(snapshot), "");
     }
 
     validate(automaton: Automaton): ValidationResult {

@@ -208,11 +208,7 @@ export class Automaton extends FormalLanguage {
     }
 
     test(sample: string): TestResult {
-        let snapshot = this.engine.initialSnapshot(this, sample);
-        while (!this.engine.stopped(snapshot)) {
-            snapshot = this.engine.step(this, snapshot);
-        }
-        return new TestResult(this.engine.accepted(snapshot), "");
+        return this.engine.test(sample, this);
     }
 
 }
