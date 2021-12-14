@@ -8,6 +8,7 @@ import { SaveEditor } from './saveEditor';
 import { Grammar } from '../../../formalLangLib/src/js/grammar';
 import { Automaton } from '../../../formalLangLib/src/js/automaton';
 import { FAEngine } from '../../../formalLangLib/src/js/FAEngine';
+import { PDAEngine } from '../../../formalLangLib/src/js/PDAEngine';
 import { RegularExpressionEditor } from './regularExpressionEditor';
 import { BadLanguageEditor } from './badLanguageEditor';
 import { FormalLanguage } from '../../../formalLangLib/src/js/formalLanguage';
@@ -284,9 +285,10 @@ export
   newPDA() {
     console.log("in newPDA");
     this.props.canvas.clear();
-    this.rendering = new BadLanguageRendering(this.props.canvas, this.props.user, "PDAs are not yet implemented");
+    let engine = new PDAEngine();
+    this.rendering = new AutomatonRendering(this.props.canvas, this.props.user, this.props.problemID, engine);
     this.setState({
-      status: "badLang",
+      status: "automaton",
       editing: null,
       clicked: null,
     });
