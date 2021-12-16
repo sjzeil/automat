@@ -122,6 +122,8 @@ export
                                 };
                             }
                         } else if (transition.length > 2) {
+                            // Storage in the state limited to deterministic automata (TMs)
+                            /*
                             if (!transition.match(/^[0-9A-Za-z](,[0-9A-Za-z])*(}[A-Za-z])?$/)) {
                                 return {
                                     warnings: warningStr,
@@ -129,6 +131,12 @@ export
                                         ' has an invalid transition: ' + transition
                                 };
                             }
+                            */
+                            return {
+                                warnings: warningStr,
+                                errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
+                                    ' has an invalid transition: ' + transition
+                            };
                         }
                     }
                 }
@@ -211,9 +219,7 @@ export
         return 'Each arrow may represent one or more transitions.<br/>' +
             '<ul><li>Each transition must contain a single alphanumeric character, or @ to denote the empty string (\u03B5).</li>' +
             '<li>Shortcuts are also available:' +
-            ' <ul><li>!x means "every character except x",</li> <li>~ means "any character", and </li>' +
-            '<li>a,b,c}w means that any of the characters to the left of the "}" can be accepted, but will be stored ' +
-            'in a "variable" named "w".</li></ul></ul>'
+            ' <ul><li>!x means "every character except x",</li> <li>~ means "any character".</li></ul></ul>'
     }
 
     initialSnapshot(au: Automaton, input: string): Snapshot {
@@ -272,8 +278,8 @@ export
                         let notChar = transition.charAt(1);
                         follow = (notChar != trigger);
                     } else if (transition.length > 2) {
-                        let acceptabletriggers = this.getTriggersFor(transition);
-                        if (acceptabletriggers.indexOf(trigger) >= 0) {
+                        let acceptableTriggers = this.getTriggersFor(transition);
+                        if (acceptableTriggers.indexOf(trigger) >= 0) {
                             follow = true;
                             if (transition.charAt(transition.length-2) == '}') {
                                 next.variables[transition.charAt(transition.length-1)] = trigger;

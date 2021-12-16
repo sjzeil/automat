@@ -19,7 +19,7 @@ function pda0n1n(): Automaton {
     return fa;
 }
 
-function pdawwr(): Automaton {
+function pda_wwr(): Automaton {
     let fa = new Automaton('Instructor', '', new PDAEngine());
     fa.addState('0');
     fa.addState('1');
@@ -35,7 +35,7 @@ function pdawwr(): Automaton {
     return fa;
 }
 
-function pdawwr_b(): Automaton {
+function pda_wwr_b(): Automaton {
     let fa = new Automaton('Instructor', '', new PDAEngine());
     fa.addState('0');
     fa.addState('1');
@@ -107,7 +107,7 @@ describe('PDAEngine', function () {
             expect(validation.errors).to.equal('');
         });
         it('valid state transitions wwr', function () {
-            let pda = pdawwr();
+            let pda = pda_wwr();
             let validation = pda.validate();
             expect(validation.warnings).to.equal('');
             expect(validation.errors).to.equal('');
@@ -145,12 +145,12 @@ describe('PDAEngine', function () {
             expect(validation.warnings).to.equal('');
             expect(validation.errors).to.equal('');
         });
-        it('accept storage shortcut', function () {
+        it('reject storage shortcut', function () {
             let pda = pda0n1n();
             pda.addTransition('0', '1', '0,1}W,0/00');
             let validation = pda.validate();
             expect(validation.warnings).to.equal('');
-            expect(validation.errors).to.equal('');
+            expect(validation.errors).to.not.equal('');
         });
 
     });
@@ -174,7 +174,7 @@ describe('PDAEngine', function () {
 
     context('initial snapshot wwr', function () {
         it('nondeterministic PDA starts with multiple selected states', function () {
-            let fa = pdawwr();
+            let fa = pda_wwr();
             let inputStr = '011011';
             let snapshot = fa.engine.initialSnapshot(fa, inputStr);
             expect(snapshot.input).to.equal(inputStr);
@@ -190,7 +190,7 @@ describe('PDAEngine', function () {
 
     context('initial snapshot wwr B', function () {
         it('nondeterministic PDA starts with multiple selected states', function () {
-            let fa = pdawwr_b();
+            let fa = pda_wwr_b();
             let inputStr = '011011';
             let snapshot = fa.engine.initialSnapshot(fa, inputStr);
             expect(snapshot.input).to.equal(inputStr);
@@ -216,7 +216,7 @@ describe('PDAEngine', function () {
             expect(snapshot.numCharsProcessed).to.equal(1);
             expect(snapshot.inputPortrayal()).to.equal('0|011');
             expect(snapshot.selectedStates.size).to.equal(1);
-            expect(snapshot.selectedStates.get(pda.states[0])).equal('0Z');
+            expect(snapshot.selectedStates.get(pda.states[0])).equal('XZ');
             expect(snapshot.selectedStates.get(pda.states[1])).to.be.undefined;
             expect(snapshot.selectedStates.get(pda.states[2])).to.be.undefined;
             expect(pda.engine.stopped(snapshot)).to.be.false;

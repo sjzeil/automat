@@ -5,7 +5,7 @@ import { TestResult, ValidationResult } from './formalLanguage';
 import { AutomatonState } from './states';
 
 
-interface PDATranstion {
+interface PDATransition {
     input: string;
     top: string;
     push: string;
@@ -125,7 +125,6 @@ export
                         let input = inputPart.substring(0, commaPos);
                         let stackTop = inputPart.substring(commaPos + 1);
                         if ((!input.match(/^[0-9A-Ya-z@~]$/)) &&
-                            (!input.match(/^[0-9A-Ya-z](,[0-9A-Ya-z])*(}[A-Ya-z])$/)) &&
                             (!input.match(/^![0-9A-Ya-z]$/))
                            ) {
                             return {
@@ -226,7 +225,7 @@ export
             ' pushed onto the stack. (Characters are pushed in the reverse order of presentation in the string.)</li>' +
             '</ul>Shortcuts are also available:' +
             ' <ul><li>!x, in the <i>input</i> or <i>top</i>, means "any character except x",</li>' +
-            '<li>~ means "any character" when occuring in the <i>input</i>, and "same as the input character" in <i>top</i> or the <i>push</i> string.' +
+            '<li>~ means "any character" when occurring in the <i>input</i>, and "same as the input character" in <i>top</i> or the <i>push</i> string.' +
             '<li>a,b,c}w, in the <i>input</i> means that any of the characters to the left of the "}" can be accepted, and will be stored ' +
             'in a "variable" named "w".</li></ul>'
     }
@@ -317,7 +316,7 @@ export
 
 
 
-    parseTransition(transitionDesc: string): PDATranstion {
+    parseTransition(transitionDesc: string): PDATransition {
         let slashPos = transitionDesc.indexOf('/');
         if (slashPos < 0) {
             throw "malformed transition: " + transitionDesc;
@@ -344,38 +343,27 @@ export
         next.variables = current.variables;
         next.numCharsProcessed = current.numCharsProcessed + 1;
         let processed = (current.input as string).substring(0, next.numCharsProcessed);
-        let trigger = current.input?.substring(current.numCharsProcessed, current.numCharsProcessed+1) as string;
+        let trigger = current.input?.substring(current.numCharsProcessed, current.numCharsProcessed + 1) as string;
         for (let arrow of au.transitions) {
             if (current.isSelected(arrow.from)) {
                 let stacks = current.getDescription(arrow.from);
-                    for (let inStack of stacks) {
-                        let transitions = arrow.label.split('\n');
-                        for (let transitionDesc of transitions) {
-                            let transition = this.parseTransition(transitionDesc);
-                            transition.input = this.replaceVariablesIn(transition.input, current.variables);
+                for (let inStack of stacks) {
+                    let transitions = arrow.label.split('\n');
+                    for (let transitionDesc of transitions) {
+                        let transition = this.parseTransition(transitionDesc);
+                        transition.input = this.replaceVariablesIn(transition.input, current.variables);
 
-            let description = current.selectedStates.get(arrow.from);
-            if (typeof description === typeof '') {
-                let transitions = arrow.label.split('\n');
-                for (let transition of transitions) {
-                    transition = this.replaceVariablesIn(transition, current.variables);
-                    let follow = false;
-                    if (transition.length == 1) {
-                        follow = (transition == trigger) || (transition == '~');
-                    } else if (transition.length == 2 && transition.charAt(0) == '!') {
-                        let notChar = transition.charAt(1);
-                        follow = (notChar != trigger);
-                    } else if (transition.length > 2) {
-                        let acceptabletriggers = this.getTriggersFor(transition);
-                        if (acceptabletriggers.indexOf(trigger) >= 0) {
-                            follow = true;
-                            if (transition.charAt(transition.length - 2) == '}') {
-                                next.variables[transition.charAt(transition.length - 1)] = trigger;
-                            }
+                        let follow = false;
+                        if (transition.input.length == 1) {
+                            follow = (transition.input == trigger) || (transition.input == '~');
+                        } else if (transition.input.length == 2 && transition.input.charAt(0) == '!') {
+                            let notChar = transition.input.charAt(1);
+                            follow = (notChar != trigger);
                         }
-                    }
-                    if (follow) {
-                        next.selectedStates.set(arrow.to, processed);
+                        if (follow && this.stackMatches(trigger, inStack, transition.top)) {
+                            let outStack = this.updateStack(trigger, inStack, transition.top, transition.push, next);
+                            this.addStackTo(outStack, next, arrow.to);
+                        }
                     }
                 }
             }
