@@ -34,6 +34,19 @@ class Snapshot {
         }
     }
 
+    isSelected(state: AutomatonState): boolean {
+        return (typeof this.selectedStates.get(state)) !== undefined;
+    }
+
+    getDescription(state: AutomatonState): string[] {
+        let desc = this.selectedStates.get(state);
+        try {
+            return (desc as string).split('\n');
+        } catch {
+            return [];
+        }
+    }
+
 
 }
 

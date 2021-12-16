@@ -79,7 +79,7 @@ task setupTest {
 import com.github.fracpete.rsync4j.RSync;
 import com.github.fracpete.processoutput4j.output.ConsoleOutputProcessOutput;
 
-task deployForTest (dependsOn: ['setupTest']) {
+task deploy (dependsOn: ['setupTest', 'build']) {
 	doLast {
         String sourceDir = project.projectDir.getAbsolutePath() + '/build/test/'
 		def destURL = "zeil@linux.cs.odu.edu:/home/zeil/secure_html/automatTest/";
@@ -100,7 +100,7 @@ task deployForTest (dependsOn: ['setupTest']) {
 task build {
 	 description = 'Build the development bundle'
 	 group = build
-	 dependsOn = ['buildReactApp', 'assembleDistribution', 'deployForTest']
+	 dependsOn = ['buildReactApp', 'assembleDistribution']
 }
 
 

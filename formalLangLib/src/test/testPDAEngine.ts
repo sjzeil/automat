@@ -11,11 +11,41 @@ function pda0n1n(): Automaton {
     fa.addState('2');
     fa.states[0].initial = true;
     fa.states[2].final = true;
-    fa.addTransition('0', '0', '0,X;XX');  // Accept 0^n1^n, n > 0
-    fa.addTransition('0', '0', '0,Z;XZ');
-    fa.addTransition('0', '1', '1,X;@');
-    fa.addTransition('1', '1', '1,X;@');
-    fa.addTransition('1', '2', '@,Z;Z');
+    fa.addTransition('0', '0', '0,X/XX');  // Accept 0^n1^n, n > 0
+    fa.addTransition('0', '0', '0,Z/XZ');
+    fa.addTransition('0', '1', '1,X/@');
+    fa.addTransition('1', '1', '1,X/@');
+    fa.addTransition('1', '2', '@,Z/Z');
+    return fa;
+}
+
+function pdawwr(): Automaton {
+    let fa = new Automaton('Instructor', '', new PDAEngine());
+    fa.addState('0');
+    fa.addState('1');
+    fa.addState('2');
+    fa.states[0].initial = true;
+    fa.states[2].final = true;
+    fa.addTransition('0', '0', '0,@/0');  // Accept ww_R
+    fa.addTransition('0', '0', '1,@/1');
+    fa.addTransition('0', '1', '@,@/@');
+    fa.addTransition('1', '1', '0,0/@');
+    fa.addTransition('1', '1', '1,1/@');
+    fa.addTransition('1', '2', '@,Z/@');
+    return fa;
+}
+
+function pdawwr_b(): Automaton {
+    let fa = new Automaton('Instructor', '', new PDAEngine());
+    fa.addState('0');
+    fa.addState('1');
+    fa.addState('2');
+    fa.states[0].initial = true;
+    fa.states[2].final = true;
+    fa.addTransition('0', '0', '~,@/~');  // Accept ww_R
+    fa.addTransition('0', '1', '@,@/@');
+    fa.addTransition('1', '1', '~,~/@');
+    fa.addTransition('1', '2', '@,Z/@');
     return fa;
 }
 
@@ -70,24 +100,64 @@ describe('PDAEngine', function () {
             expect(validation.warnings.indexOf('final')).to.lessThan(0);
             expect(validation.errors).to.equal('');
         });
-        it('valid state transitions', function() {
+        it('valid state transitions 0n1n', function () {
             let pda = pda0n1n();
             let validation = pda.validate();
             expect(validation.warnings).to.equal('');
             expect(validation.errors).to.equal('');
-        }); 
-        it('should flag invalid state transitions', function() {
+        });
+        it('valid state transitions wwr', function () {
+            let pda = pdawwr();
+            let validation = pda.validate();
+            expect(validation.warnings).to.equal('');
+            expect(validation.errors).to.equal('');
+        });
+        it('should flag invalid state transitions', function () {
             let pda = pda0n1n();
             pda.addTransition('0', '1', '2');
             let validation = pda.validate();
             expect(validation.warnings).to.equal('');
             expect(validation.errors).to.not.equal('');
-        }); 
-});
+        });
+        it('accept ! shortcut', function () {
+            let pda = pda0n1n();
+            pda.addTransition('0', '1', '!0,0/00');
+            let validation = pda.validate();
+            expect(validation.warnings).to.equal('');
+            expect(validation.errors).to.equal('');
+            pda.addTransition('0', '1', '0,!0/00');
+            validation = pda.validate();
+            expect(validation.warnings).to.equal('');
+            expect(validation.errors).to.equal('');
+        });
+        it('accept ~ shortcut', function () {
+            let pda = pda0n1n();
+            pda.addTransition('0', '1', '~,0/00');
+            let validation = pda.validate();
+            expect(validation.warnings).to.equal('');
+            expect(validation.errors).to.equal('');
+            pda.addTransition('0', '1', '~,~/00');
+            validation = pda.validate();
+            expect(validation.warnings).to.equal('');
+            expect(validation.errors).to.equal('');
+            pda.addTransition('0', '1', '~,~/~0');
+            validation = pda.validate();
+            expect(validation.warnings).to.equal('');
+            expect(validation.errors).to.equal('');
+        });
+        it('accept storage shortcut', function () {
+            let pda = pda0n1n();
+            pda.addTransition('0', '1', '0,1}W,0/00');
+            let validation = pda.validate();
+            expect(validation.warnings).to.equal('');
+            expect(validation.errors).to.equal('');
+        });
+
+    });
 
 
-    context('initial snapshot', function () {
-        it('deterministic FA starts with one selected state', function () {
+    context('initial snapshot 0n1n', function () {
+        it('deterministic PDA starts with one selected state', function () {
             let fa = pda0n1n();
             let inputStr = '011011';
             let snapshot = fa.engine.initialSnapshot(fa, inputStr);
@@ -102,170 +172,72 @@ describe('PDAEngine', function () {
         });
     });
 
-/*
+    context('initial snapshot wwr', function () {
+        it('nondeterministic PDA starts with multiple selected states', function () {
+            let fa = pdawwr();
+            let inputStr = '011011';
+            let snapshot = fa.engine.initialSnapshot(fa, inputStr);
+            expect(snapshot.input).to.equal(inputStr);
+            expect(snapshot.numCharsProcessed).to.equal(0);
+            expect(snapshot.inputPortrayal()).to.equal('|' + inputStr);
+            expect(snapshot.selectedStates.size).to.equal(3);
+            expect(snapshot.selectedStates.get(fa.states[0])).to.equal('Z');
+            expect(snapshot.selectedStates.get(fa.states[1])).to.equal('Z');
+            expect(snapshot.selectedStates.get(fa.states[2])).to.equal('');
+            expect(fa.engine.stopped(snapshot)).to.be.false;
+        });
+    });
+
+    context('initial snapshot wwr B', function () {
+        it('nondeterministic PDA starts with multiple selected states', function () {
+            let fa = pdawwr_b();
+            let inputStr = '011011';
+            let snapshot = fa.engine.initialSnapshot(fa, inputStr);
+            expect(snapshot.input).to.equal(inputStr);
+            expect(snapshot.numCharsProcessed).to.equal(0);
+            expect(snapshot.inputPortrayal()).to.equal('|' + inputStr);
+            expect(snapshot.selectedStates.size).to.equal(3);
+            expect(snapshot.selectedStates.get(fa.states[0])).to.equal('Z');
+            expect(snapshot.selectedStates.get(fa.states[1])).to.equal('Z');
+            expect(snapshot.selectedStates.get(fa.states[2])).to.equal('');
+            expect(fa.engine.stopped(snapshot)).to.be.false;
+        });
+
+
+    });
+
     context('snapshot transition', function () {
-        it('DFA transition succeeds', function () {
-            let fa = sampleDFA();
-            let inputStr = '111011';
-            let snapshot = fa.engine.initialSnapshot(fa, inputStr);
-            snapshot = fa.engine.step(fa, snapshot);
+        it('PDA transition succeeds', function () {
+            let pda = pda0n1n();
+            let inputStr = '0011';
+            let snapshot = pda.engine.initialSnapshot(pda, inputStr);
+            snapshot = pda.engine.step(pda, snapshot);
             expect(snapshot.input).to.equal(inputStr);
             expect(snapshot.numCharsProcessed).to.equal(1);
-            expect(snapshot.inputPortrayal()).to.equal('1|11011');
+            expect(snapshot.inputPortrayal()).to.equal('0|011');
             expect(snapshot.selectedStates.size).to.equal(1);
-            expect(snapshot.selectedStates.get(fa.states[0])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[1])).equal('1');
-            expect(snapshot.selectedStates.get(fa.states[2])).to.be.undefined;
-            expect(fa.engine.stopped(snapshot)).to.be.false;
+            expect(snapshot.selectedStates.get(pda.states[0])).equal('0Z');
+            expect(snapshot.selectedStates.get(pda.states[1])).to.be.undefined;
+            expect(snapshot.selectedStates.get(pda.states[2])).to.be.undefined;
+            expect(pda.engine.stopped(snapshot)).to.be.false;
         });
-        it('DFA transition fails', function () {
-            let fa = sampleDFA();
-            let inputStr = 'abc';
-            let snapshot = fa.engine.initialSnapshot(fa, inputStr);
-            snapshot = fa.engine.step(fa, snapshot);
+        it('PDA transition fails', function () {
+            let pda = pda0n1n();
+            let inputStr = '1011';
+            let snapshot = pda.engine.initialSnapshot(pda, inputStr);
+            snapshot = pda.engine.step(pda, snapshot);
             expect(snapshot.input).to.equal(inputStr);
             expect(snapshot.numCharsProcessed).to.equal(1);
-            expect(snapshot.inputPortrayal()).to.equal('a|bc');
+            expect(snapshot.inputPortrayal()).to.equal('1|011');
             expect(snapshot.selectedStates.size).to.equal(0);
-            expect(snapshot.selectedStates.get(fa.states[0])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[1])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[2])).to.be.undefined;
-            expect(fa.engine.stopped(snapshot)).to.be.true;
-            expect(fa.engine.accepted(snapshot)).to.be.false;
+            expect(snapshot.selectedStates.get(pda.states[0])).to.be.undefined;
+            expect(snapshot.selectedStates.get(pda.states[1])).to.be.undefined;
+            expect(snapshot.selectedStates.get(pda.states[2])).to.be.undefined;
+            expect(pda.engine.stopped(snapshot)).to.be.true;
+            expect(pda.engine.accepted(snapshot)).to.be.false;
         });
 
-        it('DFA transition to accept', function () {
-            let fa = sampleDFA();
-            let inputStr = '11';
-            let snapshot = fa.engine.initialSnapshot(fa, inputStr);
-            snapshot = fa.engine.step(fa, snapshot);
-            snapshot = fa.engine.step(fa, snapshot);
-            expect(snapshot.input).to.equal(inputStr);
-            expect(snapshot.numCharsProcessed).to.equal(2);
-            expect(snapshot.inputPortrayal()).to.equal('11|');
-            expect(snapshot.selectedStates.size).to.equal(1);
-            expect(snapshot.selectedStates.get(fa.states[0])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[1])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[2])).equal('11');
-            expect(fa.engine.stopped(snapshot)).to.be.true;
-            expect(fa.engine.accepted(snapshot)).to.be.true;
-        });
-
-
-
-        it('nondeterministic FA transition to multiple 0s', function () {
-            let fa = sampleNFA();
-            let inputStr = '000';
-            let snapshot = fa.engine.initialSnapshot(fa, inputStr);
-            while (!fa.engine.stopped(snapshot)) {
-                expect(fa.engine.accepted(snapshot)).to.be.false;
-                snapshot = fa.engine.step(fa, snapshot);
-            }
-            expect(snapshot.input).to.equal(inputStr);
-            expect(snapshot.numCharsProcessed).to.equal(inputStr.length);
-            expect(snapshot.inputPortrayal()).to.equal(inputStr + '|');
-            expect(snapshot.selectedStates.size).to.equal(2);
-            expect(snapshot.selectedStates.get(fa.states[0])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[1])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[2])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[3])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[4])).to.equal(inputStr);
-            expect(snapshot.selectedStates.get(fa.states[5])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[6])).to.equal(inputStr);
-            expect(fa.engine.accepted(snapshot)).to.be.true;
-        });
-
-
-        it('nondeterministic FA transition to multiple 1s', function () {
-            let fa = sampleNFA();
-            let inputStr = '111';
-            let snapshot = fa.engine.initialSnapshot(fa, inputStr);
-            snapshot = fa.engine.step(fa, snapshot);
-            expect(fa.engine.stopped(snapshot)).to.be.false;
-            expect(snapshot.input).to.equal(inputStr);
-            expect(snapshot.numCharsProcessed).to.equal(1);
-            expect(snapshot.inputPortrayal()).to.equal('1|11');
-            expect(snapshot.selectedStates.size).to.equal(2);
-            expect(snapshot.selectedStates.get(fa.states[0])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[1])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[2])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[3])).to.equal('1');
-            expect(snapshot.selectedStates.get(fa.states[4])).to.be.undefined;
-            expect(snapshot.selectedStates.get(fa.states[5])).to.equal('1');
-            expect(snapshot.selectedStates.get(fa.states[6])).to.be.undefined;
-            expect(fa.engine.accepted(snapshot)).to.be.false;
-        });
 
     });
-
-
-    context('FA execution', function () {
-        it('nondeterministic FA accepts', function () {
-            let fa = sampleNFA();
-            expect(fa.test('000').passed).to.be.true;
-            expect(fa.test('11').passed).to.be.true;
-            expect(fa.test('01').passed).to.be.false;
-            expect(fa.test('110').passed).to.be.false;
-        });
-    });
-
-    context('notChar shortcut', function() {
-        it('not-character shortcut accepted', function() {
-            let fa = notCharFA();
-            let validation = fa.validate();
-            expect(validation.errors).to.equal('');
-            expect(validation.warnings.indexOf('nondeterministic')).to.be.lessThan(0);
-            fa.addTransition('0', '1', '1');
-            validation = fa.validate();
-            expect(validation.warnings.indexOf('nondeterministic')).to.be.greaterThanOrEqual(0);
-        });
-
-        it('not-character shortcut execution', function() {
-            let fa = notCharFA();
-            expect(fa.test('0').passed).to.be.false;
-            expect(fa.test('a').passed).to.be.true;
-        });
-    });
-
-
-    context('anyChar shortcut', function() {
-        it('any-character shortcut accepted', function() {
-            let fa = anyCharFA();
-            let validation = fa.validate();
-            expect(validation.errors).to.equal('');
-            expect(validation.warnings.indexOf('nondeterministic')).to.be.lessThan(0);
-        });
-
-        it('any-character shortcut execution', function() {
-            let fa = anyCharFA();
-            expect(fa.test('0').passed).to.be.true;
-            expect(fa.test('a0a').passed).to.be.true;
-            expect(fa.test('10x0Q').passed).to.be.true;
-        });
-    });
-
-    context('variable shortcut', function() {
-        it('variable shortcut accepted', function() {
-            let fa = storedCharFA();
-            let validation = fa.validate();
-            expect(validation.errors).to.equal('');
-            expect(validation.warnings.indexOf('nondeterministic')).to.be.lessThan(0);
-            fa.addState('2');
-            fa.addTransition('1', '2', '1')
-            validation = fa.validate();
-            expect(validation.errors).to.equal('');
-            expect(validation.warnings.indexOf('nondeterministic')).to.be.greaterThanOrEqual(0);
-        });
-
-        it('variable shortcut execution', function() {
-            let fa = storedCharFA();
-            expect(fa.test('0').passed).to.be.true;
-            expect(fa.test('001').passed).to.be.true;
-            expect(fa.test('011').passed).to.be.false;
-            expect(fa.test('0055x').passed).to.be.false;
-            expect(fa.test('00110').passed).to.be.true;
-        });
-    });
-*/
 
 });

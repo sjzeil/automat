@@ -2,9 +2,14 @@ import { Automaton } from './automaton';
 import { Snapshot } from './snapshot';
 import { AutomatonEngine } from './automatonEngine';
 import { TestResult, ValidationResult } from './formalLanguage';
+import { AutomatonState } from './states';
 
 
-
+interface PDATranstion {
+    input: string;
+    top: string;
+    push: string;
+}
 
 /**
  * PDAEngine
@@ -84,24 +89,24 @@ export
                     }
                     let transitionsInThisArrow = new Set<string>();
                     for (let transition of transitions) {
-                        if (transition.match(/^.*;.*;.*$/)) {
+                        if (transition.match(/^.*\/.*\/.*$/)) {
                             return {
                                 warnings: warningStr,
                                 errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                                    ' has an invalid transition: ' + transition + ": should have only one ';'"
+                                    ' has an invalid transition: ' + transition + ": should have only one '/'"
                             };
                         }
-                        let semicolonPos = transition.indexOf(';');
-                        if (semicolonPos < 0) {
+                        let slashPos = transition.indexOf('/');
+                        if (slashPos < 0) {
                             return {
                                 warnings: warningStr,
                                 errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                                    ' has an invalid transition: ' + transition + ": does not have input and stack output separated by ';'"
+                                    ' has an invalid transition: ' + transition + ": does not have input and stack output separated by '/'"
                             };
                         }
-                        let inputPart = transition.substring(0, semicolonPos);
-                        let outputPart = transition.substring(semicolonPos+1);
-                        if (!outputPart.match(/^[0-1A-Za-z@~]*$/)) {
+                        let inputPart = transition.substring(0, slashPos);
+                        let outputPart = transition.substring(slashPos + 1);
+                        if (!outputPart.match(/^[0-9A-Za-z@~]*$/)) {
                             return {
                                 warnings: warningStr,
                                 errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
@@ -109,7 +114,7 @@ export
                             };
                         }
 
-                        let commaPos = inputPart.indexOf(',');
+                        let commaPos = inputPart.lastIndexOf(',');
                         if (commaPos < 0) {
                             return {
                                 warnings: warningStr,
@@ -118,18 +123,20 @@ export
                             };
                         }
                         let input = inputPart.substring(0, commaPos);
-                        let stackTop = inputPart.substring(commaPos+1);
-                        if (!input.match(/^([A-Ya-z0-9@~])|()$/)) {
-
-                        }
-                        if (!input.match(/[0-9A-Ya-z@~](,[0-9A-Ya-z@~])*(}[A-Ya-z])?/)) {
+                        let stackTop = inputPart.substring(commaPos + 1);
+                        if ((!input.match(/^[0-9A-Ya-z@~]$/)) &&
+                            (!input.match(/^[0-9A-Ya-z](,[0-9A-Ya-z])*(}[A-Ya-z])$/)) &&
+                            (!input.match(/^![0-9A-Ya-z]$/))
+                           ) {
                             return {
                                 warnings: warningStr,
                                 errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
                                     ' has an invalid transition: ' + transition + ": invalid input description"
                             };
                         }
-                        if (!stackTop.match(/[0-9A-Za-z](,[0-9A-Za-z])*(}[A-Za-z])?/)) {
+                        if ((!stackTop.match(/^[0-9A-Za-z@~]$/)) &&
+                            (!stackTop.match(/^![0-9A-Za-z]$/))
+                           ) {
                             return {
                                 warnings: warningStr,
                                 errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
@@ -147,12 +154,13 @@ export
             errors: errorStr
         };
     }
+
     replaceVariablesIn(transition: string, variableMapping: any): string {
         let storage = '';
         let result = transition;
-        if (transition.length > 2 && transition.charAt(transition.length-2) == '}') {
-            storage = transition.substr(transition.length-2);
-            result = transition.substr(0, transition.length-2);
+        if (transition.length > 2 && transition.charAt(transition.length - 2) == '}') {
+            storage = transition.substring(transition.length - 2);
+            result = transition.substring(0, transition.length - 2);
         }
         for (let property in variableMapping) {
             let re = new RegExp(property, 'g');
@@ -205,23 +213,21 @@ export
     }
 
     startingTransition(): string {
-        return '@';
+        return '@,@;@';
     }
 
     transitionText(): string {
         return 'Each arrow may represent one or more transitions.<br/>' +
             'Each transition will have the form <i>input,top;push</i> where ' +
-            '<ul><li><i>input</i> must contain a single alphanumeric character (not "Z") or shortcut denoting an input.</li>' + 
-            '<li><i>top</i> must contain a single alphanumeric character (may include "Z") or shortcut denoting a character to be ' +
-            ' matched and popped from the top of the stack.</li>' + 
-            '<li><i>push</i> contains a string of alphanumeric characters  (may include "Z") or ~ denoting characters to be ' +
-            ' pushed onto the stack. (Characters are oushed in the reverse order of presentation in the string.)</li>' + 
+            '<ul><li><i>input</i> must contain a single alphanumeric character (not "Z"), @, or shortcut denoting an input.</li>' +
+            '<li><i>top</i> must contain a single alphanumeric character (may include "Z"), @, or a shortcut denoting a character to be ' +
+            ' matched and popped from the top of the stack.</li>' +
+            '<li><i>push</i> contains a string of alphanumeric characters  (may include "Z") or @ denoting characters to be ' +
+            ' pushed onto the stack. (Characters are pushed in the reverse order of presentation in the string.)</li>' +
             '</ul>Shortcuts are also available:' +
-            ' <ul><li>!x means "every character except x",</li>' +
-            '<li>~ means "any character" when occuring in the <i>input</i>, and "same as the input character" in the <i>push</i> string.' +
-            ' In the <i>top</li> string, ~ means "same as the input" if ~ appeared in the input, of "any character" ' +
-            ' if ~ did not appear inthe input.</li> ' +
-            '<li>a,b,c}w means that any of the characters to the left of the "}" can be accepted, but will be stored ' +
+            ' <ul><li>!x, in the <i>input</i> or <i>top</i>, means "any character except x",</li>' +
+            '<li>~ means "any character" when occuring in the <i>input</i>, and "same as the input character" in <i>top</i> or the <i>push</i> string.' +
+            '<li>a,b,c}w, in the <i>input</i> means that any of the characters to the left of the "}" can be accepted, and will be stored ' +
             'in a "variable" named "w".</li></ul>'
     }
 
@@ -241,24 +247,95 @@ export
         while (changed) {
             changed = false;
             for (let arrow of au.transitions) {
-                let description = snapshot.selectedStates.get(arrow.from);
-                if (typeof description === typeof '') {
-                    let transitions = arrow.label.split('\n');
-                    for (let transition of transitions) {
-                        if (transition == '@') {
-                            if (typeof snapshot.selectedStates.get(arrow.to) === typeof undefined) {
-                                snapshot.selectedStates.set(arrow.to, description as string);
-                                changed = true;
-                                break;
+                if (snapshot.isSelected(arrow.from)) {
+                    let stacks = snapshot.getDescription(arrow.from);
+                    for (let inStack of stacks) {
+                        let transitions = arrow.label.split('\n');
+                        for (let transitionDesc of transitions) {
+                            let transition = this.parseTransition(transitionDesc);
+                            if (transition.input == '@' && this.stackMatches(null, inStack, transition.top)) {
+                                let outStack = this.updateStack(null, inStack, transition.top, transition.push, snapshot);
+                                changed = this.addStackTo(outStack, snapshot, arrow.to) || changed;
                             }
                         }
-                    }
-                    if (changed) {
-                        break;
                     }
                 }
             }
         }
+    }
+
+    addStackTo(stack: string, snapshot: Snapshot, state: AutomatonState): boolean {
+        let stacks = snapshot.getDescription(state);
+        let found = false;
+        for (let stack0 of stacks) {
+            found = (stack == stack0);
+            if (found) break;
+        }
+        if (found)
+            return false;
+        if (stacks.length == 0) {
+            snapshot.selectedStates.set(state, stack);
+        } else {
+            stacks.push(stack);
+            stacks.sort();
+            snapshot.selectedStates.set(state, stacks.join('\n'));
+        }
+        return true;
+    }
+
+    stackMatches(inChar: string | null, inStack: string, top: string): boolean {
+        if (top == '@')
+            return true;
+        if (inStack == '')
+            return false; // should probably never happen
+        if (top == '~' && inChar != null)
+            return true;
+        if (top.charAt(0) == '!') {
+            if (top.substring(1) != inStack.substring(0,1))
+                return true;
+        }
+        return (top == inStack.substring(0,1));
+    }
+
+    updateStack(inChar: string | null, inStack: string, top: string, push: string, snapshot: Snapshot): string {
+        let output = ''; 
+        if (top == '@') {
+            output = inStack;
+        } else {
+            output = inStack.substring(1);
+        }
+        if (push == '@')
+            return output;
+        let push2 = push;
+        if (inChar != null) {
+            push2 = push.replace(/~/g, inChar);
+        }
+        push2 = this.replaceVariablesIn(push2, snapshot.variables);
+        output = push2 + output;
+        return output;
+    }
+
+
+
+    parseTransition(transitionDesc: string): PDATranstion {
+        let slashPos = transitionDesc.indexOf('/');
+        if (slashPos < 0) {
+            throw "malformed transition: " + transitionDesc;
+        }
+        let inputPart = transitionDesc.substring(0, slashPos);
+        let outputPart = transitionDesc.substring(slashPos + 1);
+
+        let commaPos = inputPart.lastIndexOf(',');
+        if (commaPos < 0) {
+            throw "malformed transition: " + transitionDesc;
+        }
+        let input = inputPart.substring(0, commaPos);
+        let stackTop = inputPart.substring(commaPos + 1);
+        return {
+            input: input,
+            top: stackTop,
+            push: outputPart
+        };
     }
 
 
@@ -266,9 +343,17 @@ export
         let next = new Snapshot(current.input as string);
         next.variables = current.variables;
         next.numCharsProcessed = current.numCharsProcessed + 1;
-        let processed = (current.input as string).substr(0, next.numCharsProcessed);
-        let trigger = current.input?.substr(current.numCharsProcessed, 1) as string;
+        let processed = (current.input as string).substring(0, next.numCharsProcessed);
+        let trigger = current.input?.substring(current.numCharsProcessed, current.numCharsProcessed+1) as string;
         for (let arrow of au.transitions) {
+            if (current.isSelected(arrow.from)) {
+                let stacks = current.getDescription(arrow.from);
+                    for (let inStack of stacks) {
+                        let transitions = arrow.label.split('\n');
+                        for (let transitionDesc of transitions) {
+                            let transition = this.parseTransition(transitionDesc);
+                            transition.input = this.replaceVariablesIn(transition.input, current.variables);
+
             let description = current.selectedStates.get(arrow.from);
             if (typeof description === typeof '') {
                 let transitions = arrow.label.split('\n');
@@ -277,15 +362,15 @@ export
                     let follow = false;
                     if (transition.length == 1) {
                         follow = (transition == trigger) || (transition == '~');
-                    } else if (transition.length == 2 && transition.charAt(0) == '!')  {
+                    } else if (transition.length == 2 && transition.charAt(0) == '!') {
                         let notChar = transition.charAt(1);
                         follow = (notChar != trigger);
                     } else if (transition.length > 2) {
                         let acceptabletriggers = this.getTriggersFor(transition);
                         if (acceptabletriggers.indexOf(trigger) >= 0) {
                             follow = true;
-                            if (transition.charAt(transition.length-2) == '}') {
-                                next.variables[transition.charAt(transition.length-1)] = trigger;
+                            if (transition.charAt(transition.length - 2) == '}') {
+                                next.variables[transition.charAt(transition.length - 1)] = trigger;
                             }
                         }
                     }
