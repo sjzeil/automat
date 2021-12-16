@@ -15,5 +15,4 @@ This is a work in progress. Some examples:
 
 Still to be implemented:
 
-* regular expressions
-* engines for simulating finite automata, push-down-automata, and Turing machines
+* engines for simulating push-down-automata and Turing machines
