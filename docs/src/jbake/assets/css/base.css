@@ -11,24 +11,27 @@ body {
   min-height: 100%;
   height: auto !important;
   height: 100%;
-  /* Negative indent footer by it's height */
-  margin: 0 auto -60px;
-  padding-left: 220px;
+  /* Negative indent footer by its height */
+  margin: 20 auto -60px;
+  padding-left: 20px;
 }
 
 div.leftPart {
   position: relative;
   top: 0px;
-  left: -200px;
+  left: 0px;
   height: 500px;
-  width: 1px;
+  width: 200px;
   float: left;
   background: transparent;
   border-style: none;
   border-width: 0;
   background-color: #e0e0e0;
   color: #004000;
+  font-size: small;
+  margin-right: 20px;
 }
+
 
 span.menuBlockHeader {
 	font-weight: bold;
@@ -46,9 +49,18 @@ h1 {
 
 /* Set the fixed height of the footer here */
 #footer {
-  height: 60px;
+  height: 30px;
   background-color: #e0e0e0;
   padding: 0;
+}
+
+table.footer {
+  width: 100%;
+  font-size: smaller;
+}
+
+td.right {
+  text-align: right;
 }
 
 /* Lastly, apply responsive CSS fixes as necessary */

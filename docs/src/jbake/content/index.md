@@ -1,5 +1,5 @@
 title=Automat Formal Language Editor
-type=index
+type=page
 tags=directory
 status=published
 ~~~~~~

@@ -1,34 +1,34 @@
 <div class="leftPart">
   <div class="menuBlock">
     <span class="menuBlockHeader"><a href="<#if
-										   (content.rootpath)??>${content.rootpath}<#else></#if>home.html">Home</a></span>
+										   (content.rootpath)??>${content.rootpath}<#else></#if>index.html">Home</a></span>
   </div>
   <div class="menuBlock">
-    <span class="menuBlockHeader">Project Info</span>
-	<ul>
-      <li><a href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>javadoc.html">API (Javadoc)</a></li>
-      <li><a href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>dependencies.html">Dependencies</a></li>
-	</ul>
+    <span class="menuBlockHeader"><a href='studentsManual.html'>Students' Reference Manual</a></span>
+    ${content.tags}
+    <#assign relatedTags = tags?filter(tag -> tag.name == "student")>
+    <#assign relatedTag = relatedTags?first>
+    <ul>
+        <#list relatedTag.tagged_documents as article>
+               <li>
+                   <a href="${content.rootpath}${article.uri}">${article.title}</a>
+               </li>
+        </#list>
+    </ul>
   </div>
+
   <div class="menuBlock">
-    <span class="menuBlockHeader">Testing</span>
-	<ul>
-      <li><a href="<#if
-      (content.rootpath)??>${content.rootpath}<#else></#if>junit.html">Unit
-		  Tests</a></li>
-	  <!--
-      <li><a href="<#if
-		(content.rootpath)??>${content.rootpath}<#else></#if>jacoco.html">Coverage</a></li>
--->
-	</ul>
+    <span class="menuBlockHeader"><a href='instructorsManual.html'>Instructors' Reference Manual</a></span>
+    <#assign relatedTags = tags?filter(tag -> tag.name == "instructor")>
+    <#assign relatedTag = relatedTags?first>
+    <ul>
+        <#list relatedTag.tagged_documents as article>
+            <li>
+                <a href="${content.rootpath}${article.uri}">${article.title}</a>
+            </li>
+        </#list>
+    </ul>
   </div>
-  <!--
-  <div class="menuBlock">
- 	<span class="menuBlockHeader">Analysis Reports</span>
-	<ul>
-      <li><a href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>checkstyle.html">Checkstyle</a></li>
-      <li><a href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>dependencies.html">Dependencies</a></li>
-	</ul>
+
+  
   </div>
--->
-</div>

@@ -1,6 +1,6 @@
-title=Instructors Reference manual
-type=page
-tags=instructor,directory
+title=Instructors' Reference Manual
+type=contents
+directory=instructor
 status=published
 ~~~~~~
 # Description

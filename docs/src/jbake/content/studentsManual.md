@@ -1,6 +1,6 @@
-title=Students Reference manual
-type=page
-tags=student,directory
+title=Students' Reference Manual
+type=contents
+directory=student
 status=published
 ~~~~~~
 # Description
