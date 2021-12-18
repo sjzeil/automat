@@ -64,9 +64,6 @@ export
                     <a href={saveURL} target="_blank"> this link address </a>
                     and bookmarking it or pasting it into a document of your choice.
                 </div>
-                <div className="wrapped">
-                    {saveURL}
-                </div>
                 <div>
                     <input type="button" value="Back" onClick={this.goBack} />
                 </div>

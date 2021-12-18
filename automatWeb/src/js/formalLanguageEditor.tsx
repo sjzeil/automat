@@ -177,11 +177,36 @@ export
     this.setState({ status: 'loading' });
   }
   saveLanguage() {
-    this.setState({
-      oldStatus: this.state.status,
-      status: 'saving',
-    });
+    let url = this.saveLanguageURL(window.location.href);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+    } else {
+      console.log("Unable to access clipboard");
+    }
+    if (window.location.href != url) {
+      window.location.href = url;
+    } else {
+      this.setState({
+        oldStatus: this.state.status,
+        status: 'saving',
+      });
+    }
   }
+
+  saveLanguageURL(url: string) {
+    let trimmedURL = url.split('?')[0];
+    const queryString = window.location.search;
+    let urlParams = new URLSearchParams(queryString);
+    urlParams.delete('lang');
+    if (this.rendering != null) {
+        let encoded = this.encodeLanguage();
+        urlParams.append('lang', encoded);
+        let newURL = trimmedURL + '?' + urlParams.toString();
+        return newURL;
+    } else {
+        return trimmedURL;
+    }
+}
 
   gradeReport() {
     let trimmedURL = this.props.docURL.split('?')[0];
