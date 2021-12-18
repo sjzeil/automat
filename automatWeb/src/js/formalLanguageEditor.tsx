@@ -126,6 +126,7 @@ export
     this.saveLanguage = this.saveLanguage.bind(this);
     this.loadLanguage = this.loadLanguage.bind(this);
     this.gradeReport = this.gradeReport.bind(this);
+    this.help = this.help.bind(this);
 
     this.loadEncodedLang(props.docURL);
 
@@ -166,6 +167,7 @@ export
         <input type="button" value="New" onClick={this.newLanguage} disabled={this.state.status == "new"} />
         <input type="button" value="Save" onClick={this.saveLanguage} disabled={this.state.status == "new"} />
         {gradeButton()}
+        <input type="button" value="Help" onClick={this.help} />
       </div>
     );
   }
@@ -191,6 +193,10 @@ export
         status: 'saving',
       });
     }
+  }
+
+  help() {
+    window.open('help/index.html', 'automatHelp');
   }
 
   saveLanguageURL(url: string) {

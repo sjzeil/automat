@@ -1,0 +1,44 @@
+plugins {
+	id 'base'
+}
+
+task copyDocs (type: Copy, dependsOn: ['docs:bake']) {
+	from 'docs/build/jbake'
+	into 'build/temp/help'
+}
+
+task copyDist (type: Copy, dependsOn: ['automatWeb:build', 'grader:build']) {
+	from 'automatWeb/build/dist'
+	from 'grader/build/dist'
+	into 'build/temp'
+}
+
+
+
+task zipDist (type: Zip, dependsOn: ['copyDist', 'copyDocs']) {
+	from 'build/temp'
+}
+
+assemble.dependsOn 'zipDist'
+
+
+task assembleTest (type: Copy, dependsOn: ['copyDist', 'copyDocs']) {
+	from 'build/temp'
+	from 'automatWeb/test/resources'
+	into './build/test'
+
+    // Create web pages for local testing without CGI server
+	doLast {
+		String testDirectory = project.projectDir.getAbsolutePath() + '/build/test'
+		new ProcessBuilder('perl',  'automat.cgi',  'action=editor',  'problem=testProblem', 'test=instr1') .
+		    directory(new File(testDirectory)) .
+		    redirectOutput(new File(testDirectory + '/editTestProblem.html')) .
+		    start()
+		
+		new ProcessBuilder('perl',  'automat.cgi',  'action=editor',  'problem=selfAssessProblem', 'test=student1') .
+		    directory(new File(testDirectory)) .
+		    redirectOutput(new File(testDirectory  + '/editSAProblem.html')) .
+		    start()
+		
+	}
+}

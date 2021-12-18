@@ -39,43 +39,9 @@ task assembleDistribution (type: Copy, dependsOn: 'buildReactApp') {
 	into './build/dist'
 }
 
-task copyDistForTest (type: Copy, dependsOn: ['buildReactApp', 'copyResources']) {
-	from './build/dist'
-	into './build/test'
-}
-
-task assembleTest (type: Copy, dependsOn: 'assembleDistribution') {
-	from '../grader/build/dist'
-	from './build/dist'
-	from 'test/resources'
-	into './build/test'
-}
-
-task copyGraderBundles (type: Copy, dependsOn: ':grader:build') {
-	from '../grader/build/dist'
-	into './build/test'
-}
 
 
-task setupTest {
-	description "set up test environment in build/test"
-	group = "test"
-	dependsOn =['assembleTest', 'assembleDistribution']
-	doLast {
-		String testDirectory = project.projectDir.getAbsolutePath() + '/build/test'
-		new ProcessBuilder('perl',  'automat.cgi',  'action=editor',  'problem=testProblem', 'test=instr1') .
-		directory(new File(testDirectory)) .
-		redirectOutput(new File(testDirectory + '/editTestProblem.html')) .
-		start()
-		
-		new ProcessBuilder('perl',  'automat.cgi',  'action=editor',  'problem=selfAssessProblem', 'test=student1') .
-		directory(new File(testDirectory)) .
-		redirectOutput(new File(testDirectory  + '/editSAProblem.html')) .
-		start()
-		
-	}
-}
-
+/*
 import com.github.fracpete.rsync4j.RSync;
 import com.github.fracpete.processoutput4j.output.ConsoleOutputProcessOutput;
 
@@ -96,6 +62,7 @@ task deploy (dependsOn: ['setupTest', 'build']) {
         output.monitor(rsync.builder());
     }
 }
+*/
 
 task build {
 	 description = 'Build the development bundle'
