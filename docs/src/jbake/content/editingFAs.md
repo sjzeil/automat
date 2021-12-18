@@ -1,6 +1,9 @@
 title=Editing FAs
 type=page
-tags=student
+manual=student
+sequence=1
+next=selfAssessments
+prev=studentsManual
 status=published
 ~~~~~~
 ## Creating a new FA

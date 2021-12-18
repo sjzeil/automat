@@ -1,6 +1,7 @@
 title=Instructors' Reference Manual
 type=contents
 directory=instructor
+next=setup
 status=published
 ~~~~~~
 # Description

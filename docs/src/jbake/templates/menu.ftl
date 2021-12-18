@@ -4,30 +4,39 @@
 										   (content.rootpath)??>${content.rootpath}<#else></#if>index.html">Home</a></span>
   </div>
   <div class="menuBlock">
+  <hr/>
+  </div>
+  <div class="menuBlock">
     <span class="menuBlockHeader"><a href='studentsManual.html'>Students' Reference Manual</a></span>
-    ${content.tags}
-    <#assign relatedTags = tags?filter(tag -> tag.name == "student")>
-    <#assign relatedTag = relatedTags?first>
-    <ul>
-        <#list relatedTag.tagged_documents as article>
+    <#if (content.directory?? && content.directory=='student') || (content.manual?? && content.manual == 'student')>
+      <ul>
+        <#list published_content?filter(x -> x.manual??)?sort_by("sequence") as article>
+          <#if article.manual?? && article.manual='student'>
                <li>
                    <a href="${content.rootpath}${article.uri}">${article.title}</a>
                </li>
+          </#if>
         </#list>
-    </ul>
+      </ul>
+    </#if>
   </div>
 
   <div class="menuBlock">
+  <hr/>
+  </div>
+  <div class="menuBlock">
     <span class="menuBlockHeader"><a href='instructorsManual.html'>Instructors' Reference Manual</a></span>
-    <#assign relatedTags = tags?filter(tag -> tag.name == "instructor")>
-    <#assign relatedTag = relatedTags?first>
-    <ul>
-        <#list relatedTag.tagged_documents as article>
+    <#if (content.directory?? && content.directory=='instructor') || (content.manual?? && content.manual == 'instructor')>
+      <ul>
+        <#list published_content?filter(x -> x.manual??)?sort_by("sequence") as article>
+          <#if article.manual?? && article.manual='instructor'>
             <li>
                 <a href="${content.rootpath}${article.uri}">${article.title}</a>
             </li>
+          </#if>
         </#list>
-    </ul>
+      </ul>
+    </#if>
   </div>
 
   

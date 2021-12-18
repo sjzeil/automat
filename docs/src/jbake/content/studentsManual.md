@@ -1,6 +1,7 @@
 title=Students' Reference Manual
 type=contents
 directory=student
+next=editingFAs
 status=published
 ~~~~~~
 # Description

@@ -1,6 +1,8 @@
-title=Setup
+title=Overview
 type=page
-tags=instructor
+manual=instructor
+sequence=1
+prev=instructorsManual
 status=published
 ~~~~~~
 

@@ -9,13 +9,14 @@
 			<p>${content.body}</p>
 		</div>
 	</div>
-	<#assign relatedTags = tags?filter(tag -> tag.name == content.directory)>
-    <#assign relatedTag = relatedTags?first>
-    <ul>
-        <#list relatedTag.tagged_documents as article>
+	<ul>
+        <#list published_content?filter(x -> x.manual??)?sort_by("sequence") as article>
+            <#if article.manual?? && article.manual=content.directory>
+
                <li>
                    <a href="${content.rootpath}${article.uri}">${article.title}</a>
                </li>
+			</#if>
         </#list>
     </ul>
 

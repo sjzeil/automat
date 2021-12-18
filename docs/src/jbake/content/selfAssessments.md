@@ -1,6 +1,8 @@
 title=Self Assessment Problems
 type=page
-tags=student
+manual=student
+sequence=5
+prev=editingFAs
 status=published
 ~~~~~~
 ## Special Links

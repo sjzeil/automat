@@ -1,17 +1,12 @@
 title=Automat Formal Language Editor
 type=page
-tags=directory
 status=published
 ~~~~~~
 # Description
 
-A JS-based editor for constructing automata, grammars, and regular
-expressions.
+A Javascript-based editor for constructing and evaluating automata, grammars, and regular expressions.
 
-Automat will require no access to local storage, but will allow saving
-and transmission of automata via encoded URLs.  It should be
-compatible with restricted or locked-down browsers when
-administering tests.
+Automat requires no access to local storage, but will allow saving and transmission of automata via encoded URLs.  It should be compatible with restricted or locked-down browsers when administering tests.
 
 # Documentation
 
