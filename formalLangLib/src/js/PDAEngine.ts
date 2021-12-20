@@ -212,7 +212,7 @@ export
     }
 
     startingTransition(): string {
-        return '@,@;@';
+        return '@,@/@';
     }
 
     transitionText(): string {
