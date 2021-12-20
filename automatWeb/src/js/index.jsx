@@ -10,6 +10,7 @@ import "../css/editor.css";
 // ========================================
 
 var flCanvas = new fabric.Canvas('editorView');
+fabric.Object.prototype.objectCaching = false;
 
 //const queryString = window.location.search;
 //const urlParams = new URLSearchParams(queryString);

@@ -3,10 +3,6 @@ buildscript {
         gradlePluginPortal()
         mavenCentral()
     }
-
-    dependencies {
-        classpath "com.github.fracpete:rsync4j-all:3.1.2-15"
-    }
 }
 
 plugins {
@@ -41,28 +37,7 @@ task assembleDistribution (type: Copy, dependsOn: 'buildReactApp') {
 
 
 
-/*
-import com.github.fracpete.rsync4j.RSync;
-import com.github.fracpete.processoutput4j.output.ConsoleOutputProcessOutput;
 
-task deploy (dependsOn: ['setupTest', 'build']) {
-	doLast {
-        String sourceDir = project.projectDir.getAbsolutePath() + '/build/test/'
-		def destURL = "zeil@linux.cs.odu.edu:/home/zeil/secure_html/automatTest/";
-        RSync rsync = new RSync()
-                .source(sourceDir)
-                .destination(destURL)
-                .recursive(true)
-                .archive(true)
-                .delete(true)
-                .verbose(true)
-                .rsh("ssh -o IdentitiesOnly=yes -i /home/zeil/.ssh/homepc");
-        ConsoleOutputProcessOutput output =
-                new ConsoleOutputProcessOutput();
-        output.monitor(rsync.builder());
-    }
-}
-*/
 
 task build {
 	 description = 'Build the development bundle'
