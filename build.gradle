@@ -65,7 +65,7 @@ task deploy (dependsOn: 'assemble') {
     ssh.run {
       session(remotes.webServer) {
        put from: "$buildDir/distributions/automat.zip", into: '/home/zeil/secure_html/automat/'
-       execute 'unzip -u /home/zeil/secure_html/automat/automat.zip -d /home/zeil/secure_html/automat' 
+       execute 'unzip -u -o /home/zeil/secure_html/automat/automat.zip -d /home/zeil/secure_html/automat' 
        execute 'chmod +x /home/zeil/secure_html/automat/*.cgi'
       }
     }
@@ -77,7 +77,7 @@ task deployTest (dependsOn: 'zipTest') {
     ssh.run {
       session(remotes.webServer) {
        put from: "$buildDir/distributions/automat.zip", into: '/home/zeil/secure_html/automatTest/'
-       execute 'unzip -u /home/zeil/secure_html/automatTest/automatTest.zip'
+       execute 'unzip -u -o /home/zeil/secure_html/automatTest/automatTest.zip'
        execute 'chmod +x /home/zeil/secure_html/automatTest/*.cgi'
       }
     }
