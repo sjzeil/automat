@@ -1,5 +1,6 @@
 plugins {
 	id 'base'
+	id 'org.hidetake.ssh' version '2.10.1'
 }
 
 task copyDocs (type: Copy, dependsOn: ['docs:bake']) {
@@ -42,3 +43,44 @@ task assembleTest (type: Copy, dependsOn: ['copyDist', 'copyDocs']) {
 		
 	}
 }
+
+task zipTest (type: Zip, dependsOn: ['assembleTest']) {
+	from 'build/test'
+	archiveName 'automatTest.zip'
+}
+
+
+
+remotes {
+  webServer {
+    host = 'linux.cs.odu.edu'
+    user = 'zeil'
+	agent = true
+	//identity = '/home/zeil/.ssh/homepc'
+  }
+}
+
+task deploy (dependsOn: 'assemble') {
+  doLast {
+    ssh.run {
+      session(remotes.webServer) {
+       put from: "$buildDir/distributions/automat.zip", into: '/home/zeil/secure_html/automat/'
+       execute 'unzip -u /home/zeil/secure_html/automat/automat.zip -d /home/zeil/secure_html/automat' 
+       execute 'chmod +x /home/zeil/secure_html/automat/*.cgi'
+      }
+    }
+  }
+}
+
+task deployTest (dependsOn: 'zipTest') {
+  doLast {
+    ssh.run {
+      session(remotes.webServer) {
+       put from: "$buildDir/distributions/automat.zip", into: '/home/zeil/secure_html/automatTest/'
+       execute 'unzip -u /home/zeil/secure_html/automatTest/automatTest.zip'
+       execute 'chmod +x /home/zeil/secure_html/automatTest/*.cgi'
+      }
+    }
+  }
+}
+
