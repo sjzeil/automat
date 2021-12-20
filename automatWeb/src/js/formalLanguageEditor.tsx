@@ -115,6 +115,16 @@ export
       thisCanvas.selection = true;
     });
 
+    props.canvas.on('mouse:wheel', function(opt) {
+      var delta = opt.e.deltaY;
+      var zoom = props.canvas.getZoom();
+      zoom *= 0.999 ** delta;
+      if (zoom > 20) zoom = 20;
+      if (zoom < 0.01) zoom = 0.01;
+      props.canvas.setZoom(zoom);
+      opt.e.preventDefault();
+      opt.e.stopPropagation();
+    })
 
     this.newCFG = this.newCFG.bind(this);
     this.newFA = this.newFA.bind(this);

@@ -9,7 +9,7 @@
     <div>
       <div id="editorContainer" class="editorCanvas">
         <canvas id="editorView" height=600 width=600> </canvas>
-        <div>(Hold Alt key to drag diagram horizontally or vertically.)</div>
+        <div>(Hold Alt key to drag diagram horizontally or vertically. Use mouse wheel to zoom.)</div>
       </div>
     </div>
 
