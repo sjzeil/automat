@@ -6,6 +6,7 @@ import { RegularExpression } from './regularExpression';
 import { BadLanguage } from './badLanguage';
 import { FAEngine } from './FAEngine';
 import { PDAEngine } from './PDAEngine';
+import { TMEngine } from './TMEngine';
 
 
 /**
@@ -63,6 +64,10 @@ class LanguageFactory {
       return lang;
     } else if (jsonObj.specification == LanguageFactory.PDAspec) {
       let lang = new Automaton(this.user, jsonObj.problemID, new PDAEngine());
+      lang.fromJSon(jsonObj);
+      return lang;
+    } else if (jsonObj.specification == LanguageFactory.TMspec) {
+      let lang = new Automaton(this.user, jsonObj.problemID, new TMEngine());
       lang.fromJSon(jsonObj);
       return lang;
     } else {

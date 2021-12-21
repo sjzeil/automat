@@ -13,6 +13,7 @@ import { BadLanguageRendering } from './renderedBadLanguage';
 import { RegularExpressionRendering } from './renderedRegularExpression';
 import { FAEngine } from '../../../../formalLangLib/src/js/FAEngine';
 import { PDAEngine } from '../../../../formalLangLib/src/js/PDAEngine';
+import { TMEngine } from '../../../../formalLangLib/src/js/TMEngine';
 
 
 /**
@@ -72,6 +73,10 @@ export
       return lang;
     } else if (jsonObj.specification == LanguageFactory.PDAspec) {
       let lang = new AutomatonRendering(this._canvas, this.user, jsonObj.problemID, new PDAEngine());
+      lang.fromJSon(jsonObj);
+      return lang;
+    } else if (jsonObj.specification == LanguageFactory.TMspec) {
+      let lang = new AutomatonRendering(this._canvas, this.user, jsonObj.problemID, new TMEngine());
       lang.fromJSon(jsonObj);
       return lang;
     } else {

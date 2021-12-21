@@ -20,6 +20,7 @@ import { AutomatonRendering } from './renderings/renderedAutomaton';
 import { BadLanguageRendering } from './renderings/renderedBadLanguage';
 import { GrammarRendering } from './renderings/renderedGrammar';
 import { RegularExpressionRendering } from './renderings/renderedRegularExpression';
+import { TMEngine } from '../../../formalLangLib/src/js/TMEngine';
 
 
 export class MouseLoc {
@@ -130,6 +131,7 @@ export
     this.newFA = this.newFA.bind(this);
     this.newRE = this.newRE.bind(this);
     this.newPDA = this.newPDA.bind(this);
+    this.newTM = this.newTM.bind(this);
     this.newLanguage = this.newLanguage.bind(this);
     this.clicked = this.clicked.bind(this);
     this.selected = this.selected.bind(this);
@@ -327,6 +329,21 @@ export
     console.log("in newPDA");
     this.props.canvas.clear();
     let engine = new PDAEngine();
+    this.rendering = new AutomatonRendering(this.props.canvas, this.props.user, this.props.problemID, engine);
+    this.setState({
+      status: "automaton",
+      editing: null,
+      clicked: null,
+    });
+  }
+
+  /**
+   * Create a new automaton and set up the automaton editor.
+   */
+   newTM() {
+    console.log("in newTM");
+    this.props.canvas.clear();
+    let engine = new TMEngine();
     this.rendering = new AutomatonRendering(this.props.canvas, this.props.user, this.props.problemID, engine);
     this.setState({
       status: "automaton",
