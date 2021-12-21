@@ -5,6 +5,7 @@ import LZUTF8 from 'lzutf8';
 import { RegularExpression } from './regularExpression';
 import { BadLanguage } from './badLanguage';
 import { FAEngine } from './FAEngine';
+import { PDAEngine } from './PDAEngine';
 
 
 /**
@@ -58,6 +59,10 @@ class LanguageFactory {
       return lang;
     } else if (jsonObj.specification == LanguageFactory.REspec) {
       let lang = new RegularExpression(this.user, jsonObj.problemID);
+      lang.fromJSon(jsonObj);
+      return lang;
+    } else if (jsonObj.specification == LanguageFactory.PDAspec) {
+      let lang = new Automaton(this.user, jsonObj.problemID, new PDAEngine());
       lang.fromJSon(jsonObj);
       return lang;
     } else {

@@ -12,6 +12,7 @@ import { GrammarRendering } from './renderedGrammar';
 import { BadLanguageRendering } from './renderedBadLanguage';
 import { RegularExpressionRendering } from './renderedRegularExpression';
 import { FAEngine } from '../../../../formalLangLib/src/js/FAEngine';
+import { PDAEngine } from '../../../../formalLangLib/src/js/PDAEngine';
 
 
 /**
@@ -67,6 +68,10 @@ export
       return lang;
     } else if (jsonObj.specification == LanguageFactory.REspec) {
       let lang = new RegularExpressionRendering(this._canvas, this.user, jsonObj.problemID);
+      lang.fromJSon(jsonObj);
+      return lang;
+    } else if (jsonObj.specification == LanguageFactory.PDAspec) {
+      let lang = new AutomatonRendering(this._canvas, this.user, jsonObj.problemID, new PDAEngine());
       lang.fromJSon(jsonObj);
       return lang;
     } else {
