@@ -61,6 +61,10 @@ class FormalLanguage {
     problemID: string;
     unlock: string;
 
+    static epsilon: string = '\u03F5';
+    static box: string = '\u25FB';
+    static selected: string = '\u2302';
+
     clear() {
 
     }

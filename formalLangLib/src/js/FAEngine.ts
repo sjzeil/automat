@@ -1,7 +1,7 @@
 import { Automaton } from './automaton';
 import { Snapshot } from './snapshot';
 import { AutomatonEngine } from './automatonEngine';
-import { TestResult, ValidationResult } from './formalLanguage';
+import { FormalLanguage, TestResult, ValidationResult } from './formalLanguage';
 
 
 
@@ -217,7 +217,8 @@ export
 
     transitionText(): string {
         return 'Each arrow may represent one or more transitions.<br/>' +
-            '<ul><li>Each transition must contain a single alphanumeric character, or @ to denote the empty string (\u03B5).</li>' +
+            '<ul><li>Each transition must contain a single alphanumeric character, or @ to denote the empty string ('
+               + FormalLanguage.epsilon + ').</li>' +
             '<li>Shortcuts are also available:' +
             ' <ul><li>!x means "every character except x",</li> <li>~ means "any character".</li></ul></ul>'
     }

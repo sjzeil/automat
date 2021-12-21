@@ -24,7 +24,7 @@ export class RegularExpressionRendering extends LanguageRendering {
     rendering: fabric.Text;
 
     render() {
-        let result = this.language.regexp.replace(/@/g, '\u03B5');
+        let result = this.language.regexp.replace(/@/g, FormalLanguage.epsilon);
         if (this.canvas) {
             this.rendering.set('text', result);
             this.canvas.clear();

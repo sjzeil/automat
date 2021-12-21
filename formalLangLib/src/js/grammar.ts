@@ -44,7 +44,7 @@ export class Grammar extends FormalLanguage {
 
     static ProducesChar = "\u2192";
     static DerivesChar = "\u21D2";
-    static Epsilon = "\u03B5";
+    static Epsilon = FormalLanguage.epsilon;
 
     clone(): Grammar {
         let gr = new Grammar(this.createdBy, this.problemID);

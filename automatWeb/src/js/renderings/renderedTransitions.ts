@@ -3,6 +3,7 @@ import { AutomatonState } from '../../../../formalLangLib/src/js/states';
 import { AutomatonTransition } from '../../../../formalLangLib/src/js/transitions';
 import { AutomatonStateRendering } from './stateRendering';
 import { Rendering, RenderedElement } from './renderedElement';
+import { FormalLanguage } from '../../../../formalLangLib/src/js/formalLanguage';
 
 
 
@@ -212,7 +213,7 @@ Transition.angleOffset = 2.0 * Math.PI * (15.0 / 360.0);
 
     _epsilonSub(label: string): string
     {
-        return label.replace(/@/g, '\u03B5');
+        return label.replace(/@/g, FormalLanguage.epsilon);
     }
 
     _prepareRendering()

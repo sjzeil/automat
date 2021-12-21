@@ -1,6 +1,7 @@
 import { fabric } from 'fabric';
 import { RenderedElement } from './renderedElement';
 import { AutomatonState } from '../../../../formalLangLib/src/js/states';
+import { FormalLanguage } from '../../../../formalLangLib/src/js/formalLanguage';
 
 
 export interface StateOptions extends fabric.ICircleOptions {
@@ -62,6 +63,9 @@ var State = fabric.util.createClass(fabric.Group, {
 			));
 
 		let annotationText = options.annotation || "";
+		if (this.selected && annotationText == '') {
+			annotationText = FormalLanguage.selected;
+		}
 		this.set('annotation', new fabric.Text(annotationText, 
 			{
 				fontSize:this.text.fontSize,

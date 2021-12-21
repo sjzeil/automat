@@ -46,7 +46,7 @@ export class GrammarRendering extends LanguageRendering {
 
     static ProducesChar = "\u2192";
     static DerivesChar = "\u21D2";
-    static Epsilon = "\u03B5";
+    static Epsilon = FormalLanguage.epsilon;
 
 
     addProduction(prod: Production) {
