@@ -7,7 +7,7 @@ import { FormalLanguage, TestResult, ValidationResult } from './formalLanguage';
 
 
 /**
- * FAEngine
+ * TMEngine
  * 
  * An engine for Turing machines
  * 
@@ -51,6 +51,7 @@ export
         }
         let initialStates = 0;
         let finalStates = 0;
+        let numTapes = -1;  
         for (let state of automaton.states) {
             if (state.initial) {
                 ++initialStates;
@@ -87,68 +88,72 @@ export
                     }
                     let transitionsInThisArrow = new Set<string>();
                     for (let transition of transitions) {
-                        let transitionTriggers = this.getTriggersFor(transition);
-                        transitionTriggers = this.replaceVariablesIn(transitionTriggers, variableMapping);
-                        for (let i = 0; i < transitionTriggers.length; ++i) {
-                            let trigger = transitionTriggers.charAt(i);
-
-                            if (transitionsInThisArrow.has(trigger)) {
-                                return {
-                                    warnings: '',
-                                    errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                                        ' has duplicate transitions on ' + trigger + '.'
-                                }
-                            }
-                            transitionsInThisArrow.add(trigger);
-                            if (trigger == '@' || transitionsSeen.has(trigger)) {
-                                isDeterministic = false;
-                            }
-                            if (trigger != '@') {
-                                transitionsSeen.add(trigger);
+                        let inputs = [];
+                        let outputs = [];
+                        let movements = [];
+                        try {
+                            inputs = this.parseInputs(transition);
+                            outputs = this.parseOutputs(transition);
+                            movements = this.parseMovements(transition);
+                        } catch (err) {
+                            return {
+                                warnings: '',
+                                errors: err as string,
                             }
                         }
-                        if (transition.length == 1) {
-                            if (!transition.match(/^[@~0-9A-Za-z]$/)) {
-                                return {
-                                    warnings: warningStr,
-                                    errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                                        ' has an invalid transition: ' + transition
-                                };
-                            }
-                        } else if (transition.length == 2) {
-                            if (!transition.match(/^![0-9A-Za-z]$/)) {
-                                return {
-                                    warnings: warningStr,
-                                    errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                                        ' has an invalid transition: ' + transition
-                                };
-                            }
-                        } else if (transition.length > 2) {
-                            // Storage in the state limited to deterministic automata (TMs)
-                            /*
-                            if (!transition.match(/^[0-9A-Za-z](,[0-9A-Za-z])*(}[A-Za-z])?$/)) {
-                                return {
-                                    warnings: warningStr,
-                                    errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                                        ' has an invalid transition: ' + transition
-                                };
-                            }
-                            */
+                        if (inputs.length == 0) {
                             return {
-                                warnings: warningStr,
-                                errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
-                                    ' has an invalid transition: ' + transition
-                            };
+                                warnings: '',
+                                errors: 'Illegal transiton: ' + transition + ' has no inputs.',
+                            }
+                        }
+                        if (inputs.length != outputs.length) {
+                            return {
+                                warnings: '',
+                                errors: 'Illegal transiton: ' + transition + ' - # of inputs does not match # of outputs.',
+                            }
+                        }
+                        if (inputs.length != movements.length) {
+                            return {
+                                warnings: '',
+                                errors: 'Illegal transiton: ' + transition + ' - # of inputs does not match # of movements.',
+                            }
+                        }
+                        if (numTapes < 0)  {
+                            numTapes = inputs.length;
+                        } else if (inputs.length != numTapes) {
+                            return {
+                                warnings: '',
+                                errors: 'Inconsistent transitions: ' + transition + ' uses a different number of tapes than at least one other transition.',
+                            }
+                        }
+                        if (numTapes == 1) {
+                            let transitionTriggers = this.getTriggersFor(inputs[0]);
+                            transitionTriggers = this.replaceVariablesIn(transitionTriggers, variableMapping);
+                            for (let i = 0; i < transitionTriggers.length; ++i) {
+                                let trigger = transitionTriggers.charAt(i);
+
+                                if (transitionsInThisArrow.has(trigger)) {
+                                    return {
+                                        warnings: '',
+                                        errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
+                                            ' has duplicate transitions on ' + trigger + '.'
+                                    }
+                                }
+                                transitionsInThisArrow.add(trigger);
+                                if (transitionsSeen.has(trigger)) {
+                                    return {
+                                        warnings: '',
+                                        errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
+                                            ' has duplicate transitions on ' + trigger + '.'
+                                    }
+                                }
+                                transitionsSeen.add(trigger);
+                            }
                         }
                     }
                 }
             }
-        }
-
-        if (isDeterministic) {
-            warningStr += "\nThis automaton is deterministic.";
-        } else {
-            warningStr += "\nThis automaton is nondeterministic.";
         }
 
         return {
@@ -156,6 +161,19 @@ export
             errors: errorStr
         };
     }
+
+    parseInputs(transition: string): string[] {
+        throw new Error('Method not implemented.');
+    }
+
+    parseOutputs(transition: string): string[] {
+        throw new Error('Method not implemented.');
+    }
+
+    parseMovements(transition: string): string[] {
+        throw new Error('Method not implemented.');
+    }
+
     replaceVariablesIn(transition: string, variableMapping: any): string {
         let storage = '';
         let result = transition;
@@ -327,5 +345,6 @@ export
 
 
 }
+
 
 
