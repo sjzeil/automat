@@ -261,11 +261,11 @@ export
 
 
     step(au: Automaton, current: Snapshot): Snapshot {
-        let next = new Snapshot(current.input as string);
+        let next = new Snapshot(current.input[0]);
         next.variables = current.variables;
-        next.numCharsProcessed = current.numCharsProcessed + 1;
-        let processed = (current.input as string).substr(0, next.numCharsProcessed);
-        let trigger = current.input?.substr(current.numCharsProcessed, 1) as string;
+        next.numCharsProcessed[0] = current.numCharsProcessed[0] + 1;
+        let processed = (current.input[0]).substring(0, next.numCharsProcessed[0]);
+        let trigger = current.input[0].substring(current.numCharsProcessed[0], current.numCharsProcessed[0]+1);
         for (let arrow of au.transitions) {
             let description = current.selectedStates.get(arrow.from);
             if (typeof description === typeof '') {
@@ -299,12 +299,12 @@ export
 
     stopped(current: Snapshot): boolean {
         return current.selectedStates.size == 0 ||
-            current.input == null ||
-            current.numCharsProcessed >= current.input.length;
+            current.input[0] == null ||
+            current.numCharsProcessed[0] >= current.input[0].length;
     }
 
     accepted(current: Snapshot): boolean {
-        if (current.numCharsProcessed >= (current.input as string).length) {
+        if (current.numCharsProcessed[0] >= current.input[0].length) {
             let inFinalState = false;
             current.selectedStates.forEach(function (value, currentState) {
                 inFinalState = inFinalState || currentState.final;
@@ -315,6 +315,15 @@ export
         }
     }
 
+    inputPortrayal(snapshot: Snapshot): string {
+        if (snapshot.input != null) {
+            let leftPart = snapshot.input[0].substring(0, snapshot.numCharsProcessed[0]);
+            let rightPart = snapshot.input[0].substring(snapshot.numCharsProcessed[0]);
+            return leftPart + '|' + rightPart;
+        } else {
+            return '';
+        }
+    }
 
 }
 

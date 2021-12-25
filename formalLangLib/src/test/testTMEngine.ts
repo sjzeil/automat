@@ -167,24 +167,40 @@ describe('TMEngine', function () {
             expect(validation.warnings).to.equal('');
             expect(validation.errors).to.not.equal('');
         });
+        it('should flag obvious non-determinism', function () {
+            let tm = new Automaton('Instructor', '', new TMEngine());
+            tm.addState('0');
+            tm.addState('1');
+            tm.states[0].initial = true;
+            tm.addTransition('0', '1', 'a/a,L');
+            tm.addTransition('0', '0', 'a/b,R');
+            let validation = tm.validate();
+            expect(validation.warnings).to.equal('');
+            expect(validation.errors).to.not.equal('');
+        });
         it('accept ! shortcut', function () {
             let tm = tmUpperCase();
-            tm.addTransition('0', '1', '!0/0,R');
+            tm.addTransition('1', '0', '!0/0,R');
             let validation = tm.validate();
             expect(validation.warnings).to.equal('');
             expect(validation.errors).to.equal('');
         });
         it('accept ~ shortcut', function () {
-            let tm = tmUpperCase();
+            let tm = new Automaton('Instructor', '', new TMEngine());
+            tm.addState('0');
+            tm.addState('1');
+            tm.addState('2');
+            tm.states[0].initial = true;
+            tm.states[1].final = true;
             tm.addTransition('0', '1', '~/0,L');
             let validation = tm.validate();
             expect(validation.warnings).to.equal('');
             expect(validation.errors).to.equal('');
-            tm.addTransition('0', '1', '!0/~,R');
+            tm.addTransition('1', '2', '!0/~,R');
             validation = tm.validate();
             expect(validation.warnings).to.equal('');
             expect(validation.errors).to.equal('');
-            tm.addTransition('0', '1', '~/~,S');
+            tm.addTransition('2', '1', '~/~,S');
             validation = tm.validate();
             expect(validation.warnings).to.equal('');
             expect(validation.errors).to.equal('');
@@ -205,9 +221,9 @@ describe('TMEngine', function () {
             let tm = tmUpperCase();
             let inputStr = 'aBb';
             let snapshot = tm.engine.initialSnapshot(tm, inputStr);
-            expect(snapshot.input).to.equal(inputStr);
-            expect(snapshot.numCharsProcessed).to.equal(0);
-            expect(snapshot.inputPortrayal()).to.equal('|' + inputStr);
+            expect(snapshot.input[0]).to.equal(inputStr);
+            expect(snapshot.numCharsProcessed[0]).to.equal(0);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('@[a]Bb');
             expect(snapshot.selectedStates.size).to.equal(1);
             expect(snapshot.selectedStates.get(tm.states[0])).to.equal('');
             expect(snapshot.selectedStates.get(tm.states[1])).to.be.undefined;
@@ -220,9 +236,9 @@ describe('TMEngine', function () {
             let tm = tm_scs();
             let inputStr = '011011';
             let snapshot = tm.engine.initialSnapshot(tm, inputStr);
-            expect(snapshot.input).to.equal(inputStr);
-            expect(snapshot.numCharsProcessed).to.equal(0);
-            expect(snapshot.inputPortrayal()).to.equal('|' + inputStr);
+            expect(snapshot.input[0]).to.equal(inputStr);
+            expect(snapshot.numCharsProcessed[0]).to.equal(0);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('@[0]11011');
             expect(snapshot.selectedStates.size).to.equal(1);
             expect(snapshot.selectedStates.get(tm.states[0])).to.equal('');
             for (let i = 1; i < tm.states.length; ++i) {
@@ -231,14 +247,32 @@ describe('TMEngine', function () {
         });
     });
 
+
+    context('trim input portrayal', function () {
+        it('should leave only one @ at each end', function () {
+            let tm = tm_scs();
+            let snapshot = tm.engine.initialSnapshot(tm, '@@1@@');
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('@[1]@');
+        });
+    });
+
+    context('empty input portrayal', function () {
+        it('should show empty tape as @[@]@', function () {
+            let tm = tm_scs();
+            let snapshot = tm.engine.initialSnapshot(tm, '');
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('@[@]@');
+        });
+    });
+
+
     context('initial snapshot multitape', function () {
         it('TM starts with one selected state', function () {
             let tm = tmTwoTapes();
             let inputStr = 'aBb';
             let snapshot = tm.engine.initialSnapshot(tm, inputStr);
-            expect(snapshot.input).to.equal(inputStr);
-            expect(snapshot.numCharsProcessed).to.equal(0);
-            expect(snapshot.inputPortrayal()).to.equal('|aBb\n|');
+            expect(snapshot.input[0]).to.equal(inputStr);
+            expect(snapshot.numCharsProcessed[0]).to.equal(0);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('@[a]Bb\n@[@]@');
             expect(snapshot.selectedStates.size).to.equal(1);
             expect(snapshot.selectedStates.get(tm.states[0])).to.equal('');
             for (let i = 1; i < tm.states.length; ++i) {
@@ -254,9 +288,9 @@ describe('TMEngine', function () {
             let inputStr = 'aAb';
             let snapshot = tm.engine.initialSnapshot(tm, inputStr);
             snapshot = tm.engine.step(tm, snapshot);
-            expect(snapshot.input).to.equal(inputStr);
-            expect(snapshot.numCharsProcessed).to.equal(1);
-            expect(snapshot.inputPortrayal()).to.equal('A|Ab');
+            expect(snapshot.input[0]).to.equal('AAb');
+            expect(snapshot.numCharsProcessed[0]).to.equal(1);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('A[A]b');
             expect(snapshot.selectedStates.size).to.equal(1);
             expect(snapshot.selectedStates.get(tm.states[0])).equal('');
             expect(snapshot.selectedStates.get(tm.states[1])).to.be.undefined;
@@ -267,9 +301,8 @@ describe('TMEngine', function () {
             let inputStr = '1011';
             let snapshot = tm.engine.initialSnapshot(tm, inputStr);
             snapshot = tm.engine.step(tm, snapshot);
-            expect(snapshot.input).to.equal(inputStr);
-            expect(snapshot.numCharsProcessed).to.equal(1);
-            expect(snapshot.inputPortrayal()).to.equal('|1011');
+            expect(snapshot.input[0]).to.equal(inputStr);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('@[1]011');
             expect(snapshot.selectedStates.size).to.equal(0);
             expect(snapshot.selectedStates.get(tm.states[0])).to.be.undefined;
             expect(snapshot.selectedStates.get(tm.states[1])).to.be.undefined;
@@ -281,13 +314,29 @@ describe('TMEngine', function () {
             let inputStr = 'aAb';
             let snapshot = tm.engine.initialSnapshot(tm, inputStr);
             snapshot = tm.engine.step(tm, snapshot);
-            expect(snapshot.input).to.equal(inputStr);
-            expect(snapshot.numCharsProcessed).to.equal(1);
-            expect(snapshot.inputPortrayal()).to.equal('A|Ab\n|@a');
+            expect(snapshot.input[0]).to.equal('AAb');
+            expect(snapshot.numCharsProcessed[0]).to.equal(1);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('A[A]b\n@[@]a');
             expect(snapshot.selectedStates.size).to.equal(1);
             expect(snapshot.selectedStates.get(tm.states[0])).equal('');
             expect(snapshot.selectedStates.get(tm.states[1])).to.be.undefined;
             expect(tm.engine.stopped(snapshot)).to.be.false;
+        });
+        it('TMs can time-out', function () {
+            let tm = new Automaton('Instructor', '', new TMEngine());
+            tm.addState('0');
+            tm.addState('1');
+            tm.states[0].initial = true;
+            tm.states[1].final = true;
+            tm.addTransition('0', '0', '~/~,S');
+            let snapshot = tm.engine.initialSnapshot(tm, '0');
+            expect(tm.engine.stopped(snapshot)).to.be.false;
+            for (let i = 0; i < TMEngine.executionLimit; ++i) {
+                snapshot = tm.engine.step(tm, snapshot);
+                expect(tm.engine.stopped(snapshot)).to.be.false;
+            }
+            snapshot = tm.engine.step(tm, snapshot);
+            expect(tm.engine.stopped(snapshot)).to.be.true;
         });
 
 

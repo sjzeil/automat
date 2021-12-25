@@ -163,23 +163,102 @@ export
     }
 
     parseInputs(transition: string): string[] {
-        throw new Error('Method not implemented.');
+        let results = [] as string[];
+        let parts = transition.split('/');
+        if (parts.length < 2) {
+            throw 'Transition "' + transition + '" has no "/" dividing the input and output sections.'
+        }
+        if (parts.length > 2) {
+            throw 'Transition "' + transition + '" has multiple "/" dividers.'
+        }
+        let input = parts[0];
+        this.parseInputsInto(input, transition, results);
+        return results;
+    }
+
+    parseInputsInto(transitionInput: string, transition: string, results: string[]): string[] {
+        if (transitionInput.length == 0) {
+            return [];
+        } else if (transitionInput.charAt(0) == '!') {
+            if (transitionInput.match(/^![0-9A-Za-z@]/)) {
+                results.push(transitionInput.substring(0,2));
+                this.parseInputsInto(transitionInput.substring(2), transition, results);
+            } else {
+                throw 'Invalid input character in ' + transition + ' following a !'
+            }
+        } else if (transitionInput.match(/^[0-9A-Za-z@](,[0-9A-Za-z@])*}[A-Za-z]/)) {
+            let pos = transitionInput.indexOf('}') + 2;
+            results.push(transitionInput.substring(0,pos));
+            this.parseInputsInto(transitionInput.substring(pos), transition, results);
+        } else if (transitionInput.match(/^[0-9A-Za-z@~]/)) {
+            results.push(transitionInput.substring(0,1));
+            this.parseInputsInto(transitionInput.substring(1), transition, results);
+        } else {
+            throw 'Illegal character "' + transitionInput.charAt(0) + '" in transition ' + transition;
+        }
+        return results;
     }
 
     parseOutputs(transition: string): string[] {
-        throw new Error('Method not implemented.');
+        let parts = transition.split('/');
+        if (parts.length < 2) {
+            throw 'Transition "' + transition + '" has no "/" dividing the input and output sections.'
+        }
+        if (parts.length > 2) {
+            throw 'Transition "' + transition + '" has multiple "/" dividers.'
+        }
+        let outputParts = parts[1].split(/,/);
+        if (outputParts.length < 2) {
+            throw 'Transition "' + transition + '" has no "," dividing the tape output and movement.'
+        }
+        if (outputParts.length > 2) {
+            throw 'Transition "' + transition + '" has multiple "," dividers.'
+        }
+        let output = outputParts[0];
+        if (output.match(/^[0-9A-Za-z@~]+$/)) {
+            let results = [] as string[];
+            for (let ch of output) {
+                results.push(ch);
+            }
+            return results;
+        } else {
+            throw 'Illegal character in tape output of transition ' + transition;
+        }
     }
 
     parseMovements(transition: string): string[] {
-        throw new Error('Method not implemented.');
+        let parts = transition.split('/');
+        if (parts.length < 2) {
+            throw 'Transition "' + transition + '" has no "/" dividing the input and output sections.'
+        }
+        if (parts.length > 2) {
+            throw 'Transition "' + transition + '" has multiple "/" dividers.'
+        }
+        let outputParts = parts[1].split(/,/);
+        if (outputParts.length < 2) {
+            throw 'Transition "' + transition + '" has no "," dividing the tape output and movement.'
+        }
+        if (outputParts.length > 2) {
+            throw 'Transition "' + transition + '" has multiple "," dividers.'
+        }
+        let movement = outputParts[1];
+        if (movement.match(/^[LRS]+$/)) {
+            let results = [] as string[];
+            for (let ch of movement) {
+                results.push(ch);
+            }
+            return results;
+        } else {
+            throw 'Illegal character in movement part of transition ' + transition;
+        }
     }
 
     replaceVariablesIn(transition: string, variableMapping: any): string {
         let storage = '';
         let result = transition;
         if (transition.length > 2 && transition.charAt(transition.length-2) == '}') {
-            storage = transition.substr(transition.length-2);
-            result = transition.substr(0, transition.length-2);
+            storage = transition.substring(transition.length-2);
+            result = transition.substring(0, transition.length-2);
         }
         for (let property in variableMapping) {
             let re = new RegExp(property, 'g');
@@ -203,7 +282,7 @@ export
         return result;
     }
 
-    private static charSet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    private static charSet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@';
 
     private getTriggersFor(transition: string): string {
         if (transition.length == 1) {
@@ -252,96 +331,222 @@ export
     }
 
     initialSnapshot(au: Automaton, input: string): Snapshot {
-        let snapshot = new Snapshot(input);
+        let trimmedInput = input.replace(/^@*/,'').replace(/@*$/,'');
+        let snapshot = new Snapshot(trimmedInput);
+        let transitions = au.transitions[0].label.split("\n");
+        let movements = this.parseMovements(transitions[0]);
+        let numTapes = movements.length;
+        snapshot.setNumTapes(numTapes);
         for (let state of au.states) {
             if (state.initial) {
                 snapshot.selectedStates.set(state, '');
             }
         }
-        this.computeEpsilonClosure(au, snapshot);
         return snapshot;
-    }
-
-    private computeEpsilonClosure(au: Automaton, snapshot: Snapshot) {
-        let changed = true;
-        while (changed) {
-            changed = false;
-            for (let arrow of au.transitions) {
-                let description = snapshot.selectedStates.get(arrow.from);
-                if (typeof description === typeof '') {
-                    let transitions = arrow.label.split('\n');
-                    for (let transition of transitions) {
-                        if (transition == '@') {
-                            if (typeof snapshot.selectedStates.get(arrow.to) === typeof undefined) {
-                                snapshot.selectedStates.set(arrow.to, description as string);
-                                changed = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (changed) {
-                        break;
-                    }
-                }
-            }
-        }
     }
 
 
     step(au: Automaton, current: Snapshot): Snapshot {
-        let next = new Snapshot(current.input as string);
-        next.variables = current.variables;
-        next.numCharsProcessed = current.numCharsProcessed + 1;
-        let processed = (current.input as string).substr(0, next.numCharsProcessed);
-        let trigger = current.input?.substr(current.numCharsProcessed, 1) as string;
-        for (let arrow of au.transitions) {
-            let description = current.selectedStates.get(arrow.from);
-            if (typeof description === typeof '') {
-                let transitions = arrow.label.split('\n');
-                for (let transition of transitions) {
-                    transition = this.replaceVariablesIn(transition, current.variables);
-                    let follow = false;
-                    if (transition.length == 1) {
-                        follow = (transition == trigger) || (transition == '~');
-                    } else if (transition.length == 2 && transition.charAt(0) == '!')  {
-                        let notChar = transition.charAt(1);
-                        follow = (notChar != trigger);
-                    } else if (transition.length > 2) {
-                        let acceptableTriggers = this.getTriggersFor(transition);
-                        if (acceptableTriggers.indexOf(trigger) >= 0) {
-                            follow = true;
-                            if (transition.charAt(transition.length-2) == '}') {
-                                next.variables[transition.charAt(transition.length-1)] = trigger;
-                            }
+        if (current.stepCounter < TMEngine.executionLimit) {
+            for (let arrow of au.transitions) {
+                if (current.isSelected(arrow.from)) {
+                    let transitions = arrow.label.split('\n');
+                    for (let transition of transitions) {
+                        let OK = this.inputMatches(transition, current);
+                        if (OK) {
+                            let next = this.applyTransition(transition, current);
+                            next.selectedStates.set(arrow.to, '');
+                            ++next.stepCounter;
+                            return next;
                         }
-                    }
-                    if (follow) {
-                        next.selectedStates.set(arrow.to, processed);
                     }
                 }
             }
         }
-        this.computeEpsilonClosure(au, next);
+        let failed = current.clone();
+        return failed;
+    }
+    
+    applyTransition(transition: string, current: Snapshot): Snapshot {
+        let inputs = [];
+        let outputs = [];
+        let movements = [];
+        let next = current.clone();
+        inputs = this.parseInputs(transition);
+        outputs = this.parseOutputs(transition);
+        movements = this.parseMovements(transition);
+        for (let tapeNum = 0; tapeNum < inputs.length; ++tapeNum) {
+            let headPosition = current.numCharsProcessed[tapeNum];
+            let tape = current.input[tapeNum];
+            let tapeChar = '@';
+            if (headPosition >= 0 && headPosition < tape.length) {
+                tapeChar = tape.charAt(headPosition);
+            }
+            // Store variable if rule was a,b,c,}w
+            let inputRule = inputs[tapeNum];
+            if (inputRule.length > 2) {
+                let pos = inputRule.indexOf('{');
+                if (pos < 0) {
+                    throw 'Illegal input rule encountered.';
+                }
+                next.variables.set(inputRule.substring(pos + 1), tapeChar);
+            }
+            // Write character to tape
+            let tapeOutput = outputs[tapeNum];
+            if (tapeOutput == '~') {
+                tapeOutput = tapeChar;
+            } else {
+                tapeOutput = this.replaceVariablesIn(tapeOutput, next.variables);
+            }
+            this.writeToTape(tapeOutput, tapeNum, next);
+            // Move
+            this.shiftTapeHead(movements[tapeNum], tapeNum, next);
+        }
         return next;
     }
+    
+    writeToTape(tapeOutput: string, tapeNum: number, snapshot: Snapshot) {
+        let k = snapshot.numCharsProcessed[tapeNum];
+        let tape = snapshot.input[tapeNum];
+        if (tape != '') {
+            while (k < 0) {
+                tape = '@' + tape;
+                ++k;
+            }
+            while (k > tape.length) {
+                tape += '@';
+            }
+        } else {
+            tape = '@';
+        }
+        tape = tape.substring(0, k) + tapeOutput + tape.substring(k + 1);
+        snapshot.input[tapeNum] = tape;
+        snapshot.numCharsProcessed[tapeNum] = k;
+    }
+
+    shiftTapeHead(direction: string, tapeNum: number, snapshot: Snapshot) {
+        if (direction == 'L') {
+            --snapshot.numCharsProcessed[tapeNum];
+            if (snapshot.numCharsProcessed[tapeNum] < 0) {
+                snapshot.input[tapeNum] = '@' + snapshot.input[tapeNum];
+                snapshot.numCharsProcessed[tapeNum] = 0;
+            }
+        } else if (direction == 'R') {
+            ++snapshot.numCharsProcessed[tapeNum];
+            if (snapshot.numCharsProcessed[tapeNum] >= snapshot.input[tapeNum].length) {
+                snapshot.input[tapeNum] += '@';
+            }
+        }
+    }
+
+
+
+
+
+    inputMatches(transition: string, current: Snapshot): boolean {
+        let inputs = [];
+        try {
+            inputs = this.parseInputs(transition);
+            let tapeNum = 0;
+            for (let inputRule of inputs) {
+                if (!this.checkTransitionInput(inputRule, current.input[tapeNum], 
+                         current.numCharsProcessed[tapeNum], current.variables)) {
+                    return false;
+                }
+                ++tapeNum;
+            }
+            return true;
+        } catch (err) {
+            return false;
+        }
+    }
+
+    private checkTransitionInput(inputRule: string, tape: string, headPosition: number, mapping: any): boolean {
+        let tapeChar = '@';
+        if (headPosition >= 0 && headPosition < tape.length) {
+            tapeChar = tape.charAt(headPosition);
+        }
+        if (inputRule.length == 1) {
+            if (inputRule == '~') {
+                return true;
+            }
+            let inputRuleSub = this.replaceVariablesIn(inputRule, mapping);
+            return inputRuleSub == tapeChar;
+        } else if (inputRule.length == 2) {
+            if (inputRule.charAt(0) != '!')
+                return false;
+            let inputRuleSub = this.replaceVariablesIn(inputRule, mapping);
+            return inputRuleSub.charAt(1) != tapeChar;
+        } else {
+            let pos = inputRule.indexOf('{');
+            if (pos < 0)
+                return false;
+            return inputRule.substring(0, pos).indexOf(tapeChar) >= 0;
+        }
+    }
+
 
     stopped(current: Snapshot): boolean {
-        return current.selectedStates.size == 0 ||
-            current.input == null ||
-            current.numCharsProcessed >= current.input.length;
+        if (current.selectedStates.size == 0) {
+            return true;
+        } else {
+            let inFinalState = false;
+            current.selectedStates.forEach(function (value, currentState) {
+                inFinalState = currentState.final;
+            });
+            return inFinalState;
+        }
     }
 
     accepted(current: Snapshot): boolean {
-        if (current.numCharsProcessed >= (current.input as string).length) {
+        if (current.selectedStates.size > 0) {
             let inFinalState = false;
             current.selectedStates.forEach(function (value, currentState) {
-                inFinalState = inFinalState || currentState.final;
+                inFinalState = currentState.final;
             });
             return inFinalState;
         } else {
             return false;
+        }            
+    }
+
+
+    inputPortrayal(snapshot: Snapshot): string {
+        if (snapshot.input != null) {
+            let tapes = snapshot.input;
+            let result = '';
+
+            for (let i = 0; i < tapes.length; ++i) {
+                let tape = tapes[i];
+                let leftPart = tape.substring(0, snapshot.numCharsProcessed[i]);
+                while (leftPart.length > 0 && leftPart.charAt(0) == '@') {
+                    leftPart = leftPart.substring(1);
+                }
+                if (leftPart.length == 0) {
+                    leftPart = '@';
+                }
+                let rightPart = tape.substring(snapshot.numCharsProcessed[i]);
+                while (rightPart.length > 0 && rightPart.charAt(rightPart.length-1) == '@') {
+                    rightPart = rightPart.substring(0, rightPart.length-1);
+                }
+                if (rightPart.length == 0) {
+                    rightPart = '@@';
+                } else if (rightPart.length == 1) {
+                    rightPart = rightPart + '@';
+                }
+                let symbolAtHead = rightPart.charAt(0);
+                rightPart = rightPart.substring(1);
+                if (result != '') {
+                    result += "\n";
+                }
+                result += leftPart + '[' + symbolAtHead + ']' + rightPart;
+            }
+            return result;
+        } else {
+            return '';
         }
     }
+
 
 
 }

@@ -339,11 +339,11 @@ export
 
 
     step(au: Automaton, current: Snapshot): Snapshot {
-        let next = new Snapshot(current.input as string);
+        let next = new Snapshot(current.input[0]);
         next.variables = current.variables;
-        next.numCharsProcessed = current.numCharsProcessed + 1;
-        let processed = (current.input as string).substring(0, next.numCharsProcessed);
-        let trigger = current.input?.substring(current.numCharsProcessed, current.numCharsProcessed + 1) as string;
+        next.numCharsProcessed[0] = current.numCharsProcessed[0] + 1;
+        let processed = (current.input[0]).substring(0, next.numCharsProcessed[0]);
+        let trigger = current.input[0].substring(current.numCharsProcessed[0], current.numCharsProcessed[0] + 1);
         for (let arrow of au.transitions) {
             if (current.isSelected(arrow.from)) {
                 let stacks = current.getDescription(arrow.from);
@@ -375,11 +375,11 @@ export
     stopped(current: Snapshot): boolean {
         return current.selectedStates.size == 0 ||
             current.input == null ||
-            current.numCharsProcessed >= current.input.length;
+            current.numCharsProcessed[0] >= current.input[0].length;
     }
 
     accepted(current: Snapshot): boolean {
-        if (current.numCharsProcessed >= (current.input as string).length) {
+        if (current.numCharsProcessed[0] >= current.input[0].length) {
             let inFinalState = false;
             current.selectedStates.forEach(function (value, currentState) {
                 inFinalState = inFinalState || currentState.final;
@@ -387,6 +387,16 @@ export
             return inFinalState;
         } else {
             return false;
+        }
+    }
+
+    inputPortrayal(snapshot: Snapshot): string {
+        if (snapshot.input != null) {
+            let leftPart = snapshot.input[0].substring(0, snapshot.numCharsProcessed[0]);
+            let rightPart = snapshot.input[0].substring(snapshot.numCharsProcessed[0]);
+            return leftPart + '|' + rightPart;
+        } else {
+            return '';
         }
     }
 

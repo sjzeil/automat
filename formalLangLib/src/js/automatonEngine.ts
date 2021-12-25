@@ -44,6 +44,8 @@ abstract class AutomatonEngine {
     abstract stopped(current: Snapshot): boolean;
 
     abstract accepted(current: Snapshot): boolean;
+
+    abstract inputPortrayal(current: Snapshot): string;
 }
 
 

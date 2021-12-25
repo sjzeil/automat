@@ -12,26 +12,31 @@ import { AutomatonState } from './states';
 export
 class Snapshot {
     constructor(input: string) {
-        this.input = input;
-        this.numCharsProcessed = 0;
+        this.input = [input];
+        this.numCharsProcessed = [0];
         this.selectedStates = new Map();
         this.variables = {};
+        this.stepCounter = 0;
     }
 
-    input: string | null; // Input to the automaton (null for TMs)
-    numCharsProcessed: number; // Portion of input that has been processed already
+
+    input: string[]; // Input to the automaton (tape for TMs)
+    numCharsProcessed: number[]; // Portion of input that has been processed already
     selectedStates: Map<AutomatonState, string>;
     variables: any; // map from alphanumeric characters to alphanumeric characters
+    stepCounter: number;
 
 
-    inputPortrayal(): string {
-        if (this.input != null) {
-            let leftPart = this.input.substr(0, this.numCharsProcessed);
-            let rightPart = this.input.substr(this.numCharsProcessed);
-            return leftPart + '|' + rightPart;
-        } else {
-            return '';
+    setNumTapes(n: number)
+    {
+        while (this.input.length < n) {
+            this.input.push('');
+            this.numCharsProcessed.push(0);
         }
+    }
+
+    getNumTapes() {
+        return this.input.length;
     }
 
     isSelected(state: AutomatonState): boolean {
@@ -47,6 +52,18 @@ class Snapshot {
         }
     }
 
+    clone(): Snapshot {
+        let result = new Snapshot(this.input[0]);
+        let numTapes = this.getNumTapes();
+        result.setNumTapes(numTapes);
+        result.variables = this.variables;
+        for (let i = 0; i < numTapes; ++i) {
+            result.input[i] = this.input[i];
+            result.numCharsProcessed[i] = this.numCharsProcessed[i];
+        }
+        result.stepCounter = this.stepCounter;
+        return result;
+    }
 
 }
 
