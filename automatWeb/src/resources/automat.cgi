@@ -30,7 +30,7 @@ my $username = $ENV{"REMOTE_USER"};
 if (!defined($username)) {
 	$username="Anonymous";
 }
-my $debugging = 1;
+my $debugging = 0;
 my $testName = $query->param("test");
 if (defined($testName)) {
 	$username = "**$testName";
@@ -64,15 +64,16 @@ if ($page_url eq "https://") {
 my %properties;
 
 print $query->header();
-foreach my $param ($query->param()) {
-	my $value = $query->param($param);
-    printf("<div>%s = %s</div>\n",
-         escapeHTML($param),
-         escapeHTML($value)
-      );
-}
-my $authenticationMsg = "";
+#foreach my $param ($query->param()) {
+#	my $value = $query->param($param);
+#    printf("<div>%s = %s</div>\n",
+#         escapeHTML($param),
+#         escapeHTML($value)
+#      );
+#}
 
+my $authenticationMsg = "";
+my $warningMessage = "";
 
 loadProperties();
 loadLanguageMetadata();
@@ -97,37 +98,39 @@ $properties{"graderNotes"} = $graderNotes;
 identifyInstructors();
 
 my $htmlText = "";
+if ($authenticationMsg ne '' && $properties{'user'} eq 'Instructor') {
+	$warningMessage = $authenticationMsg;
+	$authenticationMsg = '';
+}
 if ($authenticationMsg eq "") {
 	$authenticationMsg = OKToLoad();
 }
 
-print 'user=' . $properties{'user'} . '<br/>';
 
 if (($query->param('problemEdited') eq '1' ) && ($properties{'user'} eq 'Instructor')) {
-	print '<html><body>\n';
-	print $properties{'user'};
+	print "<html><body>\n";
 	my @iniFiles = glob($properties{"base"} . "/$problem/*.ini");
 	if (!-d $properties{"base"}. "/$problem") {
 		print "Creating problem directory.<br/>";
 		mkdir $properties{"base"}. "/$problem";
 		system("chgrp $preferredGroup " . $properties{"base"}. "/$problem");
-		system("chmod $preferredDirPermissions" . $properties{"base"}. "/$problem");
+		system("chmod $preferredDirPermissions " . $properties{"base"}. "/$problem");
 	}
 	my $iniFile = $properties{"base"}. "/$problem/$problem.ini";
 	open INI, ">$iniFile" || die "cannot write to $iniFile";
     print "Writing $iniFile.\n<br/>";
 	print INI "title=" . $query->param('problemTitle') . "\n";
 	print INI "solution=" . $query->param('problemSolution') . "\n";
-	if ($query->param('problemLock') ne '') {
-	    print INI "lock=" . $query->param('problemLock') . "\n";
-	} elsif ($query->param('problemSelfAssess')) {
+	if ($query->param('problemSelfAssess')) {
 	    print INI "lock=0\n";
+	} elsif ($query->param('problemLock') ne '') {
+	    print INI "lock=" . $query->param('problemLock') . "\n";
 	}
 	close INI;
 	system("chgrp $preferredGroup $iniFile");
 	system("chmod $preferredFilePermissions $iniFile");
-	print '<p><a href="' .$query->param('problemURL') . '">back</a></p>';
-	print '</body></html>\n';
+	print '<p><a href="' . $query->param('problemURL') . '">OK</a></p>';
+	print "</body></html>\n";
 
 } elsif (($query->param('dataRequested') eq '1' ) && ($properties{'user'} eq 'Instructor')) {
 		my $solution = $properties{"solution"};
@@ -155,29 +158,23 @@ if (($query->param('problemEdited') eq '1' ) && ($properties{'user'} eq 'Instruc
 		}
 		my $reportOut = `$graderCommand`;
 
-	print '<html><body>\n';
+	print "<html><body>\n";
 	my $problemDir = $properties{"base"} . "/$problem/";
 	if (-r "$problemDir/accept.dat") {
 	    system("chgrp $preferredGroup $problemDir/accept.dat");
 	    system("chmod $preferredFilePermissions $problemDir/accept.dat");
-		my $count  = `wc -l < $problemDir/accept.dat`;
-		print "<div>$count entries in accept.dat</div>\n";
 	}
 	if (-r "$problemDir/reject.dat") {
 	    system("chgrp $preferredGroup $problemDir/reject.dat");
 	    system("chmod $preferredFilePermissions $problemDir/reject.dat");
-		my $count  = `wc -l < $problemDir/reject.dat`;
-		print "<div>$count entries in reject.dat</div>\n";
 	}
 	if (-r "$problemDir/expected.dat") {
 	    system("chgrp $preferredGroup $problemDir/expected.dat");
 	    system("chmod $preferredFilePermissions $problemDir/expected.dat");
-		my $count  = `wc -l < $problemDir/expected.dat`;
-		print "<div>$count entries in expected.dat</div>\n";
 	}
-	print '<p><a href="' .$query->param('problemURL') . '">back</a></p>';
-	print '\n<pre>' . $reportOut . '</pre>';
-	print '</body></html>\n';
+	print $reportOut;
+	print '<p><a href="' .$query->param('problemURL') . '">OK</a></p>';
+	print "</body></html>\n";
 
 } elsif ($authenticationMsg eq "") {  # authentication succeeded
 
@@ -221,10 +218,10 @@ if (($query->param('problemEdited') eq '1' ) && ($properties{'user'} eq 'Instruc
 			$problemEdit .= "<label for='problemTitle'>Title:</label>\n" .
 			    "<input type='text' id='problemTitle' name='problemTitle' value='" 
 					. $properties{"title"} . "'/><br/>\n";
+			$problemEdit .= "<input type='button' value='Use Submission as Solution' onclick='useAsSolution()'/>\n";
 			$problemEdit .= "<label for='problemSolution'>Solution:</label>\n" .
 			    "<input type='text' id='problemSolution' name='problemSolution' size='40' value='" 
-					. $properties{"solution"} . "'/> ";
-			$problemEdit .= "<input type='button' value='Use Submission as Solution' onclick='useAsSolution()'/><br/>\n";
+					. $properties{"solution"} . "'/><br/> ";
 			$problemEdit .= "<input type='hidden' id='problemLock' name='problemLock' value='" 
 					. $properties{"lock"} . "'/>\n";
 			$problemEdit .= "<input type='hidden' id='problemEdited' name='problemEdited' value='0'/> \n";
@@ -264,9 +261,9 @@ if (($query->param('problemEdited') eq '1' ) && ($properties{'user'} eq 'Instruc
 				$problemEdit .= "<input type='hidden' id='test2' name='test' value='" . $query->param('test') . "'/>\n";
 			}
 			$problemEdit .= "<label for='genAccept'>Generate accept.dat?</label>\n" .
-			    "<input type='checkBox' id='genAccept' name='genAccept'/>\n";
+			    "<input type='checkBox' id='genAccept' name='genAccept'/><br/>\n";
 			$problemEdit .= "<label for='genReject'>Generate reject.dat?</label>\n" .
-			    "<input type='checkBox' id='genReject' name='genReject'/>\n";
+			    "<input type='checkBox' id='genReject' name='genReject'/><br/>\n";
 			$problemEdit .= "<label for='genExpect'>Generate expected.dat? (TMs only)</label>\n" .
 			    "<input type='checkBox' id='genExpect' name='genExpect'/>\n";
 			$problemEdit .= "<script>\n" .

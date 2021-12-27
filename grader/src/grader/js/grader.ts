@@ -179,7 +179,7 @@ let accept = [] as string[];
 try {
     accept = readStrings(`${baseDir}/${problem}/accept.dat`);
 } catch(err){
-    error(`Could not read accepted strings from ${baseDir}/${problem}/accept.dat<br/>\n{$err}`);
+    error(`Could not read accepted strings from ${baseDir}/${problem}/accept.dat<br/>\n${err}`);
 }
 dbg("read " + accept.length + " accept strings");
 
@@ -189,7 +189,7 @@ let reject = [] as string[];
 try {
     reject = readStrings(`${baseDir}/${problem}/reject.dat`);
 } catch(err){
-    error(`Could not read reject strings from ${baseDir}/${problem}/reject.dat<br/>\n{$err}`);
+    error(`Could not read reject strings from ${baseDir}/${problem}/reject.dat<br/>\n${err}`);
 }
 dbg("read " + reject.length + " reject strings");
 
@@ -198,7 +198,7 @@ if (language.producesOutput()) {
     try {
         expected = readStrings(`${baseDir}/${problem}/expected.dat`);
     } catch(err){
-        error(`Could not read expected strings from ${baseDir}/${problem}/expected.dat<br/>\n{$err}`);
+        error(`Could not read expected strings from ${baseDir}/${problem}/expected.dat<br/>\n${err}`);
     }
     dbg("read " + expected.length + " expected strings");
     if (expected.length != accept.length) {
@@ -235,7 +235,7 @@ if (reject.length > 0) {
 }
 
 if (acceptResults.rejected.length > 0) {
-    console.log(div('results', 'Some examples of strings that your language should have accepted but rejected instead are:'
+    console.log(div('results', 'Some examples of strings that your language rejected but should have accepted:'
        + printExamples(acceptResults.rejected)));
 }
 if (acceptResults.acceptedFailed.length > 0) {
@@ -243,7 +243,7 @@ if (acceptResults.acceptedFailed.length > 0) {
        + printOutputExamples(acceptResults)));
 }
 if (rejectResults.acceptedPassed.length > 0) {
-    console.log(div('results', 'Some examples of strings that your language should have rejected but accecpted instead are:'
+    console.log(div('results', 'Some examples of strings that your language accepted but should have rejected:'
        + printExamples(rejectResults.acceptedPassed)));
 }
 
