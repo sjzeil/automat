@@ -2,7 +2,8 @@
   "name": "automatGrader",
   "exports": {
     "./src/grader/js/metadata.ts": "build/dist/metadata.bundle.js",
-    "./src/grader/js/grader.ts": "build/dist/grader.bundle.js"
+    "./src/grader/js/grader.ts": "build/dist/grader.bundle.js",
+    "./src/grader/js/generator.ts": "build/dist/generator.bundle.js"
   },
   "version": "1.0.0",
   "description": "A formal language editor",
@@ -12,7 +13,7 @@
   "license": "ISC",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node build/dist/generator.bundle.js --alphabet='01' --stringlen=3 --user=Instructor --base=./build/test --problem=problem --genAccept --genReject --solution='https://www.cs.odu.edu/~zeil/automatTest/automat.cgi?test=instr1&problem=testProblem&lang=eyJzcGVjaWZpY2F0aW9uIjoiYXV0b21hdG9uRkEiLCJjcmVhdGVkQnkiOiJJbnN0cnVjdG9yIiwicHJvYmxlbUlEIjoidGVzdFDGECIsInVubG9jayI6IiIsInN0YXRlcyI6W3sibGFiZWwiOiIwIiwiaW5pdGlhbCI6dHJ1ZSwiZmluxA1mYWxzZSwieCI6MTk2LCJ5IjoxNDJ9LMo7Mcw7xy7HPMZJeCI6MzM5xjs5MX1dLCJ0cmFuc2nkANvmAIZmcm9t5wCFdG%2FHCchfMCLEbdAixHXIIjEifV19'",
     "watch": "webpack --watch",
     "start": "webpack serve --open --config webpack.dev.js",
     "server": "node server.js",

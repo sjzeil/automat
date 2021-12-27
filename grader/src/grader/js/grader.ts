@@ -175,7 +175,7 @@ if (language.canBeCheckedForEquivalence()) {
 
 dbg("baseDir is " + baseDir);
 // Try to read the list of strings that should be accepted.
-let accept = [] as String[];
+let accept = [] as string[];
 try {
     accept = readStrings(`${baseDir}/${problem}/accept.dat`);
 } catch(err){

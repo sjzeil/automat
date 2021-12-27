@@ -78,6 +78,8 @@ task deployTest (dependsOn: 'zipTest') {
       session(remotes.webServer) {
        put from: "$buildDir/distributions/automatTest.zip", into: '/home/zeil/secure_html/automatTest/'
        execute 'unzip -u -o /home/zeil/secure_html/automatTest/automatTest.zip -d /home/zeil/secure_html/automatTest'
+       execute 'find /home/zeil/secure_html/automatTest/ -type d | xargs chmod 770'
+       execute 'find /home/zeil/secure_html/automatTest/ -type f | xargs chmod 660'
        execute 'chmod +x /home/zeil/secure_html/automatTest/*.cgi'
       }
     }

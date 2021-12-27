@@ -6,6 +6,7 @@ module.exports = {
     target: 'node',
     entry: {
         grader: './src/grader/js/grader.ts',
+        generator: './src/grader/js/generator.ts',
         metadata: './src/grader/js/metadata.ts',
     },
     output: {

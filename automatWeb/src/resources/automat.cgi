@@ -113,7 +113,7 @@ if (($query->param('problemEdited') eq '1' ) && ($properties{'user'} eq 'Instruc
 		system("chgrp $preferredGroup " . $properties{"base"}. "/$problem");
 		system("chmod $preferredDirPermissions" . $properties{"base"}. "/$problem");
 	}
-	my $iniFile = $properties{"base"}. "/$problem/automat.ini";
+	my $iniFile = $properties{"base"}. "/$problem/$problem.ini";
 	open INI, ">$iniFile" || die "cannot write to $iniFile";
     print "Writing $iniFile.\n<br/>";
 	print INI "title=" . $query->param('problemTitle') . "\n";
@@ -127,6 +127,56 @@ if (($query->param('problemEdited') eq '1' ) && ($properties{'user'} eq 'Instruc
 	system("chgrp $preferredGroup $iniFile");
 	system("chmod $preferredFilePermissions $iniFile");
 	print '<p><a href="' .$query->param('problemURL') . '">back</a></p>';
+	print '</body></html>\n';
+
+} elsif (($query->param('dataRequested') eq '1' ) && ($properties{'user'} eq 'Instructor')) {
+		my $solution = $properties{"solution"};
+		my $ukey = userUnlockKey();
+		my $graderCommand = "$nodePath generator.bundle.js --user=$username --solution='$solution'"
+			.  " --problem=" . $properties{"problem"} 
+			. " --base='" . $properties{"base"} . "'"
+			. " --alphabet='" . $query->param('alphabet') . "'"
+			. " --stringlen='" . $query->param('maxLen') . "'"
+			;
+		if ($query->param('genAccept')) {
+			$graderCommand .= ' --genAccept=1';
+		} else {
+			$graderCommand .= ' --genAccept=0';
+		}
+		if ($query->param('genReject')) {
+			$graderCommand .= ' --genReject=1';
+		} else {
+			$graderCommand .= ' --genReject=0';
+		}
+		if ($query->param('genExpect')) {
+			$graderCommand .= ' --genExpect=1';
+		} else {
+			$graderCommand .= ' --genExpect=0';
+		}
+		my $reportOut = `$graderCommand`;
+
+	print '<html><body>\n';
+	my $problemDir = $properties{"base"} . "/$problem/";
+	if (-r "$problemDir/accept.dat") {
+	    system("chgrp $preferredGroup $problemDir/accept.dat");
+	    system("chmod $preferredFilePermissions $problemDir/accept.dat");
+		my $count  = `wc -l < $problemDir/accept.dat`;
+		print "<div>$count entries in accept.dat</div>\n";
+	}
+	if (-r "$problemDir/reject.dat") {
+	    system("chgrp $preferredGroup $problemDir/reject.dat");
+	    system("chmod $preferredFilePermissions $problemDir/reject.dat");
+		my $count  = `wc -l < $problemDir/reject.dat`;
+		print "<div>$count entries in reject.dat</div>\n";
+	}
+	if (-r "$problemDir/expected.dat") {
+	    system("chgrp $preferredGroup $problemDir/expected.dat");
+	    system("chmod $preferredFilePermissions $problemDir/expected.dat");
+		my $count  = `wc -l < $problemDir/expected.dat`;
+		print "<div>$count entries in expected.dat</div>\n";
+	}
+	print '<p><a href="' .$query->param('problemURL') . '">back</a></p>';
+	print '\n<pre>' . $reportOut . '</pre>';
 	print '</body></html>\n';
 
 } elsif ($authenticationMsg eq "") {  # authentication succeeded
@@ -208,22 +258,25 @@ if (($query->param('problemEdited') eq '1' ) && ($properties{'user'} eq 'Instruc
 			$problemEdit .= "<label for='maxLen'>Maximum string length:</label>\n" .
 			    "<input type='text' id='maxLen' name='maxLen' size='3' value='4' /><br/>\n";
 			$problemEdit .= "<input type='hidden' id='dataRequested' name='dataRequested' value='0'/> \n";
-			$problemEdit .= "<input type='hidden' id='problemURL' name='problemURL' value='{location.href}'/>\n";
-			$problemEdit .= "<input type='hidden' id='problem' name='problem' value='" . $problem . "'/>\n";
+			$problemEdit .= "<input type='hidden' id='problemURL2' name='problemURL' value='{location.href}'/>\n";
+			$problemEdit .= "<input type='hidden' id='problem2' name='problem' value='" . $problem . "'/>\n";
 			if ($query->param('test')) {
-				$problemEdit .= "<input type='hidden' id='test' name='test' value='" . $query->param('test') . "'/>\n";
+				$problemEdit .= "<input type='hidden' id='test2' name='test' value='" . $query->param('test') . "'/>\n";
 			}
 			$problemEdit .= "<label for='genAccept'>Generate accept.dat?</label>\n" .
 			    "<input type='checkBox' id='genAccept' name='genAccept'/>\n";
 			$problemEdit .= "<label for='genReject'>Generate reject.dat?</label>\n" .
 			    "<input type='checkBox' id='genReject' name='genReject'/>\n";
-			$problemEdit .= "<label for='genFunct'>Generate function.dat? (TMs only)</label>\n" .
-			    "<input type='checkBox' id='genFunct' name='genFunct'/>\n";
+			$problemEdit .= "<label for='genExpect'>Generate expected.dat? (TMs only)</label>\n" .
+			    "<input type='checkBox' id='genExpect' name='genExpect'/>\n";
 			$problemEdit .= "<script>\n" .
 				"function generateData() {let edited = document.getElementById('dataRequested'); dataRequested.value = '1';\n" .
+				"let problemURL = document.getElementById('problemURL2');\n" .
+				"problemURL.value = location.href;\n" .
+				
 				"let form = document.getElementById('generateForm');\nform.submit();}" .
 				"</script>\n";
-			$problemEdit .= "<input type='button' value='Generate' onclick='generateData()'/><br/>\n";
+			$problemEdit .= "<br/><input type='button' value='Generate' onclick='generateData()'/><br/>\n";
 			$problemEdit .= "</div>\n";
 			$problemEdit .= "</form>\n";
 
