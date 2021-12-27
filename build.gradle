@@ -76,8 +76,8 @@ task deployTest (dependsOn: 'zipTest') {
   doLast {
     ssh.run {
       session(remotes.webServer) {
-       put from: "$buildDir/distributions/automat.zip", into: '/home/zeil/secure_html/automatTest/'
-       execute 'unzip -u -o /home/zeil/secure_html/automatTest/automatTest.zip'
+       put from: "$buildDir/distributions/automatTest.zip", into: '/home/zeil/secure_html/automatTest/'
+       execute 'unzip -u -o /home/zeil/secure_html/automatTest/automatTest.zip -d /home/zeil/secure_html/automatTest'
        execute 'chmod +x /home/zeil/secure_html/automatTest/*.cgi'
       }
     }

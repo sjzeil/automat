@@ -40,5 +40,8 @@
         </details>
       </div>
     </div>
+    <div>
+      @graderForm@
+    </div>
   </body>
 </html>
