@@ -25,6 +25,7 @@ a:visited {
 }
 
 ul { overflow: hidden; }
+ol { overflow: hidden; }
 
 div.leftPart {
   position: relative;
