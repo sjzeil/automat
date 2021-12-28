@@ -213,7 +213,7 @@ export
         a.clearDecorations();
         let testResult = (<span></span>);
         if (this.state.snapshot != null) {
-            processedInput = this.state.snapshot.inputPortrayal();
+            processedInput = automaton.engine.inputPortrayal(this.state.snapshot);
             a.decorateStates(this.state.snapshot);
             if (automaton.engine.stopped(this.state.snapshot)) {
                 if (automaton.engine.accepted(this.state.snapshot)) {
