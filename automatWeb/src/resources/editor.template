@@ -5,21 +5,24 @@
   <body>
     <h1>@title@</h1>
     <h2>@problem@: <span id='creatorName'>@createdBy@</span></h2>
-    
-    <div>
-      <div id="editorContainer" class="editorCanvas">
-        <canvas id="editorView" height=600 width=600> </canvas>
-        <div>(Hold Alt key to drag diagram horizontally or vertically. Use mouse wheel to zoom.)</div>
+    <div class="mainBody">
+      <div class="leftColumn">
+        <div id="editorContainer" class="editorCanvas">
+          <canvas id="editorView" height=600 width=600> </canvas>
+          <div>(Hold Alt key to drag diagram horizontally or vertically. Use mouse wheel to zoom.)</div>
+        </div>
       </div>
-    </div>
 
-    <script>
+      <script>
         document.languageURL = document.URL;
         document.problem = "@problem@";
         document.username = "@user@";
         document.lock = "@lock@";
-    </script>
-    <div id="react-entry-point"></div>
-    <script src="./editor.bundle.js"> </script>
+      </script>
+      <div class='rightColumn'>
+        <div id="react-entry-point"></div>
+      </div>
+      <script src="./editor.bundle.js"> </script>
+    </div>
   </body>
 </html>

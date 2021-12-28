@@ -26,6 +26,17 @@ ol { overflow: hidden; }
     background-color: #FFFFFF;
 }
 
+
+div.leftColumn {
+    display: inline-block;
+    vertical-align: top;
+}
+div.rightColumn {
+    display: inline-block;
+    max-width: calc(100% - 610px);
+    vertical-align: top;
+}
+
 div.testing {
     border: 1px solid black;
     background-color: #E8E8E8;
