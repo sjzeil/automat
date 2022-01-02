@@ -1,7 +1,7 @@
 title=Students' Reference Manual
 type=contents
 directory=student
-next=editingFAs
+next=creatingAnFA
 status=published
 ~~~~~~
 # Description

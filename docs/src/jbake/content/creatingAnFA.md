@@ -1,9 +1,9 @@
-title=Editing FAs
+title=Creating a new FA
 type=page
 manual=student
-sequence=3
-next=testingAnFA
-prev=savingYourWork
+sequence=1
+next=savingYourWork
+prev=studentsManual
 status=published
 ~~~~~~
 ## Creating a new FA
@@ -65,6 +65,7 @@ The editor supports three special rules for transitions in finite automata:
 1. The @ symbol can be typed to indicate <span>&epsilon;</span>, the empty string.
 2. The ~ character can be used to indicate that any single alphanumeric character will be matched.
 3. The ! character can be placed in front of an alphanumeric character to indicate that the transition will occur on any character _except_ that one. For example, `!0` would match any alphanumeric character except `0`.
+
 
 
 

@@ -6,19 +6,19 @@
 	<div class="center">
 	    <#include "menu.ftl">
 		<div class="rightPart">
-			<p>${content.body}</p>
+			<div>${content.body}</div>
+	        <ul>
+                <#list published_content?filter(x -> x.manual??)?sort_by("sequence") as article>
+                    <#if article.manual?? && article.manual=content.directory>
+
+                       <li>
+                           <a href="${content.rootpath}${article.uri}">${article.title}</a>
+                       </li>
+			        </#if>
+                </#list>
+            </ul>
 		</div>
 	</div>
-	<ul>
-        <#list published_content?filter(x -> x.manual??)?sort_by("sequence") as article>
-            <#if article.manual?? && article.manual=content.directory>
-
-               <li>
-                   <a href="${content.rootpath}${article.uri}">${article.title}</a>
-               </li>
-			</#if>
-        </#list>
-    </ul>
 
 
 <#include "footer.ftl">
