@@ -24,7 +24,15 @@ my @actions=("editor", "grading", "summary");
 
 my $query = new CGI;
 
-my $page_url = "https://" . $ENV{SERVER_NAME} . $ENV{REQUEST_URI};
+my $serverName = $ENV{SERVER_NAME};
+if (!defined($serverName)) {
+	$serverName = "127.0.0.1";
+}
+my $requestURI = $ENV{REQUEST_URI};
+if (!defined($requestURI)) {
+	$requestURI = '.';
+}
+my $page_url = "https://" . $serverName . $requestURI;
 
 my $username = $ENV{"REMOTE_USER"};
 if (!defined($username)) {
@@ -90,7 +98,7 @@ $properties{"instructorSummaryURL"} = $instructorSummaryURL;
 
 my $graderNotes = '';
 my $notesFile = $properties{"base"} . "/" . $properties{"problem"} . "/notes.md";
-if ($action == "grading" && -r $notesFile) {
+if ($action eq "grading" && -r $notesFile) {
 	$graderNotes = `$pandoc --ascii --mathjax < $notesFile`;
 }
 $properties{"graderNotes"} = $graderNotes;
@@ -107,7 +115,7 @@ if ($authenticationMsg eq "") {
 }
 
 
-if (($query->param('problemEdited') eq '1' ) && ($properties{'user'} eq 'Instructor')) {
+if (($query->param('problemEdited')) && ($query->param('problemEdited') eq '1' ) && ($properties{'user'} eq 'Instructor')) {
 	print "<html><body>\n";
 	my @iniFiles = glob($properties{"base"} . "/$problem/*.ini");
 	if (!-d $properties{"base"}. "/$problem") {
@@ -132,7 +140,7 @@ if (($query->param('problemEdited') eq '1' ) && ($properties{'user'} eq 'Instruc
 	print '<p><a href="' . $query->param('problemURL') . '">OK</a></p>';
 	print "</body></html>\n";
 
-} elsif (($query->param('dataRequested') eq '1' ) && ($properties{'user'} eq 'Instructor')) {
+} elsif (($query->param('dataRequested')) && ($query->param('dataRequested') eq '1' ) && ($properties{'user'} eq 'Instructor')) {
 		my $solution = $properties{"solution"};
 		my $ukey = userUnlockKey();
 		my $graderCommand = "$nodePath generator.bundle.js --user=$username --solution='$solution'"
@@ -177,9 +185,7 @@ if (($query->param('problemEdited') eq '1' ) && ($properties{'user'} eq 'Instruc
 	print "</body></html>\n";
 
 } elsif ($authenticationMsg eq "") {  # authentication succeeded
-
 	$htmlText = readFileIntoString($action . ".template");
-
 
 	if ($action eq "grading") {
 		# Run the grade report
@@ -390,6 +396,7 @@ sub loadProperties
 	defined($properties{"title"}) || ($properties{"title"} = "Formal Language Editor");
 	defined($properties{"solution"}) || ($properties{"solution"} = "");
 	defined($properties{"instructors"}) || ($properties{"instructors"} = '');
+	defined($properties{"unlock"}) || ($properties{"unlock"} = 'x');
 	$properties{"user"} = $username;
 	$properties{"problem"} = $problem;
 	if (!defined($properties{"lock"})) {
