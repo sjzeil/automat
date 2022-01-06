@@ -10,5 +10,5 @@ Automat requires no access to local storage, but will allow saving and transmiss
 
 # Documentation
 
-* [Students' Reference Manual](./studentsManual.html)
-* [Instructors' Reference Manual](./instructorsManual.html)
+* [For Students](./studentsManual.html)
+* [For Instructors](./instructorsManual.html)

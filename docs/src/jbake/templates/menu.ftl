@@ -7,7 +7,7 @@
   <hr/>
   </div>
   <div class="menuBlock">
-    <span class="menuBlockHeader"><a href='studentsManual.html'>Students' Reference Manual</a></span>
+    <span class="menuBlockHeader"><a href='studentsManual.html'>For Students</a></span>
     <#if (content.directory?? && content.directory=='student') || (content.manual?? && content.manual == 'student')>
       <ul>
         <#list published_content?filter(x -> x.manual??)?sort_by("sequence") as article>
@@ -25,7 +25,7 @@
   <hr/>
   </div>
   <div class="menuBlock">
-    <span class="menuBlockHeader"><a href='instructorsManual.html'>Instructors' Reference Manual</a></span>
+    <span class="menuBlockHeader"><a href='instructorsManual.html'>For Instructors</a></span>
     <#if (content.directory?? && content.directory=='instructor') || (content.manual?? && content.manual == 'instructor')>
       <ul>
         <#list published_content?filter(x -> x.manual??)?sort_by("sequence") as article>
