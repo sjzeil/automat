@@ -2,8 +2,8 @@ title=Saving Your Work
 type=page
 manual=student
 sequence=2
-next=creatingAnFA
-prev=editingFAs
+prev=creatingAnFA
+next=testingFAs
 status=published
 ~~~~~~
 

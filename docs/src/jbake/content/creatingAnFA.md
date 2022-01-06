@@ -1,4 +1,4 @@
-title=Creating a new FA
+title=Creating and Editing an FA
 type=page
 manual=student
 sequence=1
@@ -18,7 +18,7 @@ You will see a split screen with a drawing area on the left and an editing area 
 
 You can now build your new automaton by adding states and then adding transitions between them.
 
-### Creating States
+## Creating States
 
 To create a new automaton state, click the `+State` button and then click in the drawing area to indicate where you would like the state to be placed. 
 
@@ -33,10 +33,26 @@ Once you have placed your state, you can use the controls in the editing area to
 * Mark the state as a final (a.k.a. accepting) state.
 * Delete the state.
 
-You can also click on the state in the drawing area and drag it to a new position.
+
+### Editing States
+
+Click on any state in the drawing area to edit that state.
+
+You can move a state in the drawing area by clicking on it and dragging it to a new position.
+
+If the drawing area is getting too crowded:
+
+* While holding down the Alt key, click and drag anywhere in the drawing area to shift the drawing area sideways or up-and-down.
+* Use the mouse wheel while the mouse is positioned in the drawing area to zoom in and out.
 
 
-### Creating Transitions
+
+
+
+
+
+
+## Creating Transitions
 
 To create a new transition, click the `+Transition` button.
 
@@ -57,6 +73,10 @@ In the editing area to the right, you can see the same stack of characters. The 
 * Replace a new transition rule by selecting it in the stack, typing a character in the `Transition:` box and clicking `Replace`.
 * Remove an existing transition rule by selecting it in the stack and clicking `Remove`.
 * Move the selected character up and down in the stack. This is for esthetic purposes only -- it has no effect on the behavior of the automaton.
+
+### Editing an Existing Transition
+
+To select an existing transition for editing, click on the _text stack_ attached to the arrow.
 
 ### Special Rules in Transitions
 
