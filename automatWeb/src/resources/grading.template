@@ -21,12 +21,12 @@
         <h2>Instructor's Solution</h2>
         <details>
           <summary>Click to reveal</summary>
+            <div class="graderNotes">@graderNotes@</div>
             <div>
               <div id="editorContainer" class="summaryCanvas">
                 <canvas id="editorView" height=600 width=600> </canvas>
               <div>(Hold Alt key to drag diagram horizontally or vertically.)</div>
             </div>
-            <div class="graderNotes">@graderNotes@</div>
 
             <script>
               document.languageURL = "@solution@";
