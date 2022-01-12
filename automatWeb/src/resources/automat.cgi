@@ -99,7 +99,10 @@ $properties{"instructorSummaryURL"} = $instructorSummaryURL;
 my $graderNotes = '';
 my $notesFile = $properties{"base"} . "/" . $properties{"problem"} . "/notes.md";
 if ($action eq "grading" && -r $notesFile) {
-	$graderNotes = `$pandoc --ascii --mathjax < $notesFile`;
+	my $currentDir = `pwd`;
+	chdir $properties{"base"} . "/" . $properties{"problem"};
+	$graderNotes = `$pandoc --ascii --mathjax < notes.md`;
+	chdir $currentDir;
 }
 $properties{"graderNotes"} = $graderNotes;
 
