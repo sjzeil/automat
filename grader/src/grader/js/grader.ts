@@ -148,8 +148,11 @@ if (user === "Instructor") {
     urlParams.delete('lang');
     urlParams.append('lang', languageUnlocked);
     let unlockedURL = urlParts[0] + '?' + urlParams.toString();
-    
-    info (`Release this report to students by giving them <a target='blank' href='${unlockedURL}'>this URL</a>.`);
+    if (lock == '0') {
+        info("This problem is unlocked.")
+    } else {
+        info (`Release this report to students by giving them <a target='blank' href='${unlockedURL}'>this URL</a>.`);
+    }
 }
 
 dbg("solution=" + solution);
@@ -162,7 +165,7 @@ if (language.specification !== solutionLanguage.specification) {
     error (`Expected ${solutionLanguage.specification}, but submission is ${language.specification}.`);
     //process.exit(1);
 } else {
-    info (language.specification);
+    //info (language.specification);
 }
 
 if (language.canBeCheckedForEquivalence()) {
