@@ -4,7 +4,7 @@
   </head>
   <body>
     <h1>@title@</h1>
-    <h2>@problem@: <span id='creatorName'>@createdBy@</span></h2>
+    <h2><span id='creatorName'>@createdBy@</span></h2>
     <div class="mainBody">
       <div class="leftColumn">
         <div id="editorContainer" class="editorCanvas">
