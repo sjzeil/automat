@@ -74,16 +74,25 @@ my %properties;
 print $query->header();
 #foreach my $param ($query->param()) {
 #	my $value = $query->param($param);
-#    printf("<div>%s = %s</div>\n",
-#         escapeHTML($param),
-#         escapeHTML($value)
-#      );
+#   printf("<div>%s = %s</div>\n",
+#        escapeHTML($param),
+#        escapeHTML($value)
+#     );
 #}
 
 my $authenticationMsg = "";
 my $warningMessage = "";
 
 loadProperties();
+if ($debugging) {
+	foreach my $prop (keys %properties) {
+		my $value = $properties{$prop};
+    	printf("<div>%s = %s</div>\n",
+         escapeHTML($prop),
+         escapeHTML($value)
+      );
+	}
+}
 loadLanguageMetadata();
 
 # Special properties for grade reports
@@ -346,7 +355,7 @@ sub loadProperties
 		while ($line = <INI>) {
 			chomp $line;
 			$line =~ s/#.*$//; # trim comments
-			if ($line =~ /base *= *(.*)/i) {
+			if ($line =~ /^ *base *= *(.*)/i) {
 				$properties{"base"} = $1;
 			}
 		}
