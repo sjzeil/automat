@@ -190,7 +190,7 @@ if (($query->param('problemEdited')) && ($query->param('problemEdited') eq '1' )
 	    system("chgrp $preferredGroup $problemDir/expected.dat");
 	    system("chmod $preferredFilePermissions $problemDir/expected.dat");
 	}
-	print $reportOut;
+	print "<pre>$graderCommand</pre><br/>Report: " . $reportOut;
 	print '<p><a href="' .$query->param('problemURL') . '">OK</a></p>';
 	print "</body></html>\n";
 
@@ -354,7 +354,7 @@ sub loadProperties
 		my $line;
 		while ($line = <INI>) {
 			chomp $line;
-			$line =~ s/#.*$//; # trim comments
+			#$line =~ s/#.*$//; # trim comments
 			if ($line =~ /^ *base *= *(.*)/i) {
 				$properties{"base"} = $1;
 			}
@@ -371,7 +371,7 @@ sub loadProperties
 			my $line;
 			while ($line = <INI1>) {
 				chomp $line;
-				$line =~ s/#.*$//; # trim comments
+				#$line =~ s/#.*$//; # trim comments
 				if ($line =~ / *([A-Za-z0-9]*) *= *(.*)/i) {
 					$properties{$1} = $2;
 				}
@@ -393,7 +393,7 @@ sub loadProperties
 			my $line;
 			while ($line = <INI2>) {
 				chomp $line;
-				$line =~ s/#.*$//; # trim comments
+				#$line =~ s/#.*$//; # trim comments
 				if ($line =~ / *([A-Za-z0-9]*) *= *(.*)/i) {
 					$properties{$1} = $2;
 				}

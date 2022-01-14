@@ -154,7 +154,9 @@ if (user === "Instructor") {
 
     if (genAccept) {
         try {
-            fs.writeFileSync(`${baseDir}/${problem}/accept.dat`, accept.join('\n') + '\n', 'UTF-8');
+            let path = `${baseDir}/${problem}/accept.dat`;
+            fs.writeFileSync(path, accept.join('\n') + '\n', 'UTF-8');
+            info('Wrote to ' + path);
         } catch (err) {
             error(`Could not write accepted strings to ${baseDir}/${problem}/accept.dat<br/>\n{$err}`)
         }
@@ -162,7 +164,9 @@ if (user === "Instructor") {
 
     if (genReject) {
         try {
-            fs.writeFileSync(`${baseDir}/${problem}/reject.dat`, reject.join('\n') + '\n', 'UTF-8');
+            let path = `${baseDir}/${problem}/reject.dat`;
+            fs.writeFileSync(path, reject.join('\n') + '\n', 'UTF-8');
+            info('Wrote to ' + path);
         } catch (err) {
             error(`Could not write rejected strings to ${baseDir}/${problem}/reject.dat<br/>\n{$err}`)
         }
@@ -176,6 +180,8 @@ if (user === "Instructor") {
         }
     }
 
+} else {
+    error(`Unauthorized user: ${user}`)
 }
 
 process.exit(0);
