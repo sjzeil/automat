@@ -110,6 +110,8 @@ my $notesFile = $properties{"base"} . "/" . $properties{"problem"} . "/notes.md"
 if ($action eq "grading" && -r $notesFile) {
 	my $pandocDir = $properties{"base"} . "/" . $properties{"problem"};
 	$graderNotes = `cd $pandocDir; $pandoc --ascii --mathjax < notes.md`;
+	my $gRedirect = "./graphicsRedirect.cgi?problem=$problem&graphic=";
+	$graderNotes =~ s/<img *src="/"<img src=\"$gRedirect"/ge;
 }
 $properties{"graderNotes"} = $graderNotes;
 

@@ -1,11 +1,14 @@
-This is an explanation of the instructor's solution.
+# Solution Notes
 
-Can we use graphics?
+Notes on a problem solution may be written in Markdown notation
+and will be included in the grade report.
 
-Via markdown:
+* Graphics may be included, but must be given as a path relative to the problem directory.
 
-![foo.png](graphicsRedirect.cgi?problem=selfAssessProblem&graphic=foo.png)
+    * Via markdown:
 
-Direct inclusion
+        ![foo.png](foo.png)
 
-<img src="graphicsRedirect.cgi?problem=selfAssessProblem&graphic=foo.png"/>
+    * Direct inclusion
+
+        <img src="foo.png"/>
