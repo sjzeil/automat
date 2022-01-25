@@ -2,6 +2,7 @@ import { FAEngine } from '../js/FAEngine';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { Automaton } from '../js/automaton';
+import { PDAEngine } from '../js/PDAEngine';
 
 
 function sampleDFA(): Automaton {
@@ -314,5 +315,52 @@ describe('FAEngine', function () {
 
     });
 
+
+    context('FA comparison', function () {
+        it('two equiv automata', function () {
+            let fa1 = sampleDFA();
+            let fa2 = new Automaton('Instructor', '', new FAEngine());
+            fa2.addState('0');
+            fa2.addState('1');
+            fa2.addState('2');
+            fa2.states[0].initial = true;
+            fa2.states[1].final = true;
+            fa2.addTransition('0', '0', '0\n1');  // NFA version of sample
+            fa2.addTransition('0', '2', '1');
+            fa2.addTransition('2', '1', '1');
+        
+            expect(fa1.engine.canBeCheckedForEquivalence()).to.be.true;
+            expect(fa2.engine.canBeCheckedForEquivalence()).to.be.true;
+            expect(fa1.engine.equivalent(fa1, fa2)).to.be.true;
+            expect(fa1.engine.equivalent(fa2, fa1)).to.be.true;
+        });
+
+        it('incompatible automata', function () {
+            let fa1 = sampleDFA();
+
+            let fa3 = new Automaton('Instructor', '', new PDAEngine());
+            fa3.addState('0');
+
+            expect(fa1.engine.equivalent(fa1, fa3)).to.be.false;
+        });
+
+        it('similar but different automata', function () {
+            let fa1 = sampleDFA();
+            let fa2 = new Automaton('Instructor', '', new FAEngine());
+            fa2.addState('0');
+            fa2.addState('1');
+            fa2.addState('2');
+            fa2.states[0].initial = true;
+            fa2.states[1].final = true;
+            fa2.addTransition('0', '0', '0');  // NFA version of sample
+            fa2.addTransition('0', '0', '1');
+            fa2.addTransition('0', '2', '1');
+            fa2.addTransition('2', '1', '1');
+        
+            fa2.states[2].final = true;
+            expect(fa1.engine.equivalent(fa1, fa2)).to.be.false;
+            expect(fa1.engine.equivalent(fa2, fa1)).to.be.false;
+        });
+    });
 
 });

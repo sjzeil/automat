@@ -23,12 +23,89 @@ export
     }
 
     canBeCheckedForEquivalence(): boolean {
-        return false;  // TODO to change this later
+        return true;
     }
 
 
-    equivalent(automaton: Automaton, automaton2: Automaton): boolean {
-        return false;
+    equivalent(fa1: Automaton, fa2: Automaton): boolean {
+        if (fa2.specification != fa1.specification)
+            return false;
+
+        let alphabet = this.getAlphabet(fa1, {});
+        alphabet = this.getAlphabet(fa2, alphabet);
+        if (Object.keys(alphabet).length == 0)
+            return true;
+
+        let toBeProcessed = [];
+        let seen = {} as any;  // set of strings
+        let snap1 = this.initialSnapshot(fa1, '');
+        let snap2 = this.initialSnapshot(fa2, '');
+        seen[this.signatureOf(snap1, snap2)] = 1;
+        if (this.inAcceptedState(snap1) != this.inAcceptedState(snap2))
+            return false;
+        for (let input of Object.keys(alphabet)) {
+            let snap1a = this.forceInput(snap1, input);
+            let snap2a = this.forceInput(snap2, input);
+            toBeProcessed.push({ fa1: snap1a, fa2: snap2a });
+        }
+
+        while (toBeProcessed.length > 0) {
+            let current = toBeProcessed[toBeProcessed.length-1];
+            toBeProcessed.pop();
+            let snap1 = this.step(fa1, current.fa1);
+            let snap2 = this.step(fa2, current.fa2);
+            let signature = this.signatureOf(snap1, snap2); 
+            if (!(signature in seen)) {
+                if (this.inAcceptedState(snap1) != this.inAcceptedState(snap2))
+                    return false;
+                seen[signature] = 1;
+                for (let input of Object.keys(alphabet)) {
+                    let snap1a = this.forceInput(snap1, input);
+                    let snap2a = this.forceInput(snap2, input);
+                    toBeProcessed.push({ fa1: snap1a, fa2: snap2a });
+                }
+            }
+        }
+        return true;
+    }
+
+    forceInput(snap0: Snapshot, input: string): Snapshot {
+        let snap = snap0.clone();
+        snap.input[0] = input;
+        snap.numCharsProcessed[0] = 0;
+        snap0.selectedStates.forEach((value, key) => {snap.selectedStates.set(key, value)});
+        return snap;
+    }
+
+    signatureOf(snap1: Snapshot, snap2: Snapshot): string {
+        return this.signatureOf1(snap1) + "\t\t" + this.signatureOf1(snap2);
+    }
+    signatureOf1(snap: Snapshot): string {
+        let sig = '';
+        let first = true;
+        snap.selectedStates.forEach(
+            (value, key) => {
+                if (!first)
+                    sig += "\t";
+                first = false;
+                sig += key.label;
+            }
+        );
+        return sig;
+    }
+
+    getAlphabet(fa: Automaton, baseSet: any): any {
+        for (let arrow of fa.transitions) {
+            let transitions = arrow.label.split('\n');
+            for (let input of transitions) {
+                if (input.length == 1 && input != '~') {
+                    baseSet[input] = 1;
+                } else if (input.length == 2 && input.charAt(0) == '!') {
+                    baseSet[input.charAt(1)] = 1;
+                }
+            }
+        }
+        return baseSet;
     }
 
 
@@ -157,9 +234,9 @@ export
     replaceVariablesIn(transition: string, variableMapping: any): string {
         let storage = '';
         let result = transition;
-        if (transition.length > 2 && transition.charAt(transition.length-2) == '}') {
-            storage = transition.substr(transition.length-2);
-            result = transition.substr(0, transition.length-2);
+        if (transition.length > 2 && transition.charAt(transition.length - 2) == '}') {
+            storage = transition.substr(transition.length - 2);
+            result = transition.substr(0, transition.length - 2);
         }
         for (let property in variableMapping) {
             let re = new RegExp(property, 'g');
@@ -218,7 +295,7 @@ export
     transitionText(): string {
         return 'Each arrow may represent one or more transitions.<br/>' +
             '<ul><li>Each transition must contain a single alphanumeric character, or @ to denote the empty string ('
-               + FormalLanguage.epsilon + ').</li>' +
+            + FormalLanguage.epsilon + ').</li>' +
             '<li>Shortcuts are also available:' +
             ' <ul><li>!x means "every character except x",</li> <li>~ means "any character".</li></ul></ul>'
     }
@@ -265,7 +342,7 @@ export
         next.variables = current.variables;
         next.numCharsProcessed[0] = current.numCharsProcessed[0] + 1;
         let processed = (current.input[0]).substring(0, next.numCharsProcessed[0]);
-        let trigger = current.input[0].substring(current.numCharsProcessed[0], current.numCharsProcessed[0]+1);
+        let trigger = current.input[0].substring(current.numCharsProcessed[0], current.numCharsProcessed[0] + 1);
         for (let arrow of au.transitions) {
             let description = current.selectedStates.get(arrow.from);
             if (typeof description === typeof '') {
@@ -275,15 +352,15 @@ export
                     let follow = false;
                     if (transition.length == 1) {
                         follow = (transition == trigger) || (transition == '~');
-                    } else if (transition.length == 2 && transition.charAt(0) == '!')  {
+                    } else if (transition.length == 2 && transition.charAt(0) == '!') {
                         let notChar = transition.charAt(1);
                         follow = (notChar != trigger);
                     } else if (transition.length > 2) {
                         let acceptableTriggers = this.getTriggersFor(transition);
                         if (acceptableTriggers.indexOf(trigger) >= 0) {
                             follow = true;
-                            if (transition.charAt(transition.length-2) == '}') {
-                                next.variables[transition.charAt(transition.length-1)] = trigger;
+                            if (transition.charAt(transition.length - 2) == '}') {
+                                next.variables[transition.charAt(transition.length - 1)] = trigger;
                             }
                         }
                     }
@@ -305,14 +382,18 @@ export
 
     accepted(current: Snapshot): boolean {
         if (current.numCharsProcessed[0] >= current.input[0].length) {
-            let inFinalState = false;
-            current.selectedStates.forEach(function (value, currentState) {
-                inFinalState = inFinalState || currentState.final;
-            });
-            return inFinalState;
+            return this.inAcceptedState(current);
         } else {
             return false;
         }
+    }
+
+    inAcceptedState(current: Snapshot): boolean {
+        let inFinalState = false;
+        current.selectedStates.forEach(function (value, currentState) {
+            inFinalState = inFinalState || currentState.final;
+        });
+        return inFinalState;
     }
 
     inputPortrayal(snapshot: Snapshot): string {
