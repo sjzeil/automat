@@ -3,6 +3,7 @@ type=page
 manual=student
 sequence=6
 prev=selfAssessments
+next=creatingAnRE
 status=published
 ~~~~~~
 
