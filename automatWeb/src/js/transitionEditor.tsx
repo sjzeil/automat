@@ -128,7 +128,7 @@ export class TransitionEditor extends React.Component<TransitionEditorProps, Tra
                         <tr>
                             <td>
                                 <span>Transition:</span>
-                                <input type="text" id="transition_label" name="transition_label" 
+                                <input type="text" id="transition_label" name="transition_label" autoFocus
                                     onChange={(ev: React.ChangeEvent<HTMLInputElement>): void => this.labelChanged(ev.target.value)}
                                     value={this.state.partialLabel}
                                     />
