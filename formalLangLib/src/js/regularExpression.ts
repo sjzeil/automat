@@ -59,7 +59,7 @@ export class RegularExpression extends FormalLanguage {
             errors = "Invalid character in regular expression."
         } else {
             try {
-                let re2 = new RegExp(this.regexp);
+                let re2 = new RegExp(this.regexp.replace(/\+/g, '|'));
             } catch (err) {
                 errors = "Syntax error in regular expression."
             }

@@ -21,6 +21,11 @@ describe('RegExp', function() {
       re.regexp = 'ab*(c|e)d';
       expect (re.validate().errors).to.not.equal('');
     });
+    it('should say a*+b* is valid', function() {
+      let re = new RegularExpression("Instructor", "");
+      re.regexp = 'a*+b*';
+      expect (re.validate().errors).to.equal('');
+    });
   });
   describe('matching', function() {
     it('should say ab*(c+@)d matches abbd', function() {
