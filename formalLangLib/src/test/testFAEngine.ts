@@ -363,4 +363,27 @@ describe('FAEngine', function () {
         });
     });
 
+    it('comparing automata with shortcuts', function () {
+        let fa1 = new Automaton('Instructor', '', new FAEngine());
+        fa1.addState('0');
+        fa1.addState('1');
+        fa1.states[0].initial = true;
+        fa1.states[1].final = true;
+        fa1.addTransition('0', '1', '0\n1');  // Accepts (0+1)1*
+        fa1.addTransition('1', '1', '1');
+
+
+        let fa2 = new Automaton('Instructor', '', new FAEngine());
+        fa2.addState('0');
+        fa2.addState('1');
+        fa2.states[0].initial = true;
+        fa2.states[1].final = true;
+        fa2.addTransition('0', '1', '~');
+        fa2.addTransition('1', '1', '!0');
+    
+        expect(fa1.engine.equivalent(fa1, fa2)).to.be.true;
+        expect(fa1.engine.equivalent(fa2, fa1)).to.be.true;
+    });
+
+
 });
