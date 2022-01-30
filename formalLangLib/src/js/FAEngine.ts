@@ -98,7 +98,7 @@ export
         for (let arrow of fa.transitions) {
             let transitions = arrow.label.split('\n');
             for (let input of transitions) {
-                if (input.length == 1 && input != '~') {
+                if (input.length == 1 && input != '~' && input != '@') {
                     baseSet[input] = 1;
                 } else if (input.length == 2 && input.charAt(0) == '!') {
                     baseSet[input.charAt(1)] = 1;
