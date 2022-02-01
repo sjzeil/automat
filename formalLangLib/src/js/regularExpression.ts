@@ -150,8 +150,11 @@ export class RegularExpression extends FormalLanguage {
 
     test(sample: string): TestResult {
         let regexpForm = this.regexp.replace(/[+]/g, '|');
-        regexpForm = regexpForm.replace(/@/g, '@{0}');
-        let re = new RegExp('^' + regexpForm + '$');
+        //regexpForm = regexpForm.replace(/@/g, '@{0}');
+        regexpForm = regexpForm.replace(/@/g, '()');
+        //regexpForm = regexpForm.replace(/[(]/g, '\\(');
+        //regexpForm = regexpForm.replace(/[)]/g, '\\)');
+        let re = new RegExp('^(' + regexpForm + ')$');
         let result = re.test(sample);
         return new TestResult(result, "");
     }

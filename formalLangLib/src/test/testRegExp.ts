@@ -29,7 +29,7 @@ describe('RegExp', function () {
       expect(re.validate().errors).to.equal('');
     });
   });
-  describe('matching', function () {
+  describe('RE matching', function () {
     it('should say ab*(c+@)d matches abbd', function () {
       let re = new RegularExpression("Instructor", "");
       re.regexp = 'ab*(c+@)d';
@@ -59,6 +59,11 @@ describe('RegExp', function () {
       let re = new RegularExpression("Instructor", "");
       re.regexp = 'ab*(c+@)d';
       expect(re.test('').passed).to.be.false;
+    });
+    it('should say a(ba)*+@ does not match aa', function () {
+      let re = new RegularExpression("Instructor", "");
+      re.regexp = 'a(ba)*+@';
+      expect(re.test('aa').passed).to.be.false;
     });
   });
   describe('RE comparisons', function () {
