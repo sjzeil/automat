@@ -138,6 +138,27 @@ describe('Grammar', function () {
             expect(gr.test('bbaac').passed).to.be.false;
         });
     });
+    context('string testing', function() {
+        let gr = new Grammar('Instructor', '');
+        let productions = [
+            'S=SS',
+            'S=S*S',
+            'S=U',
+            'U=x',
+            'U=y',
+            'U=[S]'
+        ];
+        addProductions(gr, productions);
+        it('should accept x[y*x]', function() {
+            expect(gr.test('x[y*x]').passed).to.be.true;
+        });
+        it('should accept [x*[y*x]]', function() {
+            expect(gr.test('[x*[y*x]]').passed).to.be.true;
+        });
+        it('should reject x**[y*x]', function() {
+            expect(gr.test('x**[y*x]').passed).to.be.false;
+        });
+    });
 
     context('removeImmediateLeftRecursion', function () {
         let gr = new Grammar('Instructor', '');

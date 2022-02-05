@@ -390,13 +390,26 @@ export class Grammar extends FormalLanguage {
                     lastWasNonTerm = true;
                 }
             } else {
-                reStr += sym;
+                if (this.isAlphanumeric(sym)) {
+                    reStr += sym;
+                } else if (sym == ']') {
+                    reStr += '\\]';
+                } else {
+                    reStr += '[' + sym + ']';
+                }
                 lastWasNonTerm = false;
             }
         }
         reStr += '$';
         let re = new RegExp(reStr);
         return re.test(sample);
+    }
+    
+    isAlphanumeric(sym: string): boolean {
+        let code = sym.charCodeAt(0);
+        return ((code > 47 && code < 58) ||
+                (code > 64 && code < 91) ||
+                (code > 96 && code < 123));
     }
 
     splitAtFirstNonTermal(derivation: string) {
