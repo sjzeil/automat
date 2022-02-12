@@ -136,6 +136,7 @@ export
     this.clicked = this.clicked.bind(this);
     this.selected = this.selected.bind(this);
     this.saveLanguage = this.saveLanguage.bind(this);
+    this.anonymizeLanguage = this.anonymizeLanguage.bind(this);
     this.loadLanguage = this.loadLanguage.bind(this);
     this.gradeReport = this.gradeReport.bind(this);
     this.help = this.help.bind(this);
@@ -174,11 +175,22 @@ export
       }
       return gButton;
     };
+    
+    let anonButton = () => {
+      let aButton = (<span></span>);
+      if (this.props.user == "Instructor" && this.rendering != null) {
+        aButton = (<input type="button" value="Anon"
+          onClick={this.anonymizeLanguage}
+          disabled={this.state.status == "new"} />);
+      }
+      return aButton;
+    };
     return (
       <div className="editorToolbar">
         <input type="button" value="New" onClick={this.newLanguage} disabled={this.state.status == "new"} />
         <input type="button" value="Save" onClick={this.saveLanguage} disabled={this.state.status == "new"} />
         {gradeButton()}
+        {anonButton()}
         <input type="button" value="Help" onClick={this.help} />
       </div>
     );
@@ -205,6 +217,10 @@ export
         status: 'saving',
       });
     }
+  }
+
+  anonymizeLanguage() {
+    this.rendering.language.createdBy = 'Anonymous';
   }
 
   help() {
