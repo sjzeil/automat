@@ -3,6 +3,7 @@ type=page
 manual=student
 sequence=7
 prev=quizzes
+next=cfg
 status=published
 ~~~~~~
 ## Creating a new Regular Expression

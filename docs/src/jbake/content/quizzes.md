@@ -7,7 +7,11 @@ next=creatingAnRE
 status=published
 ~~~~~~
 
-When you are taking an online quiz, exam, or other graded activity, you will "submit" your answer by saving your language URL into the text entry box for the online question.
+When working on a self-assessment problem, the instructor will provide you with a special link to invoke the editor. 
+
+> You **must** use that link to prepare your answer.
+
+You will "submit" your answer by saving your language URL into the text entry box for the online question.
 
 ![](images/topMenu.png)
 
