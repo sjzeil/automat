@@ -38,7 +38,7 @@ my $username = $ENV{"REMOTE_USER"};
 if (!defined($username)) {
 	$username="Anonymous";
 }
-my $debugging = 1;
+my $debugging = 0;
 my $testName = $query->param("test");
 if (defined($testName)) {
 	$username = "**$testName";
