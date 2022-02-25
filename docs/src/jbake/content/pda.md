@@ -61,6 +61,6 @@ Below the main editing area for your FA, you can see the testing area:
 associated with that state.  Because of the nondeterminism of PDAs,
 different states may have different stacks, or the same state can be active in multiple ways (different stack contents).
 
-    \picOnRight(pdaTest, 60)
+    <img src='images/pdaTest.png' style='float: right;'/>
 
     For example, this automaton, after 4 input characters have been processed, has state 0 active with a stack `1110Z`. It also has state 1 active with a stack of `10z` and active a second time with stack `1110Z`.

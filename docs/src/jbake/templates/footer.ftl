@@ -19,7 +19,7 @@
         <tr>
         <td class='left'>${published_date?string("dd MMMM yyyy")}</td>
         <td> </td>
-        <td class='right'><span class="muted credit">&copy; 2021-2022 Old Dominion University</span></td>
+        <td class='right'><span class="muted credit">&copy; 2021-2022 Steven J. Zeil, Old Dominion University</span></td>
         </tr>
         </table>
       </div>
