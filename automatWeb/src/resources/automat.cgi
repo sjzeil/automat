@@ -38,7 +38,7 @@ my $username = $ENV{"REMOTE_USER"};
 if (!defined($username)) {
 	$username="Anonymous";
 }
-my $debugging = 0;
+my $debugging = 1;
 my $testName = $query->param("test");
 if (defined($testName)) {
 	$username = "**$testName";
@@ -88,9 +88,9 @@ if ($debugging) {
 	foreach my $prop (keys %properties) {
 		my $value = $properties{$prop};
     	printf("<div>%s = %s</div>\n",
-         escapeHTML($prop),
-         escapeHTML($value)
-      );
+			   escapeHTML($prop),
+			   escapeHTML($value)
+			);
 	}
 }
 loadLanguageMetadata();
@@ -151,33 +151,33 @@ if (($query->param('problemEdited')) && ($query->param('problemEdited') eq '1' )
 	system("chmod $preferredFilePermissions $iniFile");
 	print '<p><a href="' . $query->param('problemURL') . '">OK</a></p>';
 	print "</body></html>\n";
-
+	
 } elsif (($query->param('dataRequested')) && ($query->param('dataRequested') eq '1' ) && ($properties{'user'} eq 'Instructor')) {
-		my $solution = $properties{"solution"};
-		my $ukey = userUnlockKey();
-		my $graderCommand = "$nodePath generator.bundle.js --user=$username --solution='$solution'"
-			.  " --problem=" . $properties{"problem"} 
-			. " --base='" . $properties{"base"} . "'"
-			. " --alphabet='" . $query->param('alphabet') . "'"
-			. " --stringlen='" . $query->param('maxLen') . "'"
-			;
-		if ($query->param('genAccept')) {
-			$graderCommand .= ' --genAccept=1';
-		} else {
-			$graderCommand .= ' --genAccept=0';
-		}
-		if ($query->param('genReject')) {
-			$graderCommand .= ' --genReject=1';
-		} else {
-			$graderCommand .= ' --genReject=0';
-		}
-		if ($query->param('genExpect')) {
-			$graderCommand .= ' --genExpect=1';
-		} else {
-			$graderCommand .= ' --genExpect=0';
-		}
-		my $reportOut = `$graderCommand`;
-
+	my $solution = $properties{"solution"};
+	my $ukey = userUnlockKey();
+	my $graderCommand = "$nodePath generator.bundle.js --user=$username --solution='$solution'"
+		.  " --problem=" . $properties{"problem"} 
+	. " --base='" . $properties{"base"} . "'"
+		. " --alphabet='" . $query->param('alphabet') . "'"
+		. " --stringlen='" . $query->param('maxLen') . "'"
+		;
+	if ($query->param('genAccept')) {
+		$graderCommand .= ' --genAccept=1';
+	} else {
+		$graderCommand .= ' --genAccept=0';
+	}
+	if ($query->param('genReject')) {
+		$graderCommand .= ' --genReject=1';
+	} else {
+		$graderCommand .= ' --genReject=0';
+	}
+	if ($query->param('genExpect')) {
+		$graderCommand .= ' --genExpect=1';
+	} else {
+		$graderCommand .= ' --genExpect=0';
+	}
+	my $reportOut = `$graderCommand`;
+	
 	print "<html><body>\n";
 	my $problemDir = $properties{"base"} . "/$problem/";
 	if (-r "$problemDir/accept.dat") {
@@ -195,20 +195,20 @@ if (($query->param('problemEdited')) && ($query->param('problemEdited') eq '1' )
 	print "<pre>$graderCommand</pre><br/>Report: " . $reportOut;
 	print '<p><a href="' .$query->param('problemURL') . '">OK</a></p>';
 	print "</body></html>\n";
-
+	
 } elsif ($authenticationMsg eq "") {  # authentication succeeded
 	$htmlText = readFileIntoString($action . ".template");
-
+	
 	if ($action eq "grading") {
 		# Run the grade report
 		my $solution = $properties{"solution"};
 		my $ukey = userUnlockKey();
 		my $graderCommand = "$nodePath grader.bundle.js --user=$username --lang=$language --solution='$solution'"
 			.  " --problem=" . $properties{"problem"} 
-			. " --unlockKey='" . creatorUnlockKey() . "'"
+		. " --unlockKey='" . creatorUnlockKey() . "'"
 			. " --base='" . $properties{"base"} . "'"
 			. " --lock=" . $properties{"lock"}
-			. " --thisURL='$page_url'"
+		. " --thisURL='$page_url'"
 			. " --unlockedURL='" . $properties{"unlockedURL"} . "'"
 			;
 		my $reportOut = `$graderCommand`;
@@ -225,7 +225,7 @@ if (($query->param('problemEdited')) && ($query->param('problemEdited') eq '1' )
 			$reportOut .= "</pre>\n";
 		}
 		$properties{'reportBody'} = $reportOut;
-
+		
 		if ($properties{"user"} eq "Instructor") {
 			# Instructors can modify the problem
 			my $problemEdit = "<h2>Edit the Problem</h2>\n";
@@ -235,13 +235,13 @@ if (($query->param('problemEdited')) && ($query->param('problemEdited') eq '1' )
 			$problemEdit .= "<div>\n";
 			$problemEdit .= "<label for='problemTitle'>Title:</label>\n" .
 			    "<input type='text' id='problemTitle' name='problemTitle' value='" 
-					. $properties{"title"} . "'/><br/>\n";
+				. $properties{"title"} . "'/><br/>\n";
 			$problemEdit .= "<input type='button' value='Use Submission as Solution' onclick='useAsSolution()'/>\n";
 			$problemEdit .= "<label for='problemSolution'>Solution:</label>\n" .
 			    "<input type='text' id='problemSolution' name='problemSolution' size='40' value='" 
-					. $properties{"solution"} . "'/><br/> ";
+				. $properties{"solution"} . "'/><br/> ";
 			$problemEdit .= "<input type='hidden' id='problemLock' name='problemLock' value='" 
-					. $properties{"lock"} . "'/>\n";
+				. $properties{"lock"} . "'/>\n";
 			$problemEdit .= "<input type='hidden' id='problemEdited' name='problemEdited' value='0'/> \n";
 			$problemEdit .= "<input type='hidden' id='problemURL' name='problemURL' value='{location.href}'/>\n";
 			$problemEdit .= "<input type='hidden' id='problem' name='problem' value='" . $problem . "'/>\n";
@@ -294,15 +294,15 @@ if (($query->param('problemEdited')) && ($query->param('problemEdited') eq '1' )
 			$problemEdit .= "<br/><input type='button' value='Generate' onclick='generateData()'/><br/>\n";
 			$problemEdit .= "</div>\n";
 			$problemEdit .= "</form>\n";
-
-
+			
+			
 			$properties{'graderForm'} = $problemEdit;
 		} else {
 			$properties{'graderForm'} = '';
 		}
-
+		
 	}
-
+	
 	performSubstutitions();
 	print $htmlText;
 } else {
@@ -362,47 +362,50 @@ sub loadProperties
 			}
 		}
 		close INI;
+		$properties{"loaded1"} = 'automat.ini';
 	}
 	if (!defined($properties{"base"})) {
 		$properties{"base"} = './';
 	}
-	if ($problem ne '') {
-		my $baseINI = $properties{"base"} . '/automat.ini';
-		if (-r $baseINI) {
-			open INI1, "<$baseINI" || die "Could not open $baseINI";
-			my $line;
-			while ($line = <INI1>) {
-				chomp $line;
-				#$line =~ s/#.*$//; # trim comments
-				if ($line =~ / *([A-Za-z0-9]*) *= *(.*)/i) {
-					$properties{$1} = $2;
+	
+	my $baseINI = $properties{"base"} . '/automat.ini';
+	if (-r $baseINI) {
+		open INI1, "<$baseINI" || die "Could not open $baseINI";
+		my $line;
+		while ($line = <INI1>) {
+			chomp $line;
+			#$line =~ s/#.*$//; # trim comments
+			if ($line =~ / *([A-Za-z0-9]*) *= *(.*)/i) {
+				$properties{$1} = $2;
+			}
+		}
+		close INI1;
+		
+		if ($problem ne '') {
+			my $problemINI = $properties{"base"} . "/$problem/$problem.ini";
+			if (!-r $problemINI) {
+				$problemINI = $properties{"base"} . "/$problem/automat.ini";
+			}
+			if (!-r $problemINI) {
+				my @iniFiles = glob($properties{"base"} . "/$problem/*.ini");
+				if (scalar(@iniFiles) > 0) {
+					$problemINI = $iniFiles[0];
 				}
 			}
-			close INI1;
-		}
-		my $problemINI = $properties{"base"} . "/$problem/$problem.ini";
-		if (!-r $problemINI) {
-			$problemINI = $properties{"base"} . "/$problem/automat.ini";
-		}
-		if (!-r $problemINI) {
-			my @iniFiles = glob($properties{"base"} . "/$problem/*.ini");
-			if (scalar(@iniFiles) > 0) {
-				$problemINI = $iniFiles[0];
-			}
-		}
-		if (-r $problemINI) {
-			open INI2, "<$problemINI" || die "Could not open $problemINI";
-			my $line;
-			while ($line = <INI2>) {
-				chomp $line;
-				#$line =~ s/#.*$//; # trim comments
-				if ($line =~ / *([A-Za-z0-9]*) *= *(.*)/i) {
-					$properties{$1} = $2;
+			if (-r $problemINI) {
+				open INI2, "<$problemINI" || die "Could not open $problemINI";
+				my $line;
+				while ($line = <INI2>) {
+					chomp $line;
+					#$line =~ s/#.*$//; # trim comments
+					if ($line =~ / *([A-Za-z0-9]*) *= *(.*)/i) {
+						$properties{$1} = $2;
+					}
 				}
+				close INI2;
+			} else {
+				$authenticationMsg = "Unknown problem ID.";
 			}
-			close INI2;
-		} else {
-			$authenticationMsg = "Unknown problem ID.";
 		}
 	}
 	defined($properties{"title"}) || ($properties{"title"} = "Formal Language Editor");
