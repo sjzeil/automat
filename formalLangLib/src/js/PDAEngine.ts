@@ -217,7 +217,7 @@ export
 
     transitionText(): string {
         return 'Each arrow may represent one or more transitions.<br/>' +
-            'Each transition will have the form <i>input,top;push</i> where ' +
+            'Each transition will have the form <i>input,top/push</i> where ' +
             '<ul><li><i>input</i> must contain a single alphanumeric character (not "Z"), @, or shortcut denoting an input.</li>' +
             '<li><i>top</i> must contain a single alphanumeric character (may include "Z"), @, or a shortcut denoting a character to be ' +
             ' matched and popped from the top of the stack.</li>' +
@@ -226,8 +226,7 @@ export
             '</ul>Shortcuts are also available:' +
             ' <ul><li>!x, in the <i>input</i> or <i>top</i>, means "any character except x",</li>' +
             '<li>~ means "any character" when occurring in the <i>input</i>, and "same as the input character" in <i>top</i> or the <i>push</i> string.' +
-            '<li>a,b,c}w, in the <i>input</i> means that any of the characters to the left of the "}" can be accepted, and will be stored ' +
-            'in a "variable" named "w".</li></ul>'
+            '</ul>'
     }
 
     initialSnapshot(au: Automaton, input: string): Snapshot {

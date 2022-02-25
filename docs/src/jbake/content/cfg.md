@@ -10,7 +10,7 @@ status=published
 
 <img src='images/newLanguagesMenu.png' style='float: right;'/>
 
-To create a new Gramamr, look for the list of possible formal language types and click on `Context-Free Grammar`.
+To create a new Grammar, look for the list of possible formal language types and click on `Context-Free Grammar`.
 
 You will see a split screen with a drawing area on the left and an editing area to the right.
 
