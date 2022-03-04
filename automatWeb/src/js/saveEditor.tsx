@@ -67,6 +67,7 @@ export
                 <div>
                     <input type="button" value="Back" onClick={this.goBack} />
                 </div>
+                <div className="wrapped">Or copy-and paste this URL directly: <br/>{saveURL} </div>
             </div>
         );
     }
