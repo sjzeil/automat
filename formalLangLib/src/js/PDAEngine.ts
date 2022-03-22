@@ -106,7 +106,7 @@ export
                         }
                         let inputPart = transition.substring(0, slashPos);
                         let outputPart = transition.substring(slashPos + 1);
-                        if (!outputPart.match(/^[0-9A-Za-z@~]*$/)) {
+                        if (!outputPart.match(/^[0-9A-Za-z@~()\[\]=]*$/)) {
                             return {
                                 warnings: warningStr,
                                 errors: 'The arrow from ' + arrow.from.label + ' to ' + arrow.to.label +
@@ -124,8 +124,8 @@ export
                         }
                         let input = inputPart.substring(0, commaPos);
                         let stackTop = inputPart.substring(commaPos + 1);
-                        if ((!input.match(/^[0-9A-Ya-z@~]$/)) &&
-                            (!input.match(/^![0-9A-Ya-z]$/))
+                        if ((!input.match(/^[0-9A-Ya-z@~()\[\]=]$/)) &&
+                            (!input.match(/^![0-9A-Ya-z()\[\]=]$/))
                            ) {
                             return {
                                 warnings: warningStr,
@@ -133,8 +133,8 @@ export
                                     ' has an invalid transition: ' + transition + ": invalid input description"
                             };
                         }
-                        if ((!stackTop.match(/^[0-9A-Za-z@~]$/)) &&
-                            (!stackTop.match(/^![0-9A-Za-z]$/))
+                        if ((!stackTop.match(/^[0-9A-Za-z@~()\[\]=]$/)) &&
+                            (!stackTop.match(/^![0-9A-Za-z()\[\]=]$/))
                            ) {
                             return {
                                 warnings: warningStr,
@@ -173,7 +173,7 @@ export
         for (let arrow of automaton.transitions) {
             let transitions = arrow.label.split('\n');
             for (let transition of transitions) {
-                if (transition.match(/^[0-9A-Za-z](,[0-9A-Za-z])*}[A-Za-z]$/)) {
+                if (transition.match(/^[0-9A-Za-z()\[\]=](,[0-9A-Za-z()\[\]=])*}[A-Za-z()\[\]=]$/)) {
                     let varName = transition.charAt(transition.length - 1);
                     let transitionTriggers = this.getTriggersFor(transition);
                     result[varName] = transitionTriggers;
@@ -183,7 +183,7 @@ export
         return result;
     }
 
-    private static charSet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    private static charSet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz()[]=';
 
     private getTriggersFor(transition: string): string {
         if (transition.length == 1) {
@@ -218,10 +218,10 @@ export
     transitionText(): string {
         return 'Each arrow may represent one or more transitions.<br/>' +
             'Each transition will have the form <i>input,top/push</i> where ' +
-            '<ul><li><i>input</i> must contain a single alphanumeric character (not "Z"), @, or shortcut denoting an input.</li>' +
-            '<li><i>top</i> must contain a single alphanumeric character (may include "Z"), @, or a shortcut denoting a character to be ' +
+            '<ul><li><i>input</i> must contain a single alphanumeric character (not "Z"), a left or right parenthesis or bracket or an equal sign, @, or shortcut denoting an input.</li>' +
+            '<li><i>top</i> must contain a single alphanumeric character (may include "Z"), a left or right parenthesis or bracket or an equal sign, @, or a shortcut denoting a character to be ' +
             ' matched and popped from the top of the stack.</li>' +
-            '<li><i>push</i> contains a string of alphanumeric characters  (may include "Z") or @ denoting characters to be ' +
+            '<li><i>push</i> contains a <i>string</i> of any of the characters allowed in the <i>top</i> position or @ denoting characters to be ' +
             ' pushed onto the stack. (Characters are pushed in the reverse order of presentation in the string.)</li>' +
             '</ul>Shortcuts are also available:' +
             ' <ul><li>!x, in the <i>input</i> or <i>top</i>, means "any character except x",</li>' +

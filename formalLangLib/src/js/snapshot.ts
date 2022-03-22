@@ -40,7 +40,8 @@ class Snapshot {
     }
 
     isSelected(state: AutomatonState): boolean {
-        return (typeof this.selectedStates.get(state)) !== undefined;
+        let value = this.selectedStates.get(state);
+        return value !== undefined;
     }
 
     getDescription(state: AutomatonState): string[] {

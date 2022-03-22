@@ -152,6 +152,20 @@ describe('PDAEngine', function () {
             expect(validation.warnings).to.equal('');
             expect(validation.errors).to.not.equal('');
         });
+        it('allow parentheses', function() {
+            let pda = pda0n1n();
+            pda.addTransition('0', '1', '(,)/()');
+            let validation = pda.validate();
+            expect(validation.warnings).to.equal('');
+            expect(validation.errors).to.equal('');
+        });
+        it('allow brackets', function() {
+            let pda = pda0n1n();
+            pda.addTransition('0', '1', '[,]/[]');
+            let validation = pda.validate();
+            expect(validation.warnings).to.equal('');
+            expect(validation.errors).to.equal('');
+        });
 
     });
 
