@@ -42,6 +42,26 @@ function tm_scs(): Automaton {
     return tm;
 }
 
+function tm_test1(): Automaton {
+    let tm = new Automaton('Instructor', '', new TMEngine());
+    tm.addState('0');
+    tm.addState('1');
+    tm.addState('2');
+    tm.states[0].initial = true;
+    // from grades/TM-moreAs
+    tm.addTransition('0', '0', 'x/x,R');
+    tm.addTransition('0', '0', 'a/a,R');
+    tm.addTransition('0', '1', 'b/x,S');
+    tm.addTransition('1', '1', '!@/~,L');
+    tm.addTransition('1', '2', '@/@,R');
+    return tm;
+}
+
+
+
+
+
+
 function tmTwoTapes(): Automaton {
     let tm = new Automaton('Instructor', '', new TMEngine());
     tm.addState('0');
@@ -61,6 +81,7 @@ describe('TMEngine', function () {
     context('validate-empty-tm', function () {
         let tm = new Automaton('Instructor', '', new TMEngine());
         let validation = tm.validate();
+        expect(tm.producesOutput()).to.be.equal(true);
         it('should flag an error', function () {
             expect(validation.warnings).to.equal('');
             expect(validation.errors).to.be.not.equal('');
@@ -341,5 +362,59 @@ describe('TMEngine', function () {
 
 
     });
+
+    context('TM problem', function () {
+        it('TM transition succeeds', function () {
+            let tm = tm_test1();
+            let inputStr = 'ababb';
+            let snapshot = tm.engine.initialSnapshot(tm, inputStr);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('@[a]babb');
+
+            snapshot = tm.engine.step(tm, snapshot);
+            expect(snapshot.input[0]).to.equal('ababb');
+            expect(snapshot.numCharsProcessed[0]).to.equal(1);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('a[b]abb');
+            expect(snapshot.selectedStates.size).to.equal(1);
+            expect(snapshot.selectedStates.get(tm.states[0])).equal('');
+            expect(snapshot.selectedStates.get(tm.states[1])).to.be.undefined;
+            expect(tm.engine.stopped(snapshot)).to.be.false;
+
+            snapshot = tm.engine.step(tm, snapshot);
+            expect(snapshot.input[0]).to.equal('axabb');
+            expect(snapshot.numCharsProcessed[0]).to.equal(1);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('a[x]abb');
+            expect(snapshot.selectedStates.size).to.equal(1);
+            expect(snapshot.selectedStates.get(tm.states[0])).to.be.undefined;
+            expect(snapshot.selectedStates.get(tm.states[1])).equal('');
+            expect(tm.engine.stopped(snapshot)).to.be.false;
+
+            snapshot = tm.engine.step(tm, snapshot);
+            expect(snapshot.input[0]).to.equal('axabb');
+            expect(snapshot.numCharsProcessed[0]).to.equal(0);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('@[a]xabb');
+            expect(snapshot.selectedStates.size).to.equal(1);
+            expect(snapshot.selectedStates.get(tm.states[0])).to.be.undefined;
+            expect(snapshot.selectedStates.get(tm.states[1])).equal('');
+            expect(tm.engine.stopped(snapshot)).to.be.false;
+        });
+    });
+
+    context('TM function', function () {
+        it('TM transition succeeds', function () {
+            let tm = tmUpperCase();
+            let inputs = ['aba', 'abb', 'abc'];
+            let expected = ['ABA', 'BBB', 'x'];
+            let results = tm.testOnSamples(inputs, expected);
+            expect(results.acceptedPassed.length).to.be.equal(1);
+            expect(results.acceptedFailed.length).to.be.equal(1);
+            expect(results.rejected.length).to.be.equal(1);
+            expect(results.acceptedPassed[0]).to.be.equal('aba');
+            expect(results.actual.length).to.be.equal(1);
+            expect(results.actual[0]).to.be.equal('ABB');
+            expect(results.expected[0]).to.be.equal('BBB');
+        });
+    });
+
+
 
 });

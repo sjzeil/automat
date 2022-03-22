@@ -28,6 +28,10 @@ export
         return false;  // TODO to change this later
     }
 
+    producesOutput() {
+        return true;
+    }
+
 
     equivalent(automaton: Automaton, automaton2: Automaton): boolean {
         return false;
@@ -39,7 +43,19 @@ export
         while (!this.stopped(snapshot)) {
             snapshot = this.step(automaton, snapshot);
         }
-        return new TestResult(this.accepted(snapshot), "");
+        return new TestResult(this.accepted(snapshot), this.trimTape(snapshot.input[0]));
+    }
+
+    trimTape (tape: string): string {
+        let start = 0;
+        while (start < tape.length && tape.charAt(start) == '@') {
+            ++start;
+        }
+        let stop = tape.length;
+        while (stop > start && tape.charAt(stop-1) == '@') {
+            --stop;
+        }
+        return tape.slice(start, stop);
     }
 
     validate(automaton: Automaton): ValidationResult {

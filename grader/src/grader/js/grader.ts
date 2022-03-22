@@ -88,28 +88,28 @@ function printExamples (strings: string[]): string {
 
 
 function printOutputExample (results: SampleResults, i: number): string {
-    let output = li('Input: "' + results.acceptedFailed[i] 
-        + '"  Expected: "' + results.expected[i] 
-        + '"  Observed: "' + results.actual[i]
-        + '"' 
-        );
+    let output = '<tr><td>' + results.acceptedFailed[i] + "</td><td>"
+        + results.expected[i] + "</td><td>"
+        + + results.actual[i] + "</td></tr>"
+        ;
     return output;
 }
 
 function printOutputExamples (results: SampleResults): string {
-    let output = '\n<ul>\n';
+    let output = '\n<table border="1">\n<tr><th>Input</th><th>Expected Output</th><th>Actual Output</th></tr>';
     for (let i = 0; i < 4; ++i) {
         if (i < results.acceptedFailed.length) {
-            output += '<li>' + results.acceptedFailed[i] + '</li>\n';
+            output += printOutputExample (results, i);
+            // output += '<li>' + results.acceptedFailed[i] + '</li>\n';
         }
     }
     if (results.acceptedFailed.length >= 10) {
-        output += '<li>' + results.acceptedFailed[Math.round(results.acceptedFailed.length / 2)] + '</li>\n';
+        output += printOutputExample (results, Math.round(results.acceptedFailed.length / 2));
     }
     if (results.acceptedFailed.length >= 5) {
-        output += '<li>' + results.acceptedFailed[results.acceptedFailed.length  - 1] + '</li>\n';
+        output += printOutputExample (results, Math.round(results.acceptedFailed.length  - 1));
     }
-    output += '</ul>\n';
+    output += '</table>\n';
     return output;
 }
 
