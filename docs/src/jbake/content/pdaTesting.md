@@ -2,13 +2,13 @@ title=Testing a PDA
 type=page
 manual=student
 sequence=B
-next=
+next=tm
 prev=pda
 status=published
 ~~~~~~
 
 
-Below the main editing area for your FA, you can see the testing area:
+Below the main editing area for your PDA, you can see the testing area:
 
 
 1. Type any alphanumeric string into the "Input text:" box, and click on Start.
