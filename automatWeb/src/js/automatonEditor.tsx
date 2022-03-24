@@ -214,6 +214,8 @@ export
         let testResult = (<span></span>);
         if (this.state.snapshot != null) {
             processedInput = automaton.engine.inputPortrayal(this.state.snapshot);
+            processedInput = processedInput.replaceAll('\n', '<br/>');
+            processedInput = processedInput.replaceAll('@', FormalLanguage.epsilon);
             a.decorateStates(this.state.snapshot);
             if (automaton.engine.stopped(this.state.snapshot)) {
                 if (automaton.engine.accepted(this.state.snapshot)) {
