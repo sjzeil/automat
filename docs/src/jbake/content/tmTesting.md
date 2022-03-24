@@ -2,7 +2,7 @@ title=Testing a Turing machine
 type=page
 manual=student
 sequence=D
-next=
+next=tmMulti
 prev=tm
 status=published
 ~~~~~~
