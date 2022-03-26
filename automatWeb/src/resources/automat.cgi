@@ -7,6 +7,7 @@ use CGI::Carp qw(fatalsToBrowser);
 use List::Util 'any';
 use URI::Escape;
 use Digest::SHA qw(sha256_hex);
+use POSIX qw(strftime);
 
 use strict;
 
@@ -84,6 +85,7 @@ my $authenticationMsg = "";
 my $warningMessage = "";
 
 loadProperties();
+logAccess();
 if ($debugging) {
 	foreach my $prop (keys %properties) {
 		my $value = $properties{$prop};
@@ -347,6 +349,21 @@ sub userUnlockKey {
 	my $key = $properties{"problem"} . $properties{"user"} . $properties{"lock"};
 	my $unlock = sha256_hex($key);
 	return $unlock;
+}
+
+sub logAccess
+{
+	if ($properties{'logFile'} && $properties{'problem'}) {
+		my $thisMonth = strftime("%Y-%m-", localtime(time));
+		my $logFile = $properties{'base'} . '/' . $thisMonth . $properties{'logFile'};
+		open LOG, ">>$logFile"   or return;
+		say LOG strftime("%Y-%m-%d %H:%M:%S", localtime(time)) . "\t" . $properties{'user'} . "\t" . $properties{'problem'}
+		  . "\t" . $page_url;
+		close LOG;
+		system("chgrp $preferredGroup $logFile");
+		system("chmod $preferredDirPermissions $logFile");
+
+	}
 }
 
 sub loadProperties
