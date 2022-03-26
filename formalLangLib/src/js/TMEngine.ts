@@ -401,11 +401,12 @@ export
             // Store variable if rule was a,b,c,}w
             let inputRule = inputs[tapeNum];
             if (inputRule.length > 2) {
-                let pos = inputRule.indexOf('{');
+                let pos = inputRule.indexOf('}');
                 if (pos < 0) {
                     throw 'Illegal input rule encountered.';
                 }
-                next.variables.set(inputRule.substring(pos + 1), tapeChar);
+                let variableName = inputRule.substring(pos + 1);
+                next.variables[variableName] = tapeChar;
             }
             // Write character to tape
             let tapeOutput = outputs[tapeNum];
@@ -494,7 +495,7 @@ export
             let inputRuleSub = this.replaceVariablesIn(inputRule, mapping);
             return inputRuleSub.charAt(1) != tapeChar;
         } else {
-            let pos = inputRule.indexOf('{');
+            let pos = inputRule.indexOf('}');
             if (pos < 0)
                 return false;
             return inputRule.substring(0, pos).indexOf(tapeChar) >= 0;

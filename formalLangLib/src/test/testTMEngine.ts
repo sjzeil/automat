@@ -397,6 +397,29 @@ describe('TMEngine', function () {
             expect(snapshot.selectedStates.get(tm.states[1])).equal('');
             expect(tm.engine.stopped(snapshot)).to.be.false;
         });
+        it ('TM storage works', function() {
+            let tm = new Automaton('Instructor', '', new TMEngine());
+            tm.addState('0');
+            tm.addState('1');
+            tm.states[0].initial = true;
+            tm.states[1].final = true;
+            tm.addTransition('0', '0', 'a/A,S');
+            tm.addTransition('0', '0', 'b/B,S');
+            tm.addTransition('0', '1', 'A,B}x/x,R');
+            let inputStr = 'abb';
+            let snapshot = tm.engine.initialSnapshot(tm, inputStr);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('@[a]bb');
+            expect(tm.engine.stopped(snapshot)).to.be.false;
+            
+            snapshot = tm.engine.step(tm, snapshot);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('@[A]bb');
+            expect(tm.engine.stopped(snapshot)).to.be.false;
+            
+            snapshot = tm.engine.step(tm, snapshot);
+            expect(tm.engine.inputPortrayal(snapshot)).to.equal('A[b]b');
+            expect(tm.engine.stopped(snapshot)).to.be.true;
+        }
+        );
     });
 
     context('TM function', function () {
