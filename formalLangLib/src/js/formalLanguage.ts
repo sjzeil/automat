@@ -102,7 +102,7 @@ class FormalLanguage {
         return false;
     }
 
-    testOnSamples (samples: string[], expected: string[]): SampleResults {
+    testOnSamplesWithOutput (samples: string[], expected: string[]): SampleResults {
         let results = new SampleResults();
         for (let i = 0; i < samples.length; ++i) {
             let testResult = this.test(samples[i]);
@@ -125,6 +125,22 @@ class FormalLanguage {
         }
         return results;
     }
+
+
+    testOnSamples (samples: string[]): SampleResults {
+        let results = new SampleResults();
+        for (let i = 0; i < samples.length; ++i) {
+            let testResult = this.test(samples[i]);
+            if (testResult.passed) {
+                results.acceptedPassed.push(samples[i])
+            } else {
+                results.rejected.push(samples[i]);
+            }
+        }
+        return results;
+    }
+
+
 
     test (sample: string): TestResult {
         return new TestResult(sample.length % 2 == 0, "");

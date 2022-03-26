@@ -427,7 +427,7 @@ describe('TMEngine', function () {
             let tm = tmUpperCase();
             let inputs = ['aba', 'abb', 'abc'];
             let expected = ['ABA', 'BBB', 'x'];
-            let results = tm.testOnSamples(inputs, expected);
+            let results = tm.testOnSamplesWithOutput(inputs, expected);
             expect(results.acceptedPassed.length).to.be.equal(1);
             expect(results.acceptedFailed.length).to.be.equal(1);
             expect(results.rejected.length).to.be.equal(1);

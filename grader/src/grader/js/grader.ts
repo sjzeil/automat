@@ -197,25 +197,27 @@ try {
 dbg("read " + reject.length + " reject strings");
 
 let expected = [] as string[];
+let expectedAvailable = false;
 if (language.producesOutput()) {
     try {
         expected = readStrings(`${baseDir}/${problem}/expected.dat`);
-    } catch(err){
-        error(`Could not read expected strings from ${baseDir}/${problem}/expected.dat<br/>\n${err}`);
-    }
-    dbg("read " + expected.length + " expected strings");
-    if (expected.length != accept.length) {
-        error("accept.dat and expected.dat must be the same length.");
+        expectedAvailable = true;
+        dbg("read " + expected.length + " expected strings");
+        if (expected.length != accept.length) {
+            error("accept.dat and expected.dat must be the same length.");
+        }
+    } catch (err) {
+        expectedAvailable = false;
     }
 }
 
-let acceptResults = language.testOnSamples(accept, expected);
-let rejectResults = language.testOnSamples(reject, []);
+let acceptResults = (expectedAvailable)?  language.testOnSamplesWithOutput(accept, expected) : language.testOnSamples(accept);
+let rejectResults = language.testOnSamples(reject);
 
 let acceptAccuracy = 100.0;
 if (accept.length > 0) {
     acceptAccuracy = 100.0 * acceptResults.acceptedPassed.length / accept.length;
-    if (language.producesOutput()) {
+    if (expectedAvailable && language.producesOutput()) {
         console.log(
             div('results', 'Accepted and produced correct output for '
             + acceptResults.acceptedPassed.length + ' out of ' + accept.length + ' strings')
@@ -241,7 +243,7 @@ if (acceptResults.rejected.length > 0) {
     console.log(div('results', 'Some examples of strings that your language rejected but should have accepted:'
        + printExamples(acceptResults.rejected)));
 }
-if (acceptResults.acceptedFailed.length > 0) {
+if (expectedAvailable && acceptResults.acceptedFailed.length > 0) {
     console.log(div('results', 'Some examples of strings on which your automaton produced incorrect outputs are:' 
        + printOutputExamples(acceptResults)));
 }
