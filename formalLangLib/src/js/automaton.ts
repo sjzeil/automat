@@ -176,6 +176,8 @@ export class Automaton extends FormalLanguage {
             if (newState) {
                 newState.initial = state.initial;
                 newState.final = state.final;
+                newState.x = state.x;
+                newState.y = state.y;
             }
         }
         let transition;
