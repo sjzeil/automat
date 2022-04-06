@@ -353,6 +353,18 @@ sub userUnlockKey {
 
 sub logAccess
 {
+	if ($properties{'problem'} && $properties{'user'}) {
+		my $logFileDir = $properties{'base'} . '/' . $properties{'problem'} . '/submitted' ;
+		mkdir $logFileDir;
+		system("chgrp $preferredGroup " . $logFileDir);
+		system("chmod $preferredDirPermissions " . $logFileDir);
+		my $urlFile = $logFileDir . '/' . $properties{'user'} . '.url';
+		open URL, ">$urlFile"   or return;
+		say URL $page_url;
+		close URL;
+		system("chgrp $preferredGroup $urlFile");
+		system("chmod $preferredDirPermissions $urlFile");
+	}
 	if ($properties{'logFile'} && $properties{'problem'}) {
 		my $thisMonth = strftime("%Y-%m-", localtime(time));
 		my $logFile = $properties{'base'} . '/' . $thisMonth . $properties{'logFile'};
