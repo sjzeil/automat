@@ -56,7 +56,7 @@ export class Grammar extends FormalLanguage {
     }
 
     addProduction(prod: Production) {
-        let pos = this.productions.indexOf(prod);
+        let pos = this.productions.findIndex(obj => (prod.lhs == obj.lhs) && (prod.rhs == obj.rhs));
         if (pos < 0) {
             this.productions.push({
                 lhs: prod.lhs,
@@ -72,7 +72,7 @@ export class Grammar extends FormalLanguage {
     }
 
     removeProduction(prod: Production) {
-        let prPos = this.productions.indexOf(prod);
+        let prPos = this.productions.findIndex(obj => (prod.lhs == obj.lhs) && (prod.rhs == obj.rhs));
         if (prPos >= 0) {
             this.productions.splice(prPos, 1);
             this.derivations = [];
@@ -190,29 +190,38 @@ export class Grammar extends FormalLanguage {
         for (let production of this.productions) {
             if (production.lhs != nonTerminal) {
                 newProductions.push(production);
-            } else if (production.rhs.charAt(0) == nonTerminal) {
+            } else if ((production.rhs.length > 0) && (production.rhs.charAt(0) == nonTerminal)) {
                 recursiveProductions.push(production);
             } else {
                 nonrecursiveProductions.push(production);
             }
         }
-        let newNonTerminal = this.generateNewNonTerminal();
-        for (let prod of nonrecursiveProductions) {
-            newProductions.push({
-                lhs: nonTerminal,
-                rhs: prod.rhs + newNonTerminal
-            });
-        }
-        for (let prod of recursiveProductions) {
+        if (recursiveProductions.length > 0) {
+            let newNonTerminal = this.generateNewNonTerminal();
+            for (let prod of nonrecursiveProductions) {
+                newProductions.push({
+                    lhs: nonTerminal,
+                    rhs: prod.rhs + newNonTerminal
+                });
+            }
+            for (let prod of recursiveProductions) {
+                newProductions.push({
+                    lhs: newNonTerminal,
+                    rhs: prod.rhs.substring(1) + newNonTerminal
+                });
+            }
             newProductions.push({
                 lhs: newNonTerminal,
-                rhs: prod.rhs.substring(1) + newNonTerminal
+                rhs: ''
             });
+        } else {
+            for (let prod of nonrecursiveProductions) {
+                newProductions.push({
+                    lhs: prod.lhs,
+                    rhs: prod.rhs
+                });
+            }
         }
-        newProductions.push({
-            lhs: newNonTerminal,
-            rhs: ''
-        });
         this.productions = newProductions;
     }
 
@@ -346,7 +355,7 @@ export class Grammar extends FormalLanguage {
     }
 
     parse(sample: string): TestResult {
-       //console.log('parsing: ' + sample);
+        //console.log('parsing: ' + sample);
         let counter = 0;
         let q = new Queue<string>();
         let examined = new Set();
@@ -404,12 +413,12 @@ export class Grammar extends FormalLanguage {
         let re = new RegExp(reStr);
         return re.test(sample);
     }
-    
+
     isAlphanumeric(sym: string): boolean {
         let code = sym.charCodeAt(0);
         return ((code > 47 && code < 58) ||
-                (code > 64 && code < 91) ||
-                (code > 96 && code < 123));
+            (code > 64 && code < 91) ||
+            (code > 96 && code < 123));
     }
 
     splitAtFirstNonTermal(derivation: string) {

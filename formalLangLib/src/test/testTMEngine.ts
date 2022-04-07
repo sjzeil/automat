@@ -423,7 +423,7 @@ describe('TMEngine', function () {
     });
 
     context('TM function', function () {
-        it('TM transition succeeds', function () {
+        it('TM basic function eval', function () {
             let tm = tmUpperCase();
             let inputs = ['aba', 'abb', 'abc'];
             let expected = ['ABA', 'BBB', 'x'];
@@ -435,6 +435,39 @@ describe('TMEngine', function () {
             expect(results.actual.length).to.be.equal(1);
             expect(results.actual[0]).to.be.equal('ABB');
             expect(results.expected[0]).to.be.equal('BBB');
+        });
+        it('TM problem function eval', function () {
+            let tm = new Automaton('Instructor', '', new TMEngine());
+            tm.addState('0');
+            tm.addState('1');
+            tm.addState('2');
+            tm.addState('3');
+            tm.addState('4');
+            tm.addState('5');
+            tm.states[0].initial = true;
+            tm.states[5].final = true;
+    
+            tm.addTransition('0', '0', 'x/x,R');
+            tm.addTransition('0', '1', '1/x,R');
+            tm.addTransition('1', '1', '!@/~,R');
+            tm.addTransition('1', '2', '@/y,L');
+            tm.addTransition('2', '2', 'y/y,L');
+            tm.addTransition('2', '2', '1/1,L');
+            tm.addTransition('2', '0', 'x/x,R');
+            tm.addTransition('2', '0', '@/@,R');
+            tm.addTransition('0', '3', '@/@,L');
+            tm.addTransition('0', '3', 'y/y,L');
+            tm.addTransition('3', '3', '!@/~,L');
+            tm.addTransition('3', '4', '@/@,R');
+            tm.addTransition('4', '4', 'x/1,R');
+            tm.addTransition('4', '4', 'y/1,R');
+            tm.addTransition('4', '5', '@/@,S');
+ 
+            let inputs = ['', '1', '11'];
+            let expected = ['', '11', '1111'];
+            let results = tm.testOnSamplesWithOutput(inputs, expected);
+            expect(results.acceptedPassed.length).to.be.equal(3);
+            expect(results.acceptedFailed.length).to.be.equal(0);
         });
     });
 

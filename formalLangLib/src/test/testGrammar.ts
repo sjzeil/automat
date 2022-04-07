@@ -21,6 +21,19 @@ describe('Grammar', function () {
             expect(gr.producesOutput()).to.be.false;
         });
     });
+    context('addProduction', function() {
+        let gr = new Grammar("Instructor", "");
+        it('should add two productions', function() {
+            gr.addProduction({lhs: 'S', rhs: 'A'});
+            gr.addProduction({lhs: 'A', rhs: 'a'});
+            expect(gr.productions.length).to.be.equal(2);
+        });
+        it('should not add duplicate productions', function() {
+            gr.addProduction({lhs: 'S', rhs: 'A'});
+            gr.addProduction({lhs: 'A', rhs: 'a'});
+            expect(gr.productions.length).to.be.equal(2);
+        });
+    });
     context('valid grammar', function () {
         let gr = new Grammar('Instructor', '');
         let productions = [
@@ -157,6 +170,27 @@ describe('Grammar', function () {
         });
         it('should reject x**[y*x]', function() {
             expect(gr.test('x**[y*x]').passed).to.be.false;
+        });
+    });
+
+    context('string testing2', function() {
+        let gr = new Grammar('Instructor', '');
+        let productions = [
+            'S=0A0',
+            'S=1B1',
+            'S=BB',
+            'A=C',
+            'B=S',
+            'B=A',
+            'C=S',
+            'C='
+        ];
+        addProductions(gr, productions);
+        it('should accept ""', function() {
+            expect(gr.test('').passed).to.be.true;
+        });
+        it('should accept 00011011', function() {
+            expect(gr.test('00011011').passed).to.be.true;
         });
     });
 
