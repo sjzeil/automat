@@ -21,7 +21,7 @@ my $preferredDirPermissions = 770;
 my $preferredFilePermissions = 660;
 
 
-my @actions=("editor", "grading", "summary");
+my @actions=("editor", "grading", "summary", "loading");
 
 my $query = new CGI;
 
@@ -64,6 +64,12 @@ if (!defined($problem)) {
 	$problem="";
 }
 
+my $saved = $query->param("saved");
+if (!defined($saved)) {
+	$saved='';
+} else {
+	$page_url =~ s/&saved=1//;
+}
 
 
 if ($page_url eq "https://") {
@@ -199,113 +205,153 @@ if (($query->param('problemEdited')) && ($query->param('problemEdited') eq '1' )
 	print "</body></html>\n";
 	
 } elsif ($authenticationMsg eq "") {  # authentication succeeded
-	$htmlText = readFileIntoString($action . ".template");
-	
-	if ($action eq "grading") {
-		# Run the grade report
-		my $solution = $properties{"solution"};
-		my $ukey = userUnlockKey();
-		my $graderCommand = "$nodePath grader.bundle.js --user=$username --lang=$language --solution='$solution'"
-			.  " --problem=" . $properties{"problem"} 
-		. " --unlockKey='" . creatorUnlockKey() . "'"
-			. " --base='" . $properties{"base"} . "'"
-			. " --lock=" . $properties{"lock"}
-		. " --thisURL='$page_url'"
-			. " --unlockedURL='" . $properties{"unlockedURL"} . "'"
-			;
-		my $reportOut = `$graderCommand`;
-		if ($debugging) {
-			$reportOut .= "\n<h2>Debugging</h2><pre>\n";
-			foreach my $propertyKey (keys %properties) {
-				$reportOut .= "$propertyKey=" . $properties{$propertyKey} . "\n";
+
+	if (($action eq 'loading') && $properties{'problem'}) {
+		if ($properties{'user'} eq 'Instructor') {
+			$htmlText = "<html><head><title>Select saved language</title></head><body>\n";
+			my $logFileDir = $properties{'base'} . '/' . $properties{'problem'} . '/submitted' ;
+			my @urlFiles = glob "$logFileDir/*.url";
+			if (scalar(@urlFiles) > 0) {
+				$htmlText .= "<h1>Select saved language</h1><ul>\n";
+				foreach my $urlFile ( sort @urlFiles) {
+					open URL, "<$urlFile";
+					my $url = <URL>;
+					my $submitter = $urlFile;
+					$submitter =~ s|.*/||;
+					$submitter =~ s/[.]url//;
+					$htmlText .= "<li><a href='$url'>$submitter</li>\n";
+					close URL;
+				}
+				$htmlText .= "</ul>";
+			} else {
+				$htmlText .= "<p>No saves have been made.</p>\n";
 			}
-			$reportOut .= "page_url=$page_url\n";
-			$reportOut .= "creatorUnlockKey=" . creatorUnlockKey() . "\n";
-			$reportOut .= "userUnlockKey=" . userUnlockKey() . "\n";
-			#$reportOut .= "graderCommand=" . $graderCommand . "\n";
-			
-			$reportOut .= "</pre>\n";
-		}
-		$properties{'reportBody'} = $reportOut;
-		
-		if ($properties{"user"} eq "Instructor") {
-			# Instructors can modify the problem
-			my $problemEdit = "<h2>Edit the Problem</h2>\n";
-			$problemEdit .= "<h3>" . $properties{"problem"} . "</h3>";
-			$properties{'graderForm'} = '';
-			$problemEdit .= "<form id='problemForm' method='post'>\n";
-			$problemEdit .= "<div>\n";
-			$problemEdit .= "<label for='problemTitle'>Title:</label>\n" .
-			    "<input type='text' id='problemTitle' name='problemTitle' value='" 
-				. $properties{"title"} . "'/><br/>\n";
-			$problemEdit .= "<input type='button' value='Use Submission as Solution' onclick='useAsSolution()'/>\n";
-			$problemEdit .= "<label for='problemSolution'>Solution:</label>\n" .
-			    "<input type='text' id='problemSolution' name='problemSolution' size='40' value='" 
-				. $properties{"solution"} . "'/><br/> ";
-			$problemEdit .= "<input type='hidden' id='problemLock' name='problemLock' value='" 
-				. $properties{"lock"} . "'/>\n";
-			$problemEdit .= "<input type='hidden' id='problemEdited' name='problemEdited' value='0'/> \n";
-			$problemEdit .= "<input type='hidden' id='problemURL' name='problemURL' value='{location.href}'/>\n";
-			$problemEdit .= "<input type='hidden' id='problem' name='problem' value='" . $problem . "'/>\n";
-			if ($query->param('test')) {
-				$problemEdit .= "<input type='hidden' id='test' name='test' value='" . $query->param('test') . "'/>\n";
-			}
-			my $isSelfAssess = ($properties{"lock"} == 0);
-			$problemEdit .= "<label for='problemSelfAssess'>Self-assessed?</label>\n" .
-			    "<input type='checkBox' id='problemSelfAssess' name='problemSelfAssess'/>\n";
-			$problemEdit .= "</div>\n";
-			$problemEdit .= "</form>\n";
-			$problemEdit .= "<script>function useAsSolution() { let textBox = document.getElementById('problemSolution'); " .
-				"problemSolution.value = location.href.replace('&action=grading', '');}\n".
-				"let saCheckBox = document.getElementById('problemSelfAssess');\n" .
-				"let problemLock = document.getElementById('problemLock');\n" .
-				"saCheckBox.checked = (problemLock.value == '0');\n" .
-				"let problemURL = document.getElementById('problemURL');\n" .
-				"problemURL.value = location.href;\n" .
-				"function saveIt() {let edited = document.getElementById('problemEdited'); edited.value = '1';\n" .
-				"let form = document.getElementById('problemForm');\nform.submit();}" .
-				"</script>\n";
-			$problemEdit .= "<input type='button' value='Save &amp; Submit' onclick='saveIt()'/><br/>\n";
-			
-			$problemEdit .= "<h2>Generate Test Data</h2>\n";
-			$problemEdit .= "<form id='generateForm' method='post'>\n";
-			$problemEdit .= "<div>\n";
-			$problemEdit .= "<label for='alphabet'>Alphabet:</label>\n" .
-			    "<input type='text' id='alphabet' name='alphabet' value='01'/><br/>\n";
-			$problemEdit .= "<label for='maxLen'>Maximum string length:</label>\n" .
-			    "<input type='text' id='maxLen' name='maxLen' size='3' value='4' /><br/>\n";
-			$problemEdit .= "<input type='hidden' id='dataRequested' name='dataRequested' value='0'/> \n";
-			$problemEdit .= "<input type='hidden' id='problemURL2' name='problemURL' value='{location.href}'/>\n";
-			$problemEdit .= "<input type='hidden' id='problem2' name='problem' value='" . $problem . "'/>\n";
-			if ($query->param('test')) {
-				$problemEdit .= "<input type='hidden' id='test2' name='test' value='" . $query->param('test') . "'/>\n";
-			}
-			$problemEdit .= "<label for='genAccept'>Generate accept.dat?</label>\n" .
-			    "<input type='checkBox' id='genAccept' name='genAccept'/><br/>\n";
-			$problemEdit .= "<label for='genReject'>Generate reject.dat?</label>\n" .
-			    "<input type='checkBox' id='genReject' name='genReject'/><br/>\n";
-			$problemEdit .= "<label for='genExpect'>Generate expected.dat? (TMs only)</label>\n" .
-			    "<input type='checkBox' id='genExpect' name='genExpect'/>\n";
-			$problemEdit .= "<script>\n" .
-				"function generateData() {let edited = document.getElementById('dataRequested'); dataRequested.value = '1';\n" .
-				"let problemURL = document.getElementById('problemURL2');\n" .
-				"problemURL.value = location.href;\n" .
-				
-				"let form = document.getElementById('generateForm');\nform.submit();}" .
-				"</script>\n";
-			$problemEdit .= "<br/><input type='button' value='Generate' onclick='generateData()'/><br/>\n";
-			$problemEdit .= "</div>\n";
-			$problemEdit .= "</form>\n";
-			
-			
-			$properties{'graderForm'} = $problemEdit;
+			$htmlText .= "</body></html>\n";
 		} else {
-			$properties{'graderForm'} = '';
+			# allow student to load own saved file
+			my $logFileDir = $properties{'base'} . '/' . $properties{'problem'} . '/submitted' ;
+			my $userName = $properties{'user'};
+			my $urlFile = "$logFileDir/$userName.url";
+			$htmlText = "<html><head><title>Select saved language</title></head><body>\n";
+			if (-r $urlFile) {
+				open URL, "<$urlFile";
+				my $url = <URL>;
+				$htmlText .= "<p>Load your <a href='$url'>last-saved language</a> for this problem.</p>\n";
+				close URL;
+			} else {
+				$htmlText .= "<p>You have not saved a language for this problem..</p>\n";
+			}
+			$htmlText .= "</body></html>\n";
 		}
-		
-	}
+	} else {
+		$htmlText = readFileIntoString($action . ".template");
 	
-	performSubstutitions();
+		if ($action eq "grading") {
+			# Run the grade report
+			my $solution = $properties{"solution"};
+			my $ukey = userUnlockKey();
+			my $graderCommand = "$nodePath grader.bundle.js --user=$username --lang=$language --solution='$solution'"
+				.  " --problem=" . $properties{"problem"} 
+				. " --unlockKey='" . creatorUnlockKey() . "'"
+				. " --base='" . $properties{"base"} . "'"
+				. " --lock=" . $properties{"lock"}
+				. " --thisURL='$page_url'"
+				. " --unlockedURL='" . $properties{"unlockedURL"} . "'"
+				;
+			my $reportOut = `$graderCommand`;
+			if ($debugging) {
+				$reportOut .= "\n<h2>Debugging</h2><pre>\n";
+				foreach my $propertyKey (keys %properties) {
+					$reportOut .= "$propertyKey=" . $properties{$propertyKey} . "\n";
+				}
+				$reportOut .= "page_url=$page_url\n";
+				$reportOut .= "creatorUnlockKey=" . creatorUnlockKey() . "\n";
+				$reportOut .= "userUnlockKey=" . userUnlockKey() . "\n";
+				#$reportOut .= "graderCommand=" . $graderCommand . "\n";
+			
+				$reportOut .= "</pre>\n";
+			}
+			$properties{'reportBody'} = $reportOut;
+		
+			if ($properties{"user"} eq "Instructor") {
+				# Instructors can modify the problem
+				my $problemEdit = "<h2>Edit the Problem</h2>\n";
+				$problemEdit .= "<h3>" . $properties{"problem"} . "</h3>";
+				$properties{'graderForm'} = '';
+				$problemEdit .= "<form id='problemForm' method='post'>\n";
+				$problemEdit .= "<div>\n";
+				$problemEdit .= "<label for='problemTitle'>Title:</label>\n" .
+			    	"<input type='text' id='problemTitle' name='problemTitle' value='" 
+					. $properties{"title"} . "'/><br/>\n";
+				$problemEdit .= "<input type='button' value='Use Submission as Solution' onclick='useAsSolution()'/>\n";
+				$problemEdit .= "<label for='problemSolution'>Solution:</label>\n" .
+			    	"<input type='text' id='problemSolution' name='problemSolution' size='40' value='" 
+					. $properties{"solution"} . "'/><br/> ";
+				$problemEdit .= "<input type='hidden' id='problemLock' name='problemLock' value='" 
+					. $properties{"lock"} . "'/>\n";
+				$problemEdit .= "<input type='hidden' id='problemEdited' name='problemEdited' value='0'/> \n";
+				$problemEdit .= "<input type='hidden' id='problemURL' name='problemURL' value='{location.href}'/>\n";
+				$problemEdit .= "<input type='hidden' id='problem' name='problem' value='" . $problem . "'/>\n";
+				if ($query->param('test')) {
+					$problemEdit .= "<input type='hidden' id='test' name='test' value='" . $query->param('test') . "'/>\n";
+				}
+				my $isSelfAssess = ($properties{"lock"} == 0);
+				$problemEdit .= "<label for='problemSelfAssess'>Self-assessed?</label>\n" .
+			    	"<input type='checkBox' id='problemSelfAssess' name='problemSelfAssess'/>\n";
+				$problemEdit .= "</div>\n";
+				$problemEdit .= "</form>\n";
+				$problemEdit .= "<script>function useAsSolution() { let textBox = document.getElementById('problemSolution'); " .
+					"problemSolution.value = location.href.replace('&action=grading', '');}\n".
+					"let saCheckBox = document.getElementById('problemSelfAssess');\n" .
+					"let problemLock = document.getElementById('problemLock');\n" .
+					"saCheckBox.checked = (problemLock.value == '0');\n" .
+					"let problemURL = document.getElementById('problemURL');\n" .
+					"problemURL.value = location.href;\n" .
+					"function saveIt() {let edited = document.getElementById('problemEdited'); edited.value = '1';\n" .
+					"let form = document.getElementById('problemForm');\nform.submit();}" .
+					"</script>\n";
+				$problemEdit .= "<input type='button' value='Save &amp; Submit' onclick='saveIt()'/><br/>\n";
+			
+				$problemEdit .= "<h2>Generate Test Data</h2>\n";
+				$problemEdit .= "<form id='generateForm' method='post'>\n";
+				$problemEdit .= "<div>\n";
+				$problemEdit .= "<label for='alphabet'>Alphabet:</label>\n" .
+			    	"<input type='text' id='alphabet' name='alphabet' value='01'/><br/>\n";
+				$problemEdit .= "<label for='maxLen'>Maximum string length:</label>\n" .
+			    	"<input type='text' id='maxLen' name='maxLen' size='3' value='4' /><br/>\n";
+				$problemEdit .= "<input type='hidden' id='dataRequested' name='dataRequested' value='0'/> \n";
+				$problemEdit .= "<input type='hidden' id='problemURL2' name='problemURL' value='{location.href}'/>\n";
+				$problemEdit .= "<input type='hidden' id='problem2' name='problem' value='" . $problem . "'/>\n";
+				if ($query->param('test')) {
+					$problemEdit .= "<input type='hidden' id='test2' name='test' value='" . $query->param('test') . "'/>\n";
+				}
+				$problemEdit .= "<label for='genAccept'>Generate accept.dat?</label>\n" .
+			    	"<input type='checkBox' id='genAccept' name='genAccept'/><br/>\n";
+				$problemEdit .= "<label for='genReject'>Generate reject.dat?</label>\n" .
+			    	"<input type='checkBox' id='genReject' name='genReject'/><br/>\n";
+				$problemEdit .= "<label for='genExpect'>Generate expected.dat? (TMs only)</label>\n" .
+			    	"<input type='checkBox' id='genExpect' name='genExpect'/>\n";
+				$problemEdit .= "<script>\n" .
+					"function generateData() {let edited = document.getElementById('dataRequested'); dataRequested.value = '1';\n" .
+					"let problemURL = document.getElementById('problemURL2');\n" .
+					"problemURL.value = location.href;\n" .
+				
+					"let form = document.getElementById('generateForm');\nform.submit();}" .
+					"</script>\n";
+				$problemEdit .= "<br/><input type='button' value='Generate' onclick='generateData()'/><br/>\n";
+				$problemEdit .= "</div>\n";
+				$problemEdit .= "</form>\n";
+			
+			
+				$properties{'graderForm'} = $problemEdit;
+			} else {
+				$properties{'graderForm'} = '';
+			}
+		
+		}
+	
+		performSubstutitions();
+	}
 	print $htmlText;
 } else {
 	print "<html><body><p><b>$authenticationMsg</b></body></html>";
@@ -324,6 +370,9 @@ sub OKToLoad
 		return "";
 	}
 	if ($action eq "editor" && !defined($language)) {
+		return "";
+	}
+	if ($action eq "loading") {
 		return "";
 	}
 	if ($action ne "grading") {
@@ -353,17 +402,19 @@ sub userUnlockKey {
 
 sub logAccess
 {
-	if ($properties{'problem'} && $properties{'user'}) {
+	if ($properties{'problem'} && $properties{'user'} && $saved) {
 		my $logFileDir = $properties{'base'} . '/' . $properties{'problem'} . '/submitted' ;
 		mkdir $logFileDir;
 		system("chgrp $preferredGroup " . $logFileDir);
 		system("chmod $preferredDirPermissions " . $logFileDir);
 		my $urlFile = $logFileDir . '/' . $properties{'user'} . '.url';
 		open URL, ">$urlFile"   or return;
-		say URL $page_url;
+		my $saveURL = $page_url;
+		$saveURL =~ s/[&]saved=1//g;
+		say URL $saveURL;
 		close URL;
 		system("chgrp $preferredGroup $urlFile");
-		system("chmod $preferredDirPermissions $urlFile");
+		system("chmod $preferredFilePermissions $urlFile");
 	}
 	if ($properties{'logFile'} && $properties{'problem'}) {
 		my $thisMonth = strftime("%Y-%m-", localtime(time));

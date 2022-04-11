@@ -86,6 +86,7 @@ export
         if (this.parent.rendering != null) {
             let encoded = this.parent.encodeLanguage();
             urlParams.append('lang', encoded);
+            urlParams.append('saved', '1');
             let newURL = trimmedURL + '?' + urlParams.toString();
             return newURL;
         } else {

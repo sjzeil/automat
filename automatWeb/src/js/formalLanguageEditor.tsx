@@ -185,9 +185,20 @@ export
       }
       return aButton;
     };
+    let loadButton = () => {
+      let aButton = (<span></span>);
+      if (this.props.user == "Instructor" && this.props.problemID != "" && this.rendering != null) {
+        aButton = (<input type="button" value="Load"
+          onClick={this.loadLanguage}
+          />);
+      }
+      return aButton;
+    };
+    
     return (
       <div className="editorToolbar">
         <input type="button" value="New" onClick={this.newLanguage} disabled={this.state.status == "new"} />
+        {loadButton()}
         <input type="button" value="Save" onClick={this.saveLanguage} disabled={this.state.status == "new"} />
         {gradeButton()}
         {anonButton()}
@@ -199,9 +210,20 @@ export
   newLanguage() {
     this.setState({ status: 'new' });
   }
+  
   loadLanguage() {
-    this.setState({ status: 'loading' });
+    let url = window.location.href;
+    let trimmedURL = url.split('?')[0];
+    const queryString = window.location.search;
+    let urlParams = new URLSearchParams(queryString);
+    urlParams.delete('lang');
+    urlParams.delete('saved');
+    urlParams.delete('action');
+    urlParams.append('action', 'loading');
+    let newURL = trimmedURL + '?' + urlParams.toString();
+    window.location.href = newURL;
   }
+
   saveLanguage() {
     let url = this.saveLanguageURL(window.location.href);
     if (navigator.clipboard) {
@@ -235,6 +257,7 @@ export
     if (this.rendering != null) {
         let encoded = this.encodeLanguage();
         urlParams.append('lang', encoded);
+        urlParams.append('saved', '1');
         let newURL = trimmedURL + '?' + urlParams.toString();
         return newURL;
     } else {
