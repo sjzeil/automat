@@ -12,8 +12,12 @@ import "../css/editor.css";
 var flCanvas = new fabric.Canvas('editorView');
 fabric.Object.prototype.objectCaching = false;
 
-//const queryString = window.location.search;
-//const urlParams = new URLSearchParams(queryString);
+if (window.location.href.indexOf('&saved=1') !== -1) {
+  let newLoc = window.location.href.replace('&saved=1', '');
+  window.location.replace(newLoc);
+}
+
+
 const creatorName = document.getElementById('creatorName');
 
 ReactDOM.render(
