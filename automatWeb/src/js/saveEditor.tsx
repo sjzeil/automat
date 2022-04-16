@@ -65,7 +65,7 @@ export
                     and bookmarking it or pasting it into a document of your choice.
                 </div>
                 <div>
-                    <input type="button" value="Back" onClick={this.goBack} />
+                    <input type="button" value="OK" onClick={this.goBack} />
                 </div>
                 <div className="wrapped">Or copy-and paste this URL directly: <br/>{saveURL} </div>
             </div>
@@ -73,9 +73,13 @@ export
     }
 
     goBack() {
+        /*
         this.parent.setState({
             status: this.parent.state.oldStatus,
         });
+        */
+        let url = this.parent.saveLanguageURL(window.location.href);
+        window.location.replace(url);
     }
 
     saveLanguage(url: string) {

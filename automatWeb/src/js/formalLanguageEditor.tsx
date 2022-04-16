@@ -232,8 +232,7 @@ export
       console.log("Unable to access clipboard");
     }
     if (window.location.href != url) {
-      window.location.href = url;
-    } else {
+      history.pushState(null, '', url);
       this.setState({
         oldStatus: this.state.status,
         status: 'saving',
