@@ -114,6 +114,7 @@ export
         console.log("GrammarEditor rendering");
         let lastStep = this.rendering.derivations[this.rendering.derivations.length - 1];
         let derivationType = this.rendering.derivationProperties();
+        let validation = this.props.language.language.validate();
         return (
             <React.Fragment>
                 <div className="editors">
@@ -158,6 +159,13 @@ export
                             <span className="testResult">{this.state.testResult}</span>
                         </div>
                     </div>
+                    <div className="warnings">
+                        {validation.warnings}
+                    </div>
+                    <div className="errors">
+                        {validation.errors}
+                    </div>
+
                 </div>
             </React.Fragment>
         );

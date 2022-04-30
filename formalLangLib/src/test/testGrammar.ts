@@ -82,6 +82,30 @@ describe('Grammar', function () {
             expect(gr.validate().errors).is.not.equal("");
         });
     });
+    context('invalid RHS2', function () {
+        let gr = new Grammar('Instructor', '');
+        let productions = [
+            'S=S A',
+            'S=',
+            'A=a A'
+        ];
+        addProductions(gr, productions);
+        it('should say this is invalid', function() {
+            expect(gr.validate().errors).is.not.equal("");
+        });
+    });
+    context('invalid RHS3', function () {
+        let gr = new Grammar('Instructor', '');
+        let productions = [
+            'S=AS',
+            'S=@',
+            'A=a'
+        ];
+        addProductions(gr, productions);
+        it('should say this is invalid', function() {
+            expect(gr.validate().errors).is.not.equal("");
+        });
+    });
     context('split', function () {
         let gr = new Grammar('Instructor', '');
         let result = gr.splitAtFirstNonTermal('abQcd');
