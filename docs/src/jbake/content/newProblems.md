@@ -1,28 +1,34 @@
-title=Overview
+title=Creating a New Problem
 type=page
 manual=instructor
 sequence=1
-prev=instructorsManual
+prev=directories
 status=published
 ~~~~~~
 
-## Modes of Operation
+The files that make up a problem directory can be created manually, but it's usually easier to use Automat itself to set up most of the information.  Then, if desired, you can manually edit the lists of accept and reject strings to refine your problem checking.
 
-The Automat editor can function in three disiotnct modes:
+Suppose, for the sake of example, you wanted to create a problem in which students were asked to create a FA recognizing hte language over {0,1} of strings ending with a 1.
 
-1. A *free-form* editor, for use in preparing formal languages not tied to a specific problem, and (probably) not requiring students to log in.
-2. A *self-assessment* editor, in which students have been directed to solve a specific problem and may request immediate feedback on how well they have done, including viewing a sample solution (provided by hte instructor).
-3. A *graded problem* editor, in which students are be directed to solve a specific problem and to submit their work for grading. The sample solution and feedback are withheld until released by an instructor or grader.
+1. Browse to the base address of the Automat editor: `https://`...`/automat.cgi`
 
-The self-assessment and graded problems modes require that students be logged in. Logging in is optional for free-form editing.
+2. Create a unique label for your problem. This will be used as a directory name, so limit it to alphabetic character, numeric digits, hyphens and underscores. Let's use, for the sake of example, "FA-ends-with-1".
 
-User authentication (logging in) is handled outside of Automat, presumbly by Apache-style `.htaccess` files.
+3. In your browser modify your URL by adding "?problem=" and your label to the end.  You should wind up with something like `https://`...`/automat.cgi?problem=FA-ends-with-1`
 
-It is possible to use a single installation of Automat (at a single URL) for all three modes of operation or to use separate installations and URL's for each mode.
+4. Now go ahead and create your solution to this problem. 
 
-## Directory Structures
+5. When you are happy with your solution, click the `Grade Report` button.
 
-### Free-form Editing
+    You will receive a grade report that shows your automaton as the "Student's Submission", but has nothing under the "Instructor's Solution".
+
+    <img src='images/editTheProblem.png' style='float: right;'/>
+
+6. Scroll down to the `Edit the Problem" area.
+
+
+
+## Free-form Editing
 
 To set up for free-form editing, the basic Automat distribution files can be unpacked into any directory served by a web server with Perl CGI support.   The resulting structure will look like:
 
@@ -42,11 +48,11 @@ directory-on-webserver
 ```
 
 
-### Self-assessment and Graded Problem Modes
+## Self-assessment and Graded Problem Modes
 
 To set up for self-assessment and graded problem editing, you will need a directory served by the web server and a problem set directory that, for security reasons, should generally be in a directory readable by the server but not actually mapped onto URLs.
 
-#### On the web server
+### On the web server
 
 ```
 directory-on-webserver
@@ -68,18 +74,18 @@ directory-on-webserver
 This is the same as the free-form directory, with two additions:
 
 * A `.htaccess` or similar file forcing student logins.
-* An `automat.ini` file contaiining property assignments. This file _must_ have the property
+* An `automat.ini` file containing property assignments. This file _must_ have the property
 
     `base=`_path-to-problem-set_
 
-    indicating the location ofthe problem set directory.   It may also include the property
+    indicating the location of the problem set directory.   It may also include the property
 
     `instructors=`_name1,name2,..._
 
     though this can also be provided in lower-level `.ini` files as well.   This property provides a comma-separated list of
     login names for instructors, TAs, graders, and others who will need the ability to set up new problems, edit existing problems, and/or to grade student submissions.
 
-#### The Problem Set
+### The Problem Set
 
 The problem set directory, usually located outside of the directory tree directly served by the web server,
 will contain another `automat.ini` file and one or more problem directories.
@@ -101,6 +107,7 @@ will contain another `automat.ini` file and one or more problem directories.
 .   .
 ```
 
+#### automat.ini
 
 The `automat.ini` file in the problem set provides properties that are shared by all of the problems.  
 
@@ -118,9 +125,12 @@ The `automat.ini` file in the problem set provides properties that are shared by
 
     If the `lock` property is missing, it can be supplied in the individual problem `.ini` files, allowing self-assessment and graded problems to be mingled within a single problem set.
 
-The problem directories may have any legal directory name. The name serves as a unique ID for each problem.  For example, if I wanted to set my students the problem of designing a determnistic finite automaton to accept strings over ${0,1}$ that contain only zeros, I might name the directory `DFA-all-zeros`.
+The problem directories may have any legal directory name. The name serves as a unique ID for each problem.  For example, if I wanted to set my students the problem of designing a deterministic finite automaton to accept strings over ${0,1}$ that contain only zeros, I might name the directory `DFA-all-zeros`.
 
-Each problem set directory can contain the following:
+
+#### Problem Directories
+
+Each problem directory can contain the following:
 
 * A `.ini` file, usually carrying the same name as the directory, with the contents
 
@@ -132,9 +142,9 @@ Each problem set directory can contain the following:
 
 * `accept.dat` and `reject.dat`, lists of strings, one per line, that should be accepted by a correct solution and rejected by a correct solution, respectively.
 
-* `expected.dat`, an optional file used only with Turing machines to indicate the desired contents of tape 0 upon reachign an accepting state.
+* `expected.dat`, an optional file used only with Turing machines to indicate the desired contents of tape 0 upon reaching an accepting state.
 
-* `notes.md`, an optional file containing any content that the instructor wishes deplayed together with the sample solution, e.g., an explanation of how the solution works.  The content of this file will be in Markdown.
+* `notes.md`, an optional file containing any content that the instructor wishes deployed together with the sample solution, e.g., an explanation of how the solution works.  The content of this file will be in Markdown.
 
 
 Automat provides interactive means for instructors to create everything in a problem directory except for the `notes.md` file, though sometimes it may be easier to edit these files directly with an ordinary text editor.

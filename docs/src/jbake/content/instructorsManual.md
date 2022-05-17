@@ -1,7 +1,7 @@
 title=Instructors' Reference Manual
 type=contents
 directory=instructor
-next=setup
+next=modesOfOperation
 status=published
 ~~~~~~
 # Description
