@@ -187,7 +187,7 @@ export
     };
     let loadButton = () => {
       let aButton = (<span></span>);
-      if (this.props.user == "Instructor" && this.props.problemID != "" && this.rendering != null) {
+      if (this.props.problemID != "" && this.rendering != null) {
         aButton = (<input type="button" value="Load"
           onClick={this.loadLanguage}
           />);
@@ -229,7 +229,7 @@ export
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url);
     } else {
-      console.log("Unable to access clipboard");
+      console.log("Unable to save into clipboard");
     }
     if (window.location.href != url) {
       history.pushState(null, '', url);
