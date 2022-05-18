@@ -1,8 +1,9 @@
 title=Creating a New Problem
 type=page
 manual=instructor
-sequence=1
+sequence=3
 prev=directories
+next=notes
 status=published
 ~~~~~~
 
@@ -10,11 +11,16 @@ The files that make up a problem directory can be created manually, but it's usu
 
 Suppose, for the sake of example, you wanted to create a problem in which students were asked to create a FA recognizing hte language over {0,1} of strings ending with a 1.
 
+# Step 1: Create the problem
+
 1. Browse to the base address of the Automat editor: `https://`...`/automat.cgi`
 
 2. Create a unique label for your problem. This will be used as a directory name, so limit it to alphabetic character, numeric digits, hyphens and underscores. Let's use, for the sake of example, "FA-ends-with-1".
 
 3. In your browser modify your URL by adding "?problem=" and your label to the end.  You should wind up with something like `https://`...`/automat.cgi?problem=FA-ends-with-1`
+
+
+# Step 2: Create the instructor's solution
 
 4. Now go ahead and create your solution to this problem. 
 
@@ -24,127 +30,45 @@ Suppose, for the sake of example, you wanted to create a problem in which studen
 
     <img src='images/editTheProblem.png' style='float: right;'/>
 
-6. Scroll down to the `Edit the Problem" area.
+6. Scroll down to the `Edit the Problem" area.  Fill in the information in this section. 
+ 
+    * Replace the title with something descriptive of the problem (without giving away the answer). For example, we might use "FA: ends with 1".
+    * Click the `Use Submission as Solution`. This sets the language currently shown as the Student's Submission as the Instructor's Solution.
+    * If this problem is intended to be self-assessment rather than a graded problem, check the `Self-assessed?` box.
+
+9.  Click `Save & Submit`.
+
+    You will receive a new Grade report page. This one will show the newly registered Instructor's Solution.
+
+    It will also have some complaints near the top about missing test data files.  We'll create those next.
 
 
+# Step 3: Add the test data
 
-## Free-form Editing
+<img src='images/generateTestData.png' style='float: right;'/>
 
-To set up for free-form editing, the basic Automat distribution files can be unpacked into any directory served by a web server with Perl CGI support.   The resulting structure will look like:
+10. Scroll down to the "Generate Test Data" section. Fill in the information in this section.
 
-```
-directory-on-webserver
-|-- automat.cgi
-|-- editor.bundle.js
-|-- editor.template
-|-- generator.bundle.js
-|-- grader.bundle.js
-|-- grading.css
-|-- grading.template
-|-- help
-|   |-- ... contents of help/ directory ...
-|-- metadata.bundle.js
-|-- summary.template
-```
+    * For the "Alphabet", list the characters that can appear in this language. In our example, this would be '0' and '1'.
+    * For the "Maximum string length", enter the length of the longest strings that you want to use as test data. 
+  
+        The generator will produce all strings of length less than or equal to that maximum value, using all possible arrangements of the characters from the alphabet. This gets large quickly. If you have _k_ letters in the alphabet and a maximum string length of _m_, there will be _k<sup>m+1</sup>_ strings generated.  
+        
+        You'll want to keep that number large enough to properly exercise a student's submission but low enough that, when generating a grade report, all of the inputs can be checked without the student's web browser timing out. 
 
+        For our example, we might choose a maximum of, say, 8. 
 
-## Self-assessment and Graded Problem Modes
+    * Put a checkmark in the boxes indicating the data that you want kept. 
+        * "Generate accept.dat" means that all strings accepted by the instructor's solution will be kept for testing students' submissions.
+        * "Generate reject.dat" means that all strings rejected by the instructor's solution will be kept for testing students' submissions.
+        * "Generate expected.dat" is used only with Turing machines and means that means that, in addition to check students submissions to be sure that they accept & reject the appropriate strings, the final contents of the tape when a string is accepted must match the contents left by the instructor's solution.
+        * Click `Generate` to create the test data.
+       
+            Unless something has gone very wrong, you should receive a new grade report indicating that the student's submission (which, at this point is identical to the instructor' solution) passes all the tests.
 
-To set up for self-assessment and graded problem editing, you will need a directory served by the web server and a problem set directory that, for security reasons, should generally be in a directory readable by the server but not actually mapped onto URLs.
+If, at the end of this procedure, you are dissatisfied with the quality of the test data (e.g., your language is one for which you have thousands of rejected strings and only one or two accepted ones), you cna refine the data by
 
-### On the web server
+## Refining the Test data
 
-```
-directory-on-webserver
-|-- .htaccess
-|-- automat.cgi
-|-- automat.ini
-|-- editor.bundle.js
-|-- editor.template
-|-- generator.bundle.js
-|-- grader.bundle.js
-|-- grading.css
-|-- grading.template
-|-- help
-|   |-- ... contents of help/ directory ...
-|-- metadata.bundle.js
-|-- summary.template
-```
-
-This is the same as the free-form directory, with two additions:
-
-* A `.htaccess` or similar file forcing student logins.
-* An `automat.ini` file containing property assignments. This file _must_ have the property
-
-    `base=`_path-to-problem-set_
-
-    indicating the location of the problem set directory.   It may also include the property
-
-    `instructors=`_name1,name2,..._
-
-    though this can also be provided in lower-level `.ini` files as well.   This property provides a comma-separated list of
-    login names for instructors, TAs, graders, and others who will need the ability to set up new problems, edit existing problems, and/or to grade student submissions.
-
-### The Problem Set
-
-The problem set directory, usually located outside of the directory tree directly served by the web server,
-will contain another `automat.ini` file and one or more problem directories.
-
-```
-|-- problem-set
-|   |-- automat.ini
-|   |-- problem1
-|   |   |-- accept.dat
-|   |   |-- notes.md
-|   |   |-- reject.dat
-|   |   `-- problem1.ini
-|   `-- problem2
-|   |   |-- accept.dat
-|   |   |-- expected.dat
-|   |   |-- reject.dat
-|   |   `-- problem2.ini
-.   .
-.   .
-```
-
-#### automat.ini
-
-The `automat.ini` file in the problem set provides properties that are shared by all of the problems.  
-
-* In particular, this is the usual locations for the 
-
-    `instructors=`_name1,name2,..._
-
-    property described earlier.
-
-* If all problems in this problem set are supposed to be self-assessments, then add the property
-
-    `lock=0`
-
-    to this file.  This means that grade reports will be unlocked by default, allowing students immediate access to feedback on their submissions.
-
-    If the `lock` property is missing, it can be supplied in the individual problem `.ini` files, allowing self-assessment and graded problems to be mingled within a single problem set.
-
-The problem directories may have any legal directory name. The name serves as a unique ID for each problem.  For example, if I wanted to set my students the problem of designing a deterministic finite automaton to accept strings over ${0,1}$ that contain only zeros, I might name the directory `DFA-all-zeros`.
-
-
-#### Problem Directories
-
-Each problem directory can contain the following:
-
-* A `.ini` file, usually carrying the same name as the directory, with the contents
-
-    `title=`_a name for this problem_
-    `solution=`_URL of the instructor's sample solution_
-
-    This file can also have a `lock` property, as described earlier. If a `lock` of zero is not provided, Automat will randomly
-    generate a non-zero lock value. When a problem has a non-zero lock, grade reports will only be viewable by students after release by the instructor, and the "release" action stamps the report with the lock value.  Changing the lock value later will render any previously released grade reports unviewable.
-
-* `accept.dat` and `reject.dat`, lists of strings, one per line, that should be accepted by a correct solution and rejected by a correct solution, respectively.
-
-* `expected.dat`, an optional file used only with Turing machines to indicate the desired contents of tape 0 upon reaching an accepting state.
-
-* `notes.md`, an optional file containing any content that the instructor wishes deployed together with the sample solution, e.g., an explanation of how the solution works.  The content of this file will be in Markdown.
-
-
-Automat provides interactive means for instructors to create everything in a problem directory except for the `notes.md` file, though sometimes it may be easier to edit these files directly with an ordinary text editor.
+1. Repeating the autoamtic generation process above, using different maximum lengths for the accepted and rejected strings, or
+2. Manually edit the `accept.dat` and `reject.dat` files to add or remove test cases.

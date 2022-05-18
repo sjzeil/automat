@@ -1,7 +1,7 @@
 title=Directory Structures
 type=page
 manual=instructor
-sequence=1
+sequence=2
 prev=modesOfOperation
 next=newProblems
 status=published
@@ -13,7 +13,7 @@ status=published
 To set up for free-form editing, the basic Automat distribution files can be unpacked into any directory served by a web server with Perl CGI support.   The resulting structure will look like:
 
 ```
-directory-on-webserver
+directory-on-webserver/
 |-- automat.cgi
 |-- editor.bundle.js
 |-- editor.template
@@ -21,7 +21,7 @@ directory-on-webserver
 |-- grader.bundle.js
 |-- grading.css
 |-- grading.template
-|-- help
+|-- help/
 |   |-- ... contents of help/ directory ...
 |-- metadata.bundle.js
 |-- summary.template
@@ -35,7 +35,7 @@ To set up for self-assessment and graded problem editing, you will need a direct
 ### On the web server
 
 ```
-directory-on-webserver
+directory-on-webserver/
 |-- .htaccess
 |-- automat.cgi
 |-- automat.ini
@@ -45,7 +45,7 @@ directory-on-webserver
 |-- grader.bundle.js
 |-- grading.css
 |-- grading.template
-|-- help
+|-- help/
 |   |-- ... contents of help/ directory ...
 |-- metadata.bundle.js
 |-- summary.template
@@ -71,27 +71,21 @@ The problem set directory, usually located outside of the directory tree directl
 will contain another `automat.ini` file and one or more problem directories.
 
 ```
-|-- problem-set
+|-- problem-set/
 |   |-- automat.ini
-|   |-- problem1
-|   |   |-- accept.dat
-|   |   |-- notes.md
-|   |   |-- reject.dat
-|   |   `-- problem1.ini
-|   `-- problem2
-|   |   |-- accept.dat
-|   |   |-- expected.dat
-|   |   |-- reject.dat
-|   |   `-- problem2.ini
+|   |-- problem1/
+|   |   |-- ...contents of problem...
+|   `-- problem2/
+|   |   |-- ...contents of problem...
 .   .
 .   .
 ```
 
 #### automat.ini
 
-The `automat.ini` file in the problem set provides properties that are shared by all of the problems.  
+The `automat.ini` file in the problem set directory provides properties that are shared by all of the problems.  
 
-* In particular, this is the usual locations for the 
+* In particular, this is the usual location for the 
 
     `instructors=`_name1,name2,..._
 
@@ -108,7 +102,25 @@ The `automat.ini` file in the problem set provides properties that are shared by
 The problem directories may have any legal directory name. The name serves as a unique ID for each problem.  For example, if I wanted to set my students the problem of designing a deterministic finite automaton to accept strings over ${0,1}$ that contain only zeros, I might name the directory `DFA-all-zeros`.
 
 
-#### Problem Directories
+### Problem Directories
+
+```
+|-- problem-set/
+|   |-- automat.ini
+|   |-- problem1/
+|   |   |-- accept.dat
+|   |   |-- notes.md
+|   |   |-- reject.dat
+|   |   `-- problem1.ini
+|   `-- problem2/
+|   |   |-- accept.dat
+|   |   |-- expected.dat
+|   |   |-- reject.dat
+|   |   `-- problem2.ini
+.   .
+.   .
+```
+
 
 Each problem directory can contain the following:
 
