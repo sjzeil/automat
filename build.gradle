@@ -3,6 +3,27 @@ plugins {
 	id 'org.hidetake.ssh' version '2.10.1'
 }
 
+
+/** 
+ * Change the webserver info and the uploadLocation
+ * to your own desired deploment location.
+ */
+
+remotes {
+  webServer {
+    host = 'linux.cs.odu.edu'
+    user = 'zeil'
+	agent = true
+  }
+}
+
+ext {
+   uploadLocation = '/home/zeil/secure_html/automat'
+}
+
+
+
+
 task copyDocs (type: Copy, dependsOn: ['docs:bake']) {
 	from 'docs/build/jbake'
 	into 'build/temp/help'
@@ -51,40 +72,20 @@ task zipTest (type: Zip, dependsOn: ['assembleTest']) {
 
 
 
-remotes {
-  webServer {
-    host = 'linux.cs.odu.edu'
-    user = 'zeil'
-	agent = true
-	//identity = '/home/zeil/.ssh/homepc'
-  }
-}
+
 
 task deploy (dependsOn: 'assemble') {
   doLast {
     ssh.run {
       session(remotes.webServer) {
-       put from: "$buildDir/distributions/automat.zip", into: '/home/zeil/secure_html/automat/'
-       execute 'unzip -u -o /home/zeil/secure_html/automat/automat.zip -d /home/zeil/secure_html/automat' 
-       execute 'find /home/zeil/secure_html/automat/ -user zeil -type d | xargs chmod 770'
-       execute 'find /home/zeil/secure_html/automat/ -user zeil -type f | xargs chmod 660'
-       execute 'find /home/zeil/secure_html/automat/ -user zeil -name "*.cgi" | xargs chmod +x'
+       put from: "$buildDir/distributions/automat.zip", into: uploadLocation
+       execute "unzip -u -o ${uploadLocation}/automat.zip -d ${uploadLocation}"
+       execute "find ${uploadLocation}/ -type d | xargs chmod 770"
+       execute "find ${uploadLocation}/ -type f | xargs chmod 660"
+       execute "find ${uploadLocation}/ -name '*.cgi' | xargs chmod 771"
       }
     }
   }
 }
 
-task deployTest (dependsOn: 'zipTest') {
-  doLast {
-    ssh.run {
-      session(remotes.webServer) {
-       put from: "$buildDir/distributions/automatTest.zip", into: '/home/zeil/secure_html/automatTest/'
-       execute 'unzip -u -o /home/zeil/secure_html/automatTest/automatTest.zip -d /home/zeil/secure_html/automatTest'
-       execute 'find /home/zeil/secure_html/automatTest/ -user zeil -type d | xargs chmod 770'
-       execute 'find /home/zeil/secure_html/automatTest/ -user zeil -type f | xargs chmod 660'
-       execute 'find /home/zeil/secure_html/automatTest/ -user zeil -name "*.cgi" | xargs chmod +x'
-      }
-    }
-  }
-}
 

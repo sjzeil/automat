@@ -1,8 +1,8 @@
 title=Implementation Notes
 type=page
 manual=instructor
-sequence=4
-prev=newProblems
+sequence=5
+prev=grading
 status=published
 ~~~~~~
 

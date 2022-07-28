@@ -3,7 +3,7 @@ type=page
 manual=instructor
 sequence=3
 prev=directories
-next=notes
+next=grading
 status=published
 ~~~~~~
 

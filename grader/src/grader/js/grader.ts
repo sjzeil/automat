@@ -148,10 +148,19 @@ if (user === "Instructor") {
     urlParams.delete('lang');
     urlParams.append('lang', languageUnlocked);
     let unlockedURL = urlParts[0] + '?' + urlParams.toString();
+    
+    urlParams = new URLSearchParams(queryString);
+    urlParams.delete('action');
+    urlParams.delete('lang');
+    urlParams.append('action', 'release');
+    urlParams.append('release', language.createdBy);
+    let releaseURL=urlParts[0] + '?' + urlParams.toString();
+
     if (lock == '0') {
         info("This problem is unlocked.")
     } else {
-        info (`Release this report to students by giving them <a target='blank' href='${unlockedURL}'>this URL</a>.`);
+        info (`<a target='blank' href='${releaseURL}'>Release this report to ${language.createdBy}</a>`);
+        info (`or give them <a target='blank' href='${unlockedURL}'>this URL</a>.`);
     }
 }
 

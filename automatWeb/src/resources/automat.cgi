@@ -21,7 +21,7 @@ my $preferredDirPermissions = 770;
 my $preferredFilePermissions = 660;
 
 
-my @actions=("editor", "grading", "summary", "loading");
+my @actions=("editor", "grading", "summary", "loading", "release");
 
 my $query = new CGI;
 
@@ -42,7 +42,7 @@ if (!defined($username)) {
 my $debugging = 0;
 my $testName = $query->param("test");
 if (defined($testName)) {
-	$username = "**$testName";
+	$username = "__$testName";
 	#$debugging = 0;
 }
 
@@ -206,7 +206,13 @@ if (($query->param('problemEdited')) && ($query->param('problemEdited') eq '1' )
 	
 } elsif ($authenticationMsg eq "") {  # authentication succeeded
 
-	if (($action eq 'loading') && $properties{'problem'}) {
+	if (($action eq 'release') && $properties{'problem'} 
+		&& $properties{'user'} eq 'Instructor') {
+		my $releaseTo = $query->param("release");
+		$htmlText = "<html><head><title>Released grade report</title></head><body>Released grade report to $releaseTo\n</body></html>";
+			my $logFileDir = $properties{'base'} . '/' . $properties{'problem'} . '/submitted' ;
+			system ("date > $logFileDir/$releaseTo.released");
+	} elsif (($action eq 'loading') && $properties{'problem'}) {
 		if ($properties{'user'} eq 'Instructor') {
 			$htmlText = "<html><head><title>Select saved language</title></head><body>\n";
 			my $logFileDir = $properties{'base'} . '/' . $properties{'problem'} . '/submitted' ;
@@ -214,12 +220,14 @@ if (($query->param('problemEdited')) && ($query->param('problemEdited') eq '1' )
 			if (scalar(@urlFiles) > 0) {
 				$htmlText .= "<h1>Select saved language</h1><ul>\n";
 				foreach my $urlFile ( sort @urlFiles) {
+					my $modtime = (stat($urlFile))[9];
+					$modtime = localtime($modtime);
 					open URL, "<$urlFile";
 					my $url = <URL>;
 					my $submitter = $urlFile;
 					$submitter =~ s|.*/||;
 					$submitter =~ s/[.]url//;
-					$htmlText .= "<li><a href='$url'>$submitter</li>\n";
+					$htmlText .= "<li><a href='$url'>$submitter, $modtime</li>\n";
 					close URL;
 				}
 				$htmlText .= "</ul>";
@@ -384,7 +392,14 @@ sub OKToLoad
 		}
 		return $properties{"user"} . " cannot view automata created by " . $properties{"createdBy"};
 	} else {
-		return "The instructor has not released this grade report for viewing.";
+		my $logFileDir = $properties{'base'} . '/' . $properties{'problem'} . '/submitted' ;
+		my $releaseTo = $properties{"user"};
+		my $releaseFile = "$logFileDir/$releaseTo.released";
+		if (-r $releaseFile) {
+			return "";
+		} else { 
+			return "The instructor has not released this grade report for viewing. $releaseFile";
+		}
 	}
 }
 
