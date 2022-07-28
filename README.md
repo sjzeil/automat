@@ -25,6 +25,8 @@ formal language types and work on whatever language they want.
       of language descriptions, single-stepping though the state changes is
       permitted.
 
+   You can demo the free mode [here](https://www.cs.odu.edu/~zeil/automat/automat.cgi)
+
 * In _problem mode_, the user is expected to use a particular formal
    language type to describe a specific language (specified elsewhere by the
    instructor).   
