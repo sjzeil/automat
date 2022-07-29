@@ -151,7 +151,6 @@ if (user === "Instructor") {
     
     urlParams = new URLSearchParams(queryString);
     urlParams.delete('action');
-    urlParams.delete('lang');
     urlParams.append('action', 'release');
     urlParams.append('release', language.createdBy);
     let releaseURL=urlParts[0] + '?' + urlParams.toString();
