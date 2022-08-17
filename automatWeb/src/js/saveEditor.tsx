@@ -57,19 +57,37 @@ export
     render() {
         console.log("SaveEditor rendering");
         let saveURL = this.saveLanguage(window.location.href);
-        return (
-            <div>
+        if (this.parent.props.problemID != "") {
+            return (
                 <div>
-                    Save your formal language by right-clicking and copying  
-                    <a href={saveURL} target="_blank"> this link address </a>
-                    and bookmarking it or pasting it into a document of your choice.
-                </div>
+                    Click the OK button to save your current language
+                    for this problem and to make it available to the course
+                    instructor for review. (This will replace any previously
+                    saved language for the same problem.)
+                    <div>
+                        <input type="button" value="OK" onClick={this.goBack} />
+                    </div>
+                    <div> You can retrieve it later via the <i>Load</i> button
+                    and can also access it at
+                    <a href={saveURL} target="_blank"> this link address</a>.
+                    </div>
+                </div> 
+            );
+        } else {
+            return (
                 <div>
-                    <input type="button" value="OK" onClick={this.goBack} />
+                    <div>
+                        Save your formal language by right-clicking and copying
+                        <a href={saveURL} target="_blank"> this link address </a>
+                        and bookmarking it or pasting it into a document of your choice.
+                    </div>
+                    <div>
+                        <input type="button" value="OK" onClick={this.goBack} />
+                    </div>
+                    <div className="wrapped">Or copy-and paste this URL directly: <br />{saveURL} </div>
                 </div>
-                <div className="wrapped">Or copy-and paste this URL directly: <br/>{saveURL} </div>
-            </div>
-        );
+            );
+        }
     }
 
     goBack() {
